@@ -8,22 +8,21 @@ export class User {
   id: number;
 
   
-  @Column()
+  @Column({nullable: true })
   email: string;
   
-  @Column()
+  @Column({nullable: true })
   password: string;
 
   
-  @Column()
+  @Column({nullable: true })
   username: string;
 
-  @Column()
+  @Column({nullable: true })
   image: string;
-
-
-  @Column()
+  @Column({nullable: true })
+  name: string;
+  @Column({nullable: true })
   provider: string;
-
-
+  
 }

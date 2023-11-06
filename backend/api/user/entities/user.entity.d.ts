@@ -4,5 +4,6 @@ export declare class User {
     password: string;
     username: string;
     image: string;
+    name: string;
     provider: string;
 }

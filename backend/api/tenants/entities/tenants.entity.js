@@ -19,11 +19,11 @@ __decorate([
     __metadata("design:type", Number)
 ], Tenant.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Tenant.prototype, "name", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Tenant.prototype, "domain", void 0);
 exports.Tenant = Tenant = __decorate([
