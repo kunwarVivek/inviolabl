@@ -37,7 +37,7 @@ const WalletConnect = () => {
       console.log("conn",signature);
 
       // Send signature and address to backend for verification
-      const response = await fetch('http://localhost:3001/auth/connect-wallet', {
+      const response = await fetch('http://localhost:3001/wallet/connect-wallet', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

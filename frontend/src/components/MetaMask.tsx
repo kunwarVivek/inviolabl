@@ -17,7 +17,7 @@ const MetaMask = () => {
 
   async function verifyAddressWithBackend(walletAddress, signature) {
     try {
-      const response = await axios.post('http://localhost:3000/auth/connect-wallet', {
+      const response = await axios.post('http://localhost:3000/wallet/connect-wallet', {
         address: walletAddress,
         signature: signature,
         message: "Please sign this message to confirm your identity."

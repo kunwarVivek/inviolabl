@@ -9,14 +9,7 @@ import { alchemyProvider } from "wagmi/providers/alchemy";
 import { mainnet, polygon } from "wagmi/chains";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 
-
 export default function Home() {
-  const [account, setAccount] = useState("");
-  const { data: session, status } = useSession();
-  const [isSignUp, setIsSignUp] = useState(false);
-  const toggleForm = () => {
-    setIsSignUp(!isSignUp);
-  };
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const handleSignIn = async (e) => {
@@ -51,16 +44,16 @@ export default function Home() {
     ],
   });
 
+
   return (
     <div className="bg-white">
       <Header />
     <div className="relative min-h-screen max-w-7xl mx-auto">
       {/* Navbar */}
     
-          
-
           <div className="flex">
             <MetaMask />
+            
             <WagmiConfig config={config}>
               <WalletConnect />
             </WagmiConfig>
