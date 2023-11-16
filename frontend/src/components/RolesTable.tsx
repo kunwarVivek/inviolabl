@@ -26,7 +26,7 @@ const RolesTable = ({ roles }) => {
                 {permissions.map((perm) => (
                   <td key={perm} className="px-6 py-4 text-sm text-gray-500">
                     <input 
-                      type="checkbox" 
+                      type="checkbox"
                       className="form-checkbox h-4 w-4 text-blue-600 rounded" 
                       checked={role.permissions.includes(perm)}
                       disabled

@@ -5,18 +5,19 @@ import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 
-const Header = () => {
+const Header = ({isSidebarOpen}) => {
   const { data: session, status } = useSession();
   
   return (
     <nav className="text-black bg-gray-300 py-3 mx-auto ">
-      <div className="max-w-7xl  container mx-auto flex justify-between items-center px-6 ">
+      <div className={`${isSidebarOpen?"max-w-6xl":"max-w-7xl"} transform transition-all duration-200 ease-in-out container mx-auto flex justify-between items-center px-6`}>
         <div className="flex items-center space-x-4">
           <Link href={"/"}>
             {" "}
             <div className="text-2xl font-bold">Logo</div>
           </Link>
         </div>
+        
         <div className="flex items-center space-x-4">
           {session && (
             <button
