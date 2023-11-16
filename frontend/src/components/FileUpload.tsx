@@ -1,6 +1,5 @@
 "use client";
 import { Dialog, Transition } from "@headlessui/react";
-import Dashboard from "@/components/Dashboard";
 import React, { Fragment, useCallback, useRef, useState } from "react";
 const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
   const [files, setFiles] = useState<File[]>([]);

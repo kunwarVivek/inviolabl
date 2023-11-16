@@ -30,16 +30,13 @@ return (
       
           <FileUpload isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
       <div className="sidebar bg-slate-100 text-slate-950 text-md font-semibold w-64 space-y-3 py-4 px-2 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out">
-          {/* Logo */}
-          <Link href="/dashboard" className="text-white flex justify-center items-center space-x-2 px-4">
-              <span className="text-xl font-semibold text-blue-600">Inov</span>
-          </Link>
 
           {/* Navigation */}
+          
           <nav>
           <button
               onClick={() => setIsModalOpen(true)}
-              className="px-2 mb-4 py-2 bg-gray-500 text-white rounded hover:bg-opacity-90"
+              className="px-2 mb-4 py-2 bg-blue-500 text-white rounded hover:bg-opacity-90"
           >
             <div className="flex items-center">
              <ArrowUpCircleIcon className="h-5 w-5 mr-2" aria-hidden="true" />
