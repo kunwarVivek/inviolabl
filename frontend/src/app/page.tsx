@@ -48,7 +48,7 @@ export default function Home() {
   return (
     <div className="bg-white">
       <Header />
-    <div className="relative min-h-screen max-w-7xl mx-auto">
+    <div className="min-h-screen max-w-7xl mx-auto">
       {/* Navbar */}
     
           <div className="flex">

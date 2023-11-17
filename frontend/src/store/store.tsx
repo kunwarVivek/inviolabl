@@ -3,10 +3,12 @@ import { persistReducer, persistStore } from 'redux-persist';
 import { setupListeners } from "@reduxjs/toolkit/dist/query";
 import storage from 'redux-persist/lib/storage';
 import MetaMaskReducer from '../features/MetaMaskSlice';
+import OrganisationSettingsReducer from "@/features/OrganisationSettingsSlice";
 
 
 const reducers = combineReducers({
   metaMask: MetaMaskReducer,
+  organisationSettings:OrganisationSettingsReducer
 })
 const persistReducers = persistReducer(
   {

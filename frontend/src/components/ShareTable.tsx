@@ -1,5 +1,4 @@
 const ShareTable = ({shares}) => {
-    // Define the permissions we'll display
     const shareOptions = ['Serial No.','Email','Status'];
   
     return (

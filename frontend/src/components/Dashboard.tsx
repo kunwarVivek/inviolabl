@@ -37,7 +37,7 @@ const Dashboard = ({ children }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-gray-100">
       {/* Header */}{" "}
       <FileUpload isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
       <header className="w-full">
@@ -116,10 +116,10 @@ const Dashboard = ({ children }) => {
         </div>
 
         {/* Content area */}
-        <div className="flex-1 flex flex-col overflow-hidden bg-white">
+        <div className="flex-1 flex flex-col bg-white">
           {/* Main content */}
           <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200 ">
-            <div className={`${isSidebarOpen?"max-w-screen-lg":"max-w-screen-xl"} transform transition-all duration-200 ease-linear container mx-auto px-6 py-8`}>{children}</div>
+            <div className={`${isSidebarOpen?"max-w-screen-lg":"max-w-screen-xl"} transition-all duration-200 ease-linear container mx-auto px-6 py-8`}>{children}</div>
           </main>
         </div>
       </div>
