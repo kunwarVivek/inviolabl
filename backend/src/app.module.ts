@@ -1,38 +1,72 @@
-// src/app.module.ts
-import { Module, MiddlewareConsumer, NestModule,RequestMethod  } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import './boilerplate.polyfill';
 
-import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module';
-import { TenantModule } from './tenants/tenants.module';
-import { TenantMiddleware } from './tenants/middleware/middleware';
+import path from 'node:path';
+
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import {
+  AcceptLanguageResolver,
+  HeaderResolver,
+  I18nModule,
+  QueryResolver,
+} from 'nestjs-i18n';
+import { DataSource } from 'typeorm';
+import { addTransactionalDataSource } from 'typeorm-transactional';
+
+import { AuthModule } from './modules/auth/auth.module';
+import { HealthCheckerModule } from './modules/health-checker/health-checker.module';
+import { PostModule } from './modules/post/post.module';
+import { UserModule } from './modules/user/user.module';
+import { ApiConfigService } from './shared/services/api-config.service';
+import { SharedModule } from './shared/shared.module';
+import { WalletModule } from './modules/wallet/wallet.module';
+import { TenantModule } from './modules/tenant/tenant.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5434,
-      username: 'postgres',
-      password: '1234',
-      database: 'multitenant',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
-    }),
-   
-    TenantModule,
     AuthModule,
     UserModule,
- 
+    PostModule,
+    WalletModule,
+    TenantModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [SharedModule],
+      useFactory: (configService: ApiConfigService) =>
+        configService.postgresConfig,
+      inject: [ApiConfigService],
+      dataSourceFactory: (options) => {
+        if (!options) {
+          throw new Error('Invalid options passed');
+        }
+
+        return Promise.resolve(
+          addTransactionalDataSource(new DataSource(options)),
+        );
+      },
+    }),
+    I18nModule.forRootAsync({
+      useFactory: (configService: ApiConfigService) => ({
+        fallbackLanguage: configService.fallbackLanguage,
+        loaderOptions: {
+          path: path.join(__dirname, '/i18n/'),
+          watch: configService.isDevelopment,
+        },
+        resolvers: [
+          { use: QueryResolver, options: ['lang'] },
+          AcceptLanguageResolver,
+          new HeaderResolver(['x-lang']),
+        ],
+      }),
+      imports: [SharedModule],
+      inject: [ApiConfigService],
+    }),
+    HealthCheckerModule,
   ],
-  controllers: [],
   providers: [],
 })
-export class AppModule   {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(TenantMiddleware)
-      .exclude({ path: 'tenant', method: RequestMethod.POST })  // Exclude registration route
-      .forRoutes('*');  // Apply to all routes. Adjust as needed.
-  }
-}
+export class AppModule {}

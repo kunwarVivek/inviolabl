@@ -1,31 +1,15 @@
-// src/auth/auth.module.ts
-
 import { Module } from '@nestjs/common';
-import { JwtModule, JwtService } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { JwtStrategy } from './jwt.strategy';
-import { User } from 'src/user/entities/user.entity';
-import { AuthController } from './controllers/auth.controller';
-import { AuthService } from './services/auth.service';
-import { UserService } from 'src/user/services/user.service';
-import { HashService } from 'src/user/hash.service';
-import { LocalStrategy } from './strategy/local.strategy';
+import { AuthService } from './auth.service';
+import { AuthController } from './auth.controller'; // Make sure to import the controller
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [
-    PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({
-      secret:"secret",
-      signOptions: {
-        expiresIn: 3600,  // 1 hour
-      },
-    }),
-    TypeOrmModule.forFeature([User]),
-  ],
-  controllers:[AuthController],
-
-  providers: [AuthService,UserService, LocalStrategy, HashService],
-  exports: [PassportModule],
+    imports: [
+        JwtModule.register({
+          secret: "secret", // You should store this in an environment variable
+          signOptions: { expiresIn: '60m' }, // Tokens expire in 60 minutes
+        }),],
+  controllers: [AuthController], // Add the controller here
+  providers: [AuthService],
 })
 export class AuthModule {}
