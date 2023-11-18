@@ -4,8 +4,8 @@ module.exports = {
   solidity: "0.8.19",
   networks: {
     sepolia: {
-      url: "https://sepolia.infura.io/v3/66f01ebde6fc4dcda8e4ce6096412ca7",
-      accounts: [`0x030ea2d87c057a4576d1fa2029c7395d77d50e4158838f97f74ed71dbecb9f9f`]
+      url: "https://sepolia.infura.io/v3/2f831a59247243729a21415b6491cd2b",
+      accounts: [`0xdbd4f4486cef628b2779c4b29a3d0029463f8be5e64a2b137e6322039703a6ae`]
     }
   }
 };
