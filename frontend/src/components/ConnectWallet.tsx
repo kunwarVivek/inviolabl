@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { TruncatedWalletAddress } from "./TruncateFunction";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import UserAuthenticationABI from "../../blockchain/artifacts/contracts/UserAuthentication.sol/UserAuthentication.json";
+import UserAuthenticationABI from "../../public/UserAuthentication.json";
 import { ethers } from "ethers";
 import contractConfig from "./../../public/contractAddress.json";
 import { setAccount } from "@/features/MetaMaskSlice";
@@ -18,7 +18,7 @@ export const getProvider = () => {
 };
 
 export const getContract = async () => {
-  const provider = await getProvider();
+  const provider = getProvider();
   if (!provider) return null;
 
   const signer = await provider.getSigner();
