@@ -21,7 +21,7 @@ export class ExistsValidator implements ValidatorConstraintInterface {
   constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
 
   public async validate<E>(
-    value: string,
+    // value: string,
     args: IExistsValidationArguments<E>,
   ): Promise<boolean> {
     const [entityClass, findCondition] = args.constraints;
@@ -53,7 +53,7 @@ export function Exists<E>(
   constraints: Partial<ExistsValidationConstraints<E>>,
   validationOptions?: ValidationOptions,
 ): PropertyDecorator {
-  return (object, propertyName: string) => {
+  return (object, propertyName: any) => {
     registerDecorator({
       target: object.constructor,
       propertyName,
