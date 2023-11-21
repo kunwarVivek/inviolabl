@@ -40,23 +40,15 @@ body {
     rgba(var(--secondary-color-rgb-2), 0.2) 50%
   );
 }
-
-/* .ml_64px {
-  margin-left: 64px;
+/* Add this to your styles.css or equivalent */
+.slick-prev:before,
+.slick-next:before {
+  color: black !important;
+  content: "" !important; /* This changes the arrow color to black */
 }
-
-.ml_12rem {
-  margin-left: 12rem;
-}
-
-.max_width_1344px {
-  max-width: 1344px;
-} */
 
 .wallet_background {
   background-image: url(/walletBackground.jpg);
   background-size: cover;
   background-repeat: no-repeat;
 }
-
-/* Add this to your styles.css or equivalent */

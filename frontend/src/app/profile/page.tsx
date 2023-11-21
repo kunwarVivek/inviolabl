@@ -1,8 +1,6 @@
-// Install Tailwind CSS with Next.js as per the official documentation
-// before using this code.
+
 "use client";
 import Header from "@/components/Header";
-import Image from "next/image";
 import { useState } from "react";
 
 export default function ProfilePage() {
@@ -88,7 +86,7 @@ export default function ProfilePage() {
                 className="block text-gray-700 text-sm font-bold mb-1"
                 htmlFor="username"
               >
-               Your Site
+                Your Site
               </label>
               <input
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -102,7 +100,7 @@ export default function ProfilePage() {
                 className="block text-gray-700 text-sm font-bold mb-1"
                 htmlFor="username"
               >
-               Twitter username
+                Twitter username
               </label>
               <input
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -116,7 +114,7 @@ export default function ProfilePage() {
                 className="block text-gray-700 text-sm font-bold mb-1"
                 htmlFor="username"
               >
-               Instagram username
+                Instagram username
               </label>
               <input
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"

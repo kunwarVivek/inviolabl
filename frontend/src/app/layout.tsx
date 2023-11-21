@@ -4,7 +4,6 @@ import "./globals.css";
 import Provider from "./context/client-provider";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]/route";
-import Header from "@/components/Header";
 import { ReduxProvider } from "./context/ReduxToolkitProvider";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -17,6 +16,7 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang="en">
+
       <body className={inter.className}>
       <ReduxProvider>
         <Provider session={session}>

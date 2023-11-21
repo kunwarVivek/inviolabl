@@ -18,7 +18,7 @@ export const getProvider = () => {
 };
 
 export const getContract = async () => {
-  const provider = getProvider();
+  const provider = await getProvider();
   if (!provider) return null;
 
   const signer = await provider.getSigner();

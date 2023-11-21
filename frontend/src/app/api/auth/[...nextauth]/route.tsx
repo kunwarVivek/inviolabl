@@ -1,6 +1,3 @@
-// pages/api/auth/[...nextauth].js
-
-import { PrismaClient } from '@prisma/client';
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
@@ -24,7 +21,7 @@ export const authOptions: AuthOptions = {
       },
       async authorize(credentials:any) {
         if(credentials.password==null) return null
-        const res = await fetch("http://localhost:3001/auth/login", {
+        const res = await fetch("http://34.234.201.170/auth/login", {
           method: 'POST',
           body: JSON.stringify(credentials),
           headers: { 'Content-Type': 'application/json' },
