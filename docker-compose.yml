@@ -1,0 +1,77 @@
+version: "3"
+services:
+  nginx:
+    image: nginx:latest
+    restart: unless-stopped
+    container_name: ${PROJECT_SLUG}_nginx
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - internal
+    volumes:
+      - ./backend:/app/backend
+      - ./conf/nginx/:/etc/nginx:ro
+      - ./logs/nginx/:/var/log/nginx
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - backend
+  backend:
+    env_file:
+      - .env
+    container_name: ${PROJECT_SLUG}_backend
+    restart: unless-stopped
+    build: './backend/'
+    ports:
+      - "${PORT}:${PORT}"
+    environment:
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: postgres
+      DATABASE_NAME: ${DB_DATABASE}
+      DATABASE_USERNAME: ${DB_USERNAME}
+      DATABASE_PORT: ${DB_PORT}
+      DATABASE_PASSWORD: ${DB_PASSWORD}
+      NODE_ENV: ${NODE_ENV}
+    networks:
+      - internal
+    links:
+      - postgres
+    depends_on:
+      - postgres
+  frontend:
+    container_name: ${PROJECT_SLUG}_frontend
+    restart: unless-stopped
+    build: './frontend/'
+    ports:
+      - 3000:3000    
+    networks:
+      - internal
+    links:
+      - backend
+    depends_on:
+      - backend
+  postgres:
+    image: postgres:12.0-alpine
+    container_name: ${PROJECT_SLUG}_postgres
+    platform: linux/amd64
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    volumes:
+      - postgres:/var/lib/postgresql/data/
+    networks:
+      - internal
+
+volumes:
+  postgres:
+    # driver: local
+
+networks:
+  internal:
+    name: ${PROJECT_SLUG}_internal
+    driver: bridge    
+
+

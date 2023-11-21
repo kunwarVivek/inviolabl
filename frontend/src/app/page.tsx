@@ -48,17 +48,20 @@ export default function Home() {
   return (
     <div className="bg-white">
       <Header />
-    <div className="min-h-screen max-w-7xl mx-auto">
-      {/* Navbar */}
-    
-          <div className="flex">
-            <MetaMask />
-            
-            <WagmiConfig config={config}>
-              <WalletConnect />
-            </WagmiConfig>
-          </div>
-          </div>
+      <div className="wallet_background h-72 flex justify-center items-center mb-10">
+        <h1 className="text-5xl text-white font-bold">Wallet</h1>
+      </div>
+      <div className="min-h-screen max-w-7xl mx-auto">
+        {/* Navbar */}
+
+        <div className="flex mt-3">
+          <MetaMask />
+
+          {/* <WagmiConfig config={config}>
+            <WalletConnect />
+          </WagmiConfig> */}
+        </div>
+      </div>
     </div>
   );
 }

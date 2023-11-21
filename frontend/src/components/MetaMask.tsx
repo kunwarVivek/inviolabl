@@ -8,12 +8,12 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
-import {setAccount } from '@/features/MetaMaskSlice';
+import { setAccount } from '@/features/MetaMaskSlice';
 const MetaMask = () => {
   const dispatch = useDispatch()
-  
-    const { data: session, status } = useSession();
-    const router = useRouter()
+
+  const { data: session, status } = useSession();
+  const router = useRouter()
 
   async function verifyAddressWithBackend(walletAddress, signature) {
     try {
@@ -22,7 +22,7 @@ const MetaMask = () => {
         signature: signature,
         message: "Please sign this message to confirm your identity."
       });
-      if(response.data.success) {
+      if (response.data.success) {
         console.log('Address verified!', response.data);
         // Handle successful verification
       } else {
@@ -35,28 +35,28 @@ const MetaMask = () => {
     }
   }
 
-  
+
   async function connectToMetaMask() {
     if (typeof window.ethereum !== 'undefined') {
       try {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const accounts = await provider.send("eth_requestAccounts", []);
-        const tempAccount = accounts[0]; 
+        const tempAccount = accounts[0];
         const signer = await provider.getSigner();
         const message = "Please sign this message to confirm your identity."
-        try{
-        // Sign message after setting the account
-        const signature = await signer.signMessage(message);
-        console.log('signature verified!', signature);
+        try {
+          // Sign message after setting the account
+          const signature = await signer.signMessage(message);
+          console.log('signature verified!', signature);
 
-        // Verify address with backend if signature is obtained
-        if (signature) {
-          await verifyAddressWithBackend(tempAccount, signature);
-          dispatch(setAccount(tempAccount));
+          // Verify address with backend if signature is obtained
+          if (signature) {
+            await verifyAddressWithBackend(tempAccount, signature);
+            dispatch(setAccount(tempAccount));
+          }
+        } catch (signError) {
+          console.error('Error signing message with MetaMask:', signError);
         }
-      } catch (signError) {
-        console.error('Error signing message with MetaMask:', signError);
-      }
       } catch (error) {
         console.error('Error connecting to MetaMask', error);
       }
@@ -65,27 +65,18 @@ const MetaMask = () => {
     }
   }
   const handleConnect = () => {
-    session?connectToMetaMask():router.push("/signin")
+    session ? connectToMetaMask() : router.push("/signin")
   }
   return (
-    <div className="max-w-sm rounded overflow-hidden shadow-lg card-gradient p-4 m-10">
-    <div className="flex flex-col items-center">
-      <div className="bg-blue-600 text-white p-3 rounded-full">
-      <img src="/metamask-icon.svg" alt="Metamask Logo" width={16} height={16} /> 
-  
-      </div>
-      <div className="text-center mt-4">
-        <div className="font-bold text-xl mb-2">Metamask Wallet</div>
-        <p className="text-gray-700 text-base">
-          Connect to your Metamask wallet to proceed.
+    <div onClick={handleConnect} className="border-[0.1px] cursor-pointer hover:bg-gray-100 border-gray-300 w-1/4 max-w-sm overflow-hidden shadow-xl rounded-xl">
+      <div className="px-6 py-6">
+        <img className='w-[69px] h-[69px]' src="/metamask-icon.svg" alt="Metamask Logo" />
+        <div className="font-bold text-xl mb-3 mt-3">Metamask Wallet</div>
+        <p className="text-gray-700">
+          Start exploring blockchain applications in seconds.  Trusted by over 1 million users worldwide.
         </p>
       </div>
-      <button onClick={handleConnect} className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded mt-4">
-        Connect Wallet 
-      </button>
     </div>
-
-  </div>
   )
 }
 

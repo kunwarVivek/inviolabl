@@ -119,7 +119,7 @@ const Dashboard = ({ children }) => {
         <div className="flex-1 flex flex-col bg-white">
           {/* Main content */}
           <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200 ">
-            <div className={`${isSidebarOpen?"max-w-screen-lg":"max-w-screen-xl"} transition-all duration-200 ease-linear container mx-auto px-6 py-8`}>{children}</div>
+            <div className={`${isSidebarOpen?"max_width_1344px ml_12rem":"max-w-screen ml_64px"} transition-all duration-200 ease-linear container`}>{children}</div>
           </main>
         </div>
       </div>

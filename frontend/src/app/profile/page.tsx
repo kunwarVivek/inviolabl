@@ -83,6 +83,48 @@ export default function ProfilePage() {
                 placeholder="Phone Number"
               />
             </div>
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-1"
+                htmlFor="username"
+              >
+               Your Site
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="username"
+                type="text"
+                placeholder="Website Url"
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-1"
+                htmlFor="username"
+              >
+               Twitter username
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="username"
+                type="text"
+                placeholder="Twitter username"
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-1"
+                htmlFor="username"
+              >
+               Instagram username
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="username"
+                type="text"
+                placeholder="Instagram username"
+              />
+            </div>
           </form>
 
           {/* Right column for profile image and banner */}
