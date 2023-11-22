@@ -17,6 +17,9 @@ export default function ProfilePage() {
   return (
     <div className=" min-h-screen bg-white">
       <Header />
+      <div className="wallet_background h-72 flex justify-center items-center mb-10">
+        <h1 className="text-5xl text-white font-bold">Edit Profile</h1>
+      </div>
       <div className="container  max-w-screen-lg mx-auto p-4 ">
         <div className="bg-gray-900 rounded-md p-2 px-3 mb-4 w-fit text-white">
           Profile

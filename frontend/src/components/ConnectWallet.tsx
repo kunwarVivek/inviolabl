@@ -83,7 +83,7 @@ const ConnectWallet = () => {
   };
 
   const handleConnect = () => {
-    session ?  router.push("/") : router.push("/signin");
+    session ?  router.push("/wallet") : router.push("/signin");
   };
   return (
     <div className="flex items-center gap-4">

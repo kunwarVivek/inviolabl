@@ -13,7 +13,7 @@ const Auth = () => {
     };
 
     if(status==="authenticated"){
-      router.push("/")
+      router.push("/wallet")
     }
     if(status==="loading"){
       return(

@@ -21,7 +21,7 @@ export const authOptions: AuthOptions = {
       },
       async authorize(credentials:any) {
         if(credentials.password==null) return null
-        const res = await fetch("http://34.234.201.170/auth/login", {
+        const res = await fetch("http://34.234.201.170:3001/auth/login", {
           method: 'POST',
           body: JSON.stringify(credentials),
           headers: { 'Content-Type': 'application/json' },

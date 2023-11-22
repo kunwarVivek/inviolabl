@@ -13,10 +13,10 @@ const SignUp = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     // Call your registration endpoint
-    const response = await fetch("http://34.234.201.170/auth/register", {
+    const response = await fetch("http://34.234.201.170:3001/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tenantId:"c7008078-c6db-468b-add1-28bff0709e8e",firstName,lastName, email, password }),
+      body: JSON.stringify({ tenantId:"e74cce10-48ed-4483-82fb-ff2b6e0dfbd8",firstName,lastName, email, password }),
     });
     console.log(response.json());
 
