@@ -41,15 +41,14 @@ const Dashboard = ({ children }) => {
       {/* Header */}{" "}
       <FileUpload isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
       {/* <header className="w-full">
-        <Header isSidebarOpen={isSidebarOpen}/>
+        <Header isSidebarOpen={isSidebarOpen} />
       </header> */}
       {/* Sidebar and Content */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
         <div
-          className={`flex flex-col bg-slate-100 text-slate-950 space-y-3 py-4 px-2 absolute inset-y-0 left-0 transform transition-all duration-200 ease-linear ${
-            isSidebarOpen ? "w-48" : "w-16"
-          }`}
+          className={`flex flex-col bg-slate-100 text-slate-950 space-y-3 py-4 px-2 absolute inset-y-0 left-0 transform transition-all duration-200 ease-linear ${isSidebarOpen ? "w-48" : "w-16"
+            }`}
           onTransitionEnd={handleTransitionEnd}
         >
           {/* Toggle Button */}
@@ -65,23 +64,23 @@ const Dashboard = ({ children }) => {
           </button>
 
           {/* Navigation Links */}
-          <nav className={`flex flex-col ${!isSidebarOpen&&"items-center"} pt-10 gap-5`}>
+          <nav className={`flex flex-col ${!isSidebarOpen && "items-center"} pt-10 gap-5`}>
             {/* Conditional rendering based on sidebar state */}
             {isSidebarOpen && transitionComplete && (
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="px-2 w-fit  py-2 bg-blue-500 text-white rounded hover:bg-opacity-90"
+                className="px-3 w-fit py-4 bg-white hover:bg-slate-200 text-black shadow-2xl rounded-xl hover:bg-opacity-90"
               >
                 <div className={`flex items-center `}>
                   <ArrowUpCircleIcon
-                    className="h-5 w-5 mr-2"
+                    className="h-6 w-6 mr-2"
                     aria-hidden="true"
                   />
-                  <span className="text-sm ">Upload Files</span>
+                  <span className="text-sm font-semibold">Upload Files</span>
                 </div>
               </button>
             )} {!isSidebarOpen && (
-                <button
+              <button
                 onClick={() => setIsModalOpen(true)}
                 className=""
               >
@@ -92,23 +91,22 @@ const Dashboard = ({ children }) => {
             {isSidebarOpen && transitionComplete && (
               <Link
                 href="/dashboard"
-                className={`block p-2 mb-2 px-4 rounded transition duration-200 font-semibold  ${
-                  isActive("/dashboard")
-                    ? "bg-gray-300 text-blue-600"
-                    : "hover:bg-gray-700 hover:text-white"
-                } `}
+                className={`block p-2 mb-2 px-5 text-sm rounded-[100px] transition duration-200 font-semibold  ${isActive("/dashboard")
+                  ? "bg-[#c2e7ff] text-black"
+                  : "hover:bg-gray-700 hover:text-white"
+                  } `}
               >
                 Dashboard
               </Link>
             )}  {!isSidebarOpen && (
-                <Link
+              <Link
                 href="/dashboard">
-              <img
-                src="https://cdn-icons-png.flaticon.com/512/1828/1828765.png"
-                width={20}
-                height={20}
-                alt=""
-              />
+                <img
+                  src="https://cdn-icons-png.flaticon.com/512/1828/1828765.png"
+                  width={20}
+                  height={20}
+                  alt=""
+                />
               </Link>
             )}
             {/* More links */}
@@ -119,7 +117,7 @@ const Dashboard = ({ children }) => {
         <div className="flex-1 flex flex-col bg-white">
           {/* Main content */}
           <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200 ">
-            <div className={`${isSidebarOpen?"max-w-screen-lg":"max-w-screen-xl"} transition-all duration-200 ease-linear container mx-auto px-6 py-8`}>{children}</div>
+            <div className={`${isSidebarOpen ? "max-w-full ml-[10.5rem] pr-[10.5rem]" : "max-w-full ml-[2.5rem] pr-[2.5rem]"} transition-all duration-200 ease-linear container mx-auto px-6`}>{children}</div>
           </main>
         </div>
       </div>

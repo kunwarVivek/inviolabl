@@ -4,12 +4,12 @@ import React from 'react';
 import { Menu } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/solid';
 
-const DropdownMenu = ({ buttonText, options,onSelect  }) => {
+const DropdownMenu = ({ buttonText, options, onSelect }) => {
     return (
         <Menu as="div" className=" inline-block text-left">
-            <Menu.Button className="inline-flex justify-between items-center border border-slate-500 hover:bg-gray-300 font-bold py-1 px-4 rounded">
+            <Menu.Button className="inline-flex justify-between items-center border border-[#747775] hover:bg-gray-200 font-semibold py-1 px-4 rounded-lg">
                 {buttonText}
-                <ChevronDownIcon className="ml-2 h-5 w-5" aria-hidden="true" />
+                <ChevronDownIcon className="ml-2 h-3 w-3" aria-hidden="true" />
             </Menu.Button>
             <Menu.Items className="max-h-60 overflow-auto absolute z-10 mt-2 w-32 cursor-pointer rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
                 {options.map((option, index) => (

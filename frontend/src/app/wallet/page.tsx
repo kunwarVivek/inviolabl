@@ -1,69 +1,46 @@
 "use client";
 import Header from "@/components/Header";
 import MetaMask from "@/components/MetaMask";
-import WalletConnect from "@/components/WalletConnect";
-import { signIn, useSession } from "next-auth/react";
-import { useState } from "react";
-import { createConfig, configureChains, WagmiConfig } from "wagmi";
-import { alchemyProvider } from "wagmi/providers/alchemy";
-import { mainnet, polygon } from "wagmi/chains";
-import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
+import { useEffect, useState } from "react";
 
-const page = () => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const handleSignIn = async (e) => {
-        e.preventDefault();
-        const result = await signIn("credentials", {
-            redirect: false,
-            email,
-            password,
-        });
-        if (result.error) {
-            // Display the error message to the user
-            alert(result.error);
-        } else {
-            // The user is signed in, handle accordingly
-        }
+export default function Home() {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    // Function to handle scroll event
+    const handleScroll = () => {
+      // Check if the user has scrolled down a certain amount (e.g., 100 pixels)
+      if (window.scrollY > 10) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
     };
 
-    const { chains, publicClient, webSocketPublicClient } = configureChains(
-        [mainnet, polygon],
-        [alchemyProvider({ apiKey: "bLLtGgauy0CV5QsFILBzCcVU2o5mNq4S" })]
-    );
+    // Attach the scroll event listener
+    window.addEventListener("scroll", handleScroll);
 
-    const config = createConfig({
-        autoConnect: true,
-        publicClient,
-        webSocketPublicClient,
-        connectors: [
-            new WalletConnectConnector({
-                chains,
-                options: { projectId: "e5c941add349ff5d1923adedfcc61197" },
-            }),
-        ],
-    });
+    // Clean up the event listener when the component unmounts
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
-
-    return (
-        <div className="bg-white">
-            <Header />
-            <div className="wallet_background h-72 flex justify-center items-center mb-10">
-                <h1 className="text-5xl text-white font-bold">Wallet</h1>
-            </div>
-            <div className="min-h-screen max-w-7xl mx-auto">
-                {/* Navbar */}
-
-                <div className="flex mt-3">
-                    <MetaMask />
-
-                    {/* <WagmiConfig config={config}>
-              <WalletConnect />
-            </WagmiConfig> */}
-                </div>
-            </div>
+  return (
+    <div className="bg-white min-h-screen">
+      <Header
+        className={`text-white ${
+          isScrolled && "bg-[#403f83] border-b border-cyan-900"
+        }`}
+      />
+      <div className="wallet_background h-72 flex justify-center items-center mb-10">
+        <h1 className="text-5xl text-white font-bold">Wallet</h1>
+      </div>
+      <div className="max-w-7xl mx-auto">
+        <div className="flex">
+          <MetaMask />
         </div>
-    );
-};
-
-export default page;
+      </div>
+    </div>
+  );
+}
