@@ -3,8 +3,8 @@ import React from "react";
 const BrowseCategory = () => {
   return (
     <div className="max-w-screen-xl mx-auto mb-5 mt-4 p-4">
-      <h1 className="text-center text-2xl font-bold">Browse By Category</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-center">
+      <h1 className="text-center text-3xl font-bold mb-7">Browse By Category</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-center py-4">
       <div className="bg-blue-50 text-[#606060] hover:text-white cursor-pointer flex justify-center transition-all hover:bg-[#403f83]">
           <p className="p-5 md:p-10 font-semibold">Art</p>
         </div>
