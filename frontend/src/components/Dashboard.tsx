@@ -40,9 +40,9 @@ const Dashboard = ({ children }) => {
     <div className="flex flex-col min-h-screen bg-gray-100">
       {/* Header */}{" "}
       <FileUpload isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
-      {/* <header className="w-full">
-        <Header isSidebarOpen={isSidebarOpen} />
-      </header> */}
+      <header className="w-full">
+        <Header className={isSidebarOpen ? "max-w-6xl" : "max-w-7xl"} />
+      </header>
       {/* Sidebar and Content */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
