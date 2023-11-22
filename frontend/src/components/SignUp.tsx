@@ -2,8 +2,12 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+
 
 const SignUp = () => {
+  const router = useRouter()
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
@@ -58,12 +62,15 @@ const SignUp = () => {
 
       if (response) {
         // If registration was successful, sign in to establish a session
-        signIn("credentials", { redirect: false, email, password });
+        await signIn("credentials", { redirect: false, email, password });
+        router.push("/")
       } else {
         // Handle registration error
       }
     } catch (error) {
       // Handle error in registration process
+      console.log(error);
+
     }
   };
   return (
