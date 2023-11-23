@@ -18,6 +18,9 @@ export class TenantService {
     const tenant = new TenantEntity();
     tenant.name = createUserDto.name;
     tenant.domain = createUserDto.domain;
+    tenant.email = createUserDto.email;
+    tenant.phone = createUserDto.phone;
+
 
     return this.tenantRepository.save(tenant);
   }
@@ -59,6 +62,8 @@ async getTenantIdByDomain(domain: string): Promise<string | null> {
     const tenant: TenantEntity = new TenantEntity();
     tenant.name = updateTenantDto.name;
     tenant.domain = updateTenantDto.domain;
+    tenant.email = updateTenantDto.email;
+    tenant.phone = updateTenantDto.phone;
     tenant.id = id;
 
     return this.tenantRepository.save(tenant);

@@ -12,6 +12,8 @@ export class Tenant1619927894058 implements MigrationInterface {
         "updated_at" TIMESTAMP         NOT NULL DEFAULT now(),
         "name" character varying,
         "domain"  character varying,
+        "email" character varying,
+        "phone" character varying,
         CONSTRAINT "PK_tenants_id" PRIMARY KEY ("id")
 
       )`);

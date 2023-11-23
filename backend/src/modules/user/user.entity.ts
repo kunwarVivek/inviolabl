@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, OneToOne, VirtualColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, VirtualColumn } from 'typeorm';
 
 import { AbstractEntity } from '../../common/abstract.entity';
 import { RoleType } from '../../constants';
@@ -6,6 +6,7 @@ import { UseDto } from '../../decorators';
 import { PostEntity } from '../post/post.entity';
 import { UserDto, type UserDtoOptions } from './dtos/user.dto';
 import { UserSettingsEntity } from './user-settings.entity';
+import { TenantEntity } from '../tenant/tenant.entity';
 
 @Entity({ name: 'users' })
 @UseDto(UserDto)
@@ -30,6 +31,10 @@ export class UserEntity extends AbstractEntity<UserDto, UserDtoOptions> {
 
   @Column({ type: 'uuid' })
   tenantId!: string;
+
+  @ManyToOne(() => TenantEntity, (tenant) => tenant.users)
+  @JoinColumn({ name: 'tenantId' }) // This is the foreign key
+  tenant!: TenantEntity;
   
   @VirtualColumn({
     query: (alias) =>

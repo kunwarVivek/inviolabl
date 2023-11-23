@@ -12,9 +12,17 @@ export class TenantDto extends AbstractDto {
   @StringFieldOptional({ nullable: true })
   domain?: string | null;
 
+  @StringFieldOptional({ nullable: true })
+  email?: string | null;
+
+  @StringFieldOptional({ nullable: true })
+  phone?: string | null;
+
   constructor(tenant: TenantEntity) {
     super(tenant);
     this.name = tenant.name;
     this.domain = tenant.domain;
+    this.email = tenant.email;
+    this.phone = tenant.phone
   }
 }
