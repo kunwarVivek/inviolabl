@@ -35,7 +35,7 @@ const Auth = () => {
   };
 
   if (status === "authenticated") {
-    router.push("/")
+    router.push("/dashboard")
   }
   if (status === "loading") {
     return (
