@@ -5,9 +5,11 @@ import Provider from "./context/client-provider";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]/route";
 import { ReduxProvider } from "./context/ReduxToolkitProvider";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const inter = Inter({ subsets: ["latin"] });
-export const metadata:Metadata = {
+export const metadata: Metadata = {
   title: "Inov",
   description: "Inov Web 3.0 file transfering",
 };
@@ -18,13 +20,16 @@ export default async function RootLayout({ children }) {
     <html lang="en">
 
       <body className={inter.className}>
-      <ReduxProvider>
-        <Provider session={session}>
-        
-          {children}
-         
+        <ReduxProvider>
+          <Provider session={session}>
+
+            {children}
+
           </Provider>
-          </ReduxProvider>
+        </ReduxProvider>
+        <ToastContainer style={{             // Custom styles
+          width: '30rem',
+        }} />
       </body>
     </html>
   );
