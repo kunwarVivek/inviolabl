@@ -19,7 +19,7 @@ const ConnectWallet = () => {
       <div className={`${MetaMaskAccount && "w-48"} text-white`}>
         {!MetaMaskAccount && (
           <button
-            className="p-1 bg-purple-500 rounded-md px-4 text-sm font-semibold"
+            className="p-1 bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold"
             onClick={handleConnect}
           >
             Connect Wallet

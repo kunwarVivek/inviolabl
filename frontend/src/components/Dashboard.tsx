@@ -64,7 +64,7 @@ const Dashboard = ({ children }) => {
           </button>
 
           {/* Navigation Links */}
-          <nav className={`flex flex-col ${!isSidebarOpen && "items-center"} pt-10 gap-5`}>
+          <nav className={`flex flex-col ${!isSidebarOpen && "items-center"} px-2 pt-10 gap-3`}>
             {/* Conditional rendering based on sidebar state */}
             {isSidebarOpen && transitionComplete && (
               <button
@@ -91,16 +91,53 @@ const Dashboard = ({ children }) => {
             {isSidebarOpen && transitionComplete && (
               <Link
                 href="/dashboard"
-                className={`block p-2 mb-2 px-5 text-sm rounded-[100px] transition duration-200 font-semibold  ${isActive("/dashboard")
+                className={`block p-2 px-4 text-sm rounded-[100px] transition duration-200 font-semibold  ${isActive("/dashboard")
                   ? "bg-[#c2e7ff] text-black"
-                  : "hover:bg-gray-700 hover:text-white"
+                  : "hover:bg-gray-300"
                   } `}
               >
-                Dashboard
+                <div className={`flex items-center `}>
+                  <img
+                    src="https://cdn-icons-png.flaticon.com/512/1828/1828765.png"
+                    width={17}
+                    height={17}
+                    alt=""
+                  />
+                  <span className="text-sm font-semibold ml-2">Dashboard</span>
+                </div>
               </Link>
             )}  {!isSidebarOpen && (
               <Link
                 href="/dashboard">
+                <img
+                  src="https://cdn-icons-png.flaticon.com/512/1828/1828765.png"
+                  width={20}
+                  height={20}
+                  alt=""
+                />
+              </Link>
+            )}
+            {isSidebarOpen && transitionComplete && (
+              <Link
+                href="/admin/sharepage"
+                className={`block p-2 px-4 text-sm rounded-[100px] transition duration-200 font-semibold  ${isActive("/admin/sharepage")
+                  ? "bg-[#c2e7ff] text-black"
+                  : "hover:bg-gray-300"
+                  } `}
+              >
+                <div className={`flex items-center `}>
+                  <img
+                    src="https://cdn-icons-png.flaticon.com/512/1828/1828765.png"
+                    width={17}
+                    height={17}
+                    alt=""
+                  />
+                  <span className="text-sm font-semibold ml-2">Share Invite</span>
+                </div>
+              </Link>
+            )}  {!isSidebarOpen && (
+              <Link
+                href="/admin/sharepage">
                 <img
                   src="https://cdn-icons-png.flaticon.com/512/1828/1828765.png"
                   width={20}

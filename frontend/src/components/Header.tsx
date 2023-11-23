@@ -45,11 +45,14 @@ const Header = ({ className }: any) => {
         </div>
 
         <div className="flex items-center space-x-4">
-        <Link href={"/dashboard"}>
-            
+          {status === "authenticated" && <Link href={"/dashboard"}>
+
             <span className="text-sm font-semibold">Dashboard</span>
-          </Link>
+          </Link>}
           <ConnectWallet />
+          {status !== "authenticated" && <Link href={"/tenant"}>
+            <span className="py-[5.5px] px-4 mb-4 text-white text-sm bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 font-semibold rounded-md">Try it free</span>
+          </Link>}
           {status === "authenticated" ? (
             <Menu as={"div"} className={"relative"}>
               <Menu.Button>
