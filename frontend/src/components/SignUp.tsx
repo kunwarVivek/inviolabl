@@ -63,7 +63,7 @@ const SignUp = () => {
       if (response) {
         // If registration was successful, sign in to establish a session
         await signIn("credentials", { redirect: false, email, password });
-        router.push("/")
+        router.push("/dashboard")
       } else {
         // Handle registration error
       }

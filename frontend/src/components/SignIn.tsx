@@ -15,7 +15,7 @@ const SignIn = () => {
       // Display the error message to the user
       console.log(result);
     } else {
-      router.push("/wallet")
+      router.push("/dashboard")
     }
   }
   return (
