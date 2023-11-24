@@ -2,8 +2,10 @@
 import { useEffect, useState } from "react";
 import GoogleLogin from "@/components/Authentication";
 import Header from "@/components/Header";
+import { useValidation } from "@/components/Validation";
+import loading from "@/app/loading";
 
-const SignUp = () => {
+const SignUp = (params) => {
   const [isScrolled, setIsScrolled] = useState(false);
   console.log(window.location.hostname);
   useEffect(() => {

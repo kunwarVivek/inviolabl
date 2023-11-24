@@ -22,7 +22,6 @@ export const useValidation = (slug) => {
         }
       } catch (error) {
         console.error('Error fetching tenant ID:', error);
-        router.push('/error');
       }
     };
 

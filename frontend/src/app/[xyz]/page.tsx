@@ -1,51 +1,30 @@
-'use client'
-import Header from '@/components/Header';
-import MetaMask from '@/components/MetaMask';
-import { useState, useEffect } from "react";
+"use client";
+import BrowseCategory from "@/components/BrowseCategory";
+import Header from "@/components/Header";
+import HotCollections from "@/components/HotCollections";
+import LandingHeroSection from "@/components/LandingHeroSection";
+import NFTCards from "@/components/NFTCards";
+import NewCollections from "@/components/NewItems";
+import { useValidation } from "@/components/Validation";
+import loading from "../loading";
 
-const DynamicRoutePage = ({ params }) => {
+export default function HeroSection({ params }) {
 
-    const [isScrolled, setIsScrolled] = useState(false);
+    const isLoading = useValidation(params.xyz)
 
-    useEffect(() => {
+    if (isLoading) {
+        return loading
+      }
 
-        const handleScroll = () => {
+  return (
+    <div className="min-h-screen bg-white">
+      <Header bgColor="bg-white" />
 
-            if (window.scrollY > 10) {
-                setIsScrolled(true);
-            } else {
-                setIsScrolled(false);
-            }
-        };
-
-
-        window.addEventListener("scroll", handleScroll);
-
-
-        return () => {
-            window.removeEventListener("scroll", handleScroll);
-        };
-    }, []);
-
-
-    return (
-        <div className="bg-white min-h-screen">
-            <Header
-                className={`text-white ${isScrolled && "bg-[#403f83] border-b border-cyan-900"
-                    }`}
-            />
-            <div className="wallet_background h-72 flex justify-center items-center mb-10">
-                <h1 className="text-5xl text-white font-bold">Wallet</h1>
-            </div>
-            <div className="max-w-7xl mx-auto">
-                <div className="flex">
-                    <MetaMask />
-                </div>
-            </div>
-        </div>
-    );
-};
-
-export default DynamicRoutePage;
-
-
+      <LandingHeroSection />
+      <NFTCards />
+      <HotCollections />
+      <NewCollections />
+      <BrowseCategory />
+    </div>
+  );
+}

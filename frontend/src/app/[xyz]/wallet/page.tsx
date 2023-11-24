@@ -10,9 +10,9 @@ export default function Home({ params }) {
 
   const isLoading = useValidation(params.xyz)
   useEffect(() => {
-    // Function to handle scroll event
+
     const handleScroll = () => {
-      // Check if the user has scrolled down a certain amount (e.g., 100 pixels)
+
       if (window.scrollY > 10) {
         setIsScrolled(true);
       } else {
@@ -20,18 +20,18 @@ export default function Home({ params }) {
       }
     };
 
-    // Attach the scroll event listener
+
     window.addEventListener("scroll", handleScroll);
 
-    // Clean up the event listener when the component unmounts
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
- 
-   if(isLoading){
-   return loading
-   }
+
+  if (isLoading) {
+    return loading
+  }
 
   return (
     <div className="bg-white min-h-screen">

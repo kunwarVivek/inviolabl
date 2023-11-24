@@ -1,11 +1,13 @@
 'use client'
+import loading from '@/app/loading'
 import GoogleLogin from '@/components/Authentication'
 import Header from '@/components/Header'
+import { useValidation } from '@/components/Validation'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
-const Auth = () => {
+const Auth = (params) => {
   const [isScrolled, setIsScrolled] = useState(false);
   console.log(window.location.hostname);
   useEffect(() => {
@@ -18,6 +20,7 @@ const Auth = () => {
         setIsScrolled(false);
       }
     };
+
 
     // Attach the scroll event listener
     window.addEventListener("scroll", handleScroll);
