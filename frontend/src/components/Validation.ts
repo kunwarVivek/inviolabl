@@ -10,7 +10,7 @@ export const useValidation = (slug) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/tenants');
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tenants`);
         const fetchedTenantId = response.data;
 
         const foundTenant = await fetchedTenantId.find((tenant) => tenant.name === slug);
