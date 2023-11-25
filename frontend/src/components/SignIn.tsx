@@ -13,7 +13,7 @@ const SignIn = () => {
   const tenantDetails = useSelector(
     (state: RootState) => state.tenant.details
   );
-  const isTenantIncluded = pathname.includes(tenantDetails?.name);
+  const isTenantIncluded = tenantDetails && pathname.includes(tenantDetails?.name);
 
   const handleSignIn = async (e) => {
     e.preventDefault()

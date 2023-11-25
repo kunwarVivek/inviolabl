@@ -13,7 +13,7 @@ const GoogleLogin = () => {
   const tenantDetails = useSelector(
     (state: RootState) => state.tenant.details
   );
-  const isTenantIncluded = pathname.includes(tenantDetails?.name);
+  const isTenantIncluded = tenantDetails && pathname.includes(tenantDetails?.name);
   return (
     <div className="mb-5">
       <div className="bg-white p-8 rounded-md shadow-lg">

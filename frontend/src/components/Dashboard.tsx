@@ -19,7 +19,7 @@ const Dashboard = ({ children }) => {
   const tenantDetails = useSelector(
     (state: RootState) => state.tenant.details
   );
-  const isTenantIncluded = pathname.includes(tenantDetails?.name);
+  const isTenantIncluded = tenantDetails && pathname.includes(tenantDetails?.name);
 
   // This function checks if the path is the active route
   const isActive = (path) => {

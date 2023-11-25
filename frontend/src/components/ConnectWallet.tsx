@@ -9,7 +9,7 @@ const ConnectWallet = () => {
   const tenantDetails = useSelector(
     (state: RootState) => state.tenant.details
   );
-  const isTenantIncluded = pathname.includes(tenantDetails?.name);
+  const isTenantIncluded = tenantDetails && pathname.includes(tenantDetails?.name);
   const MetaMaskAccount = useSelector(
     (state: RootState) => state.metaMask.account
   );

@@ -26,6 +26,7 @@ const Header = ({ className }: any) => {
   );
 
   const isTenantIncluded = pathname.includes(tenantDetails?.name);
+  console.log(isTenantIncluded)
 
   const [showCopied, setShowCopied] = useState(false);
   console.log(status, session);
