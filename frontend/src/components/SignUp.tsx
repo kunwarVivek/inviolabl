@@ -21,7 +21,7 @@ const SignUp = () => {
   const tenantDetails = useSelector(
     (state: RootState) => state.tenant.details
   );
-  const isTenantIncluded = pathname.includes(tenantDetails.name);
+  const isTenantIncluded = pathname.includes(tenantDetails?.name);
 
   console.log(passwordError);
 

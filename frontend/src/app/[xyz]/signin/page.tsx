@@ -15,7 +15,7 @@ const Auth = () => {
   const tenantDetails = useSelector(
     (state: RootState) => state.tenant.details
   );
-  const isTenantIncluded = pathname.includes(tenantDetails.name);
+  const isTenantIncluded = pathname.includes(tenantDetails?.name);
   console.log(window.location.hostname);
   useEffect(() => {
     // Function to handle scroll event

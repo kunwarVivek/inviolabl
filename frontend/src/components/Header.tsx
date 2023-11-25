@@ -25,7 +25,7 @@ const Header = ({ className }: any) => {
     (state: RootState) => state.tenant.details
   );
 
-  const isTenantIncluded = pathname.includes(tenantDetails.name);
+  const isTenantIncluded = pathname.includes(tenantDetails?.name);
 
   const [showCopied, setShowCopied] = useState(false);
   console.log(status, session);

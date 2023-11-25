@@ -49,7 +49,7 @@ const MetaMask = () => {
   const tenantDetails = useSelector(
     (state: RootState) => state.tenant.details
   );
-  const isTenantIncluded = pathname.includes(tenantDetails.name);
+  const isTenantIncluded = pathname.includes(tenantDetails?.name);
 
   const { data: session, status } = useSession();
   const router = useRouter();
