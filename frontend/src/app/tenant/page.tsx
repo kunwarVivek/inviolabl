@@ -75,15 +75,15 @@ export default function Home() {
             <div
                 className="mt-14 max-w-full px-8 grid gap-8 grid-cols-1 md:grid-cols-2 md:px-12 lg:px-16 xl:px-32 py-16 mx-auto bg-gray-100 text-gray-900 rounded-lg shadow-lg">
 
-                <div className="flex flex-col justify-between">
+                <div className="flex flex-col">
                     <div>
                         <h2 className="text-3xl text-[#8364E2] font-bold">Inviolabl | Get Started</h2>
                         <div className="text-gray-700 font-semibold text-lg mt-8">
                             Start with us Now!
                         </div>
                     </div>
-                    <div className=" text-center">
-                        <img className="w-[90%]" src="/code-development-flatline.svg" alt="" />
+                    <div className="flex mt-10 justify-center items-center text-center">
+                        <img className="w-[57%]" src="nft.png" alt="" />
                     </div>
                 </div>
                 <div className="">
