@@ -18,10 +18,16 @@ const GoogleLogin = () => {
     <div className="mb-5">
       <div className="bg-white p-8 rounded-md shadow-lg">
         <h2 className="text-2xl font-bold mb-4">
-          {pathname == `/${tenantDetails.name}/signup` ? "Sign Up" : "Sign In"}
+          {isTenantIncluded
+            ? (pathname === `/${tenantDetails?.name}/signup` ? "Sign Up" : "Sign In")
+            : (pathname === '/signup' ? "Sign Up" : "Sign In")
+          }
         </h2>
 
-        {pathname == `/${tenantDetails.name}/signup` ? <SignUp /> : <SignIn />}
+        {tenantDetails && isTenantIncluded
+          ? (pathname === `/${tenantDetails.name}/signup` ? <SignUp /> : <SignIn />)
+          : (pathname === '/signup' ? <SignUp /> : <SignIn />)
+        }
 
         <div className="text-center p-1 px-3 mt-4">
           {isTenantIncluded ? (
