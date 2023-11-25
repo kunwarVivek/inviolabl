@@ -3,9 +3,13 @@ import React from 'react'
 import { useSession, signIn } from "next-auth/react"
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
+import axios from 'axios';
+import { updateUserFromResponse } from '@/features/LoginSlice';
 const SignIn = () => {
+
+  const dispatch = useDispatch()
   const router = useRouter()
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,6 +22,11 @@ const SignIn = () => {
   const handleSignIn = async (e) => {
     e.preventDefault()
     const result = await signIn('credentials', { redirect: false, email, password });
+    await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`, { email: email, password: password })
+      .then(tenantResponse => {
+        console.log(tenantResponse.data);
+        dispatch(updateUserFromResponse(tenantResponse.data.user));
+      })
     if (result.error) {
       // Display the error message to the user
       console.log(result);

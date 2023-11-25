@@ -4,16 +4,18 @@ import ConnectWallet from "./ConnectWallet";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { Menu, Transition } from "@headlessui/react"; // If using Headless UI
 import { TruncatedWalletAddress } from "./TruncateFunction";
 import { cn } from "@/lib/utils";
 import { usePathname, useSearchParams } from "next/navigation";
+import { clearUser } from "@/features/LoginSlice";
 
 const Header = ({ className }: any) => {
   const { data: session, status } = useSession();
   const pathname = usePathname();
+  const dispatch = useDispatch();
 
   const MetaMaskAccount = useSelector(
     (state: RootState) => state.metaMask.account
@@ -24,6 +26,11 @@ const Header = ({ className }: any) => {
   const tenantDetails = useSelector(
     (state: RootState) => state.tenant.details
   );
+  const userDetails = useSelector(
+    (state: RootState) => state.user.details
+  );
+
+    console.log(userDetails)
 
   const isTenantIncluded = tenantDetails && pathname.includes(tenantDetails?.name);
   console.log(isTenantIncluded)
@@ -171,7 +178,7 @@ const Header = ({ className }: any) => {
                       </Link>
                     )}
                   </Menu.Item>
-                  {!isTenantIncluded&&<><Menu.Item>
+                  {status === "authenticated" && userDetails?.role === 'ADMIN' && <><Menu.Item>
                     {({ active }) => (
                       <Link
                         href={isTenantIncluded ? `/${tenantDetails.name}/admin/adminpage` : "/admin/adminpage"}
@@ -191,50 +198,51 @@ const Header = ({ className }: any) => {
                       </Link>
                     )}
                   </Menu.Item>
-                  <Menu.Item>
-                    {({ active }) => (
-                      <Link
-                        href={isTenantIncluded ? `/${tenantDetails.name}/admin/adminprofile` : "/admin/adminprofile"}
-                        className={`${active ? "bg-gray-100" : ""
-                          } block px-2 py-2 text-sm text-gray-700`}
-                      >
-                        <div className="flex gap-2 items-center">
-                          <Image
-                            src="/settings-icon.svg"
-                            height={2}
-                            width={20}
-                            alt=""
-                            className="h-[20px] ml-2"
-                          />
-                          Settings
-                        </div>
-                      </Link>
-                    )}
-                  </Menu.Item>
-                  <Menu.Item>
-                    {({ active }) => (
-                      <Link
-                        href={isTenantIncluded ? `/${tenantDetails.name}/admin/sharepage` : "/admin/sharepage"}
-                        className={`${active ? "bg-gray-100" : ""
-                          } block px-2 py-2 text-sm text-gray-700`}
-                      >
-                        <div className="flex gap-2 items-center">
-                          <Image
-                            src="/mail-icon.png"
-                            height={2}
-                            width={20}
-                            alt=""
-                            className="h-[20px] ml-2"
-                          />
-                          Share Invite
-                        </div>
-                      </Link>
-                    )}
-                  </Menu.Item></>}
+                    <Menu.Item>
+                      {({ active }) => (
+                        <Link
+                          href={isTenantIncluded ? `/${tenantDetails.name}/admin/adminprofile` : "/admin/adminprofile"}
+                          className={`${active ? "bg-gray-100" : ""
+                            } block px-2 py-2 text-sm text-gray-700`}
+                        >
+                          <div className="flex gap-2 items-center">
+                            <Image
+                              src="/settings-icon.svg"
+                              height={2}
+                              width={20}
+                              alt=""
+                              className="h-[20px] ml-2"
+                            />
+                            Settings
+                          </div>
+                        </Link>
+                      )}
+                    </Menu.Item>
+                    <Menu.Item>
+                      {({ active }) => (
+                        <Link
+                          href={isTenantIncluded ? `/${tenantDetails.name}/admin/sharepage` : "/admin/sharepage"}
+                          className={`${active ? "bg-gray-100" : ""
+                            } block px-2 py-2 text-sm text-gray-700`}
+                        >
+                          <div className="flex gap-2 items-center">
+                            <Image
+                              src="/mail-icon.png"
+                              height={2}
+                              width={20}
+                              alt=""
+                              className="h-[20px] ml-2"
+                            />
+                            Share Invite
+                          </div>
+                        </Link>
+                      )}
+                    </Menu.Item></>}
                   <Menu.Item>
                     {({ active }) => (
                       <button
                         onClick={() => {
+                          dispatch(clearUser())
                           const callbackUrl = isTenantIncluded ? `/${tenantDetails.name}/` : "/";
                           signOut({ callbackUrl });
                         }}

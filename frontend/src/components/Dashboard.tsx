@@ -13,11 +13,16 @@ import {
 } from "@heroicons/react/24/solid";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import { useSession } from "next-auth/react";
 
 const Dashboard = ({ children }) => {
   const pathname = usePathname();
+  const { data: session, status } = useSession();
   const tenantDetails = useSelector(
     (state: RootState) => state.tenant.details
+  );
+  const userDetails = useSelector(
+    (state: RootState) => state.user.details
   );
   const isTenantIncluded = tenantDetails && pathname.includes(tenantDetails?.name);
 
@@ -123,7 +128,7 @@ const Dashboard = ({ children }) => {
                 />
               </Link>
             )}
-            {isSidebarOpen && transitionComplete && !isTenantIncluded && (
+            {isSidebarOpen && transitionComplete && status === "authenticated" && userDetails?.role === 'ADMIN' && (
               <Link
                 href={isTenantIncluded ? `/${tenantDetails.name}/admin/sharepage` : "/admin/sharepage"}
                 className={`block p-2 px-4 text-sm rounded-[100px] transition duration-200 font-semibold  ${isActive("/admin/sharepage") || isActive(`/${tenantDetails.name}/admin/sharepage`)
@@ -141,7 +146,7 @@ const Dashboard = ({ children }) => {
                   <span className="text-sm font-semibold ml-2">Share Invite</span>
                 </div>
               </Link>
-            )}  {!isSidebarOpen && !isTenantIncluded && (
+            )}  {!isSidebarOpen && status === "authenticated" && userDetails?.role === 'ADMIN' && (
               <Link
                 href={isTenantIncluded ? `/${tenantDetails.name}/admin/sharepage` : "/admin/sharepage"}>
                 <img
