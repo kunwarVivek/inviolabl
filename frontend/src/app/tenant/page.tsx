@@ -18,6 +18,8 @@ export default function Home() {
 
     const submit = (e) => {
         e.preventDefault();
+
+        // Create new tenant
         const tenantData = {
             "name": name,
             "domain": `${organizationName}.inviolabl.com`,
@@ -26,14 +28,31 @@ export default function Home() {
         };
 
         axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tenants`, tenantData)
-            .then(response => {
-                // Handle the response from the API
-                console.log(response.data);
+            .then(tenantResponse => {
+                
+                console.log(tenantResponse.data);
+                
+                const userData = {
+                    "firstName": tenantResponse.data.name,
+                    "lastName": "admin",  
+                    "email": tenantResponse.data.email,
+                    "tenantId": tenantResponse.data.id,
+                    "password": "12345678",
+                    "role": "ADMIN"  
+                };
+
+                return axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/register/`, userData);
+            })
+            .then(userResponse => {
+                
+                console.log(userResponse.data);
                 setOrganizationName('');
                 setName('');
                 setEmail('');
                 setPhone('');
-                toast.success(`Hi ${name}, a tenant with the domain ${organizationName}.inviolabl.com has been created. You will receive an email notification.`, {
+                router.push(`/${userResponse.data.firstName}`);
+                
+                toast.success(`Hi ${name}, a tenant with the domain ${organizationName}.inviolabl.com has been created, and a user has been associated. You will receive an email notification.`, {
                     pauseOnHover: true,
                     theme: 'colored',
                     progressStyle: { background: 'rgb(216 180 254)' },
@@ -41,12 +60,11 @@ export default function Home() {
                 });
             })
             .catch(error => {
-                // Handle errors
                 console.error('Error:', error);
                 toast.error('Error');
             });
-
     }
+
 
     return (
         <div>
