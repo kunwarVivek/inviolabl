@@ -11,13 +11,23 @@ interface tenantDetails {
 }
 
 interface TenantState {
-  details: tenantDetails | null; 
+  details: tenantDetails; 
 }
+
+const initialTenantDetails: tenantDetails = {
+  id: '',
+  createdAt: '',
+  updatedAt: '',
+  name: '',
+  domain: '',
+  email: '',
+  phone: '',
+};
 
 const TenantSlice = createSlice({
   name: 'tenant',
   initialState: {
-    details: null as tenantDetails | null,
+    details: { ...initialTenantDetails },
   } as TenantState,
 
   reducers: {
@@ -43,16 +53,5 @@ export const { setTenant, clearTenant, updateTenantFromResponse } = TenantSlice.
 export default TenantSlice.reducer;
 
 
-    // setTenant: (state, action: PayloadAction<Tenant>) => {
-    //   state.currentTenant = action.payload;
-    // },
-    // clearTenant: (state) => {
-    //   state.currentTenant = null;
-    // },
-    // updateTenantFromResponse: (state, action: PayloadAction<Tenant>) => {
-    //   state.currentTenant = action.payload;
-    // },
-  
 
-// export const { setTenant, clearTenant, updateTenantFromResponse } = TenantSlice.actions;
 
