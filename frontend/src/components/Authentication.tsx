@@ -4,26 +4,43 @@ import SignIn from "./SignIn";
 import { signIn } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 const GoogleLogin = () => {
+
   const pathname = usePathname();
+  const tenantDetails = useSelector(
+    (state: RootState) => state.tenant.details
+  );
+  const isTenantIncluded = pathname.includes(tenantDetails.name);
   return (
     <div className="mb-5">
       <div className="bg-white p-8 rounded-md shadow-lg">
         <h2 className="text-2xl font-bold mb-4">
-          {pathname == "/signup" ? "Sign Up" : "Sign In"}
+          {pathname == `/${tenantDetails.name}/signup` ? "Sign Up" : "Sign In"}
         </h2>
 
-        {pathname == "/signup" ? <SignUp /> : <SignIn />}
+        {pathname == `/${tenantDetails.name}/signup` ? <SignUp /> : <SignIn />}
 
         <div className="text-center p-1 px-3 mt-4">
-          <span className="p-1 px-5 text-white rounded-md cursor-pointer inline-block bg-red-600">
-            {pathname == "/signup" ? (
-              <Link href="/signin">Go to Sign In</Link>
-            ) : (
-              <Link href="/signup">Go to Sign Up</Link>
-            )}
-          </span>
+          {isTenantIncluded ? (
+            <span className="p-1 px-5 text-white rounded-md cursor-pointer inline-block bg-red-600">
+              {pathname === `/${tenantDetails.name}/signup` ? (
+                <Link href={`/${tenantDetails.name}/signin`}>Go to Sign In</Link>
+              ) : (
+                <Link href={`/${tenantDetails.name}/signup`}>Go to Sign Up</Link>
+              )}
+            </span>
+          ) : (
+            <span className="p-1 px-5 text-white rounded-md cursor-pointer inline-block bg-red-600">
+              {pathname === "/signup" ? (
+                <Link href="/signin">Go to Sign In</Link>
+              ) : (
+                <Link href="/signup">Go to Sign Up</Link>
+              )}
+            </span>
+          )}
         </div>
         <div className="mt-3 mb-3">
           <div className="flex items-center justify-center mt-3 mb-3">

@@ -2,7 +2,9 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 
 const SignUp = () => {
@@ -15,6 +17,11 @@ const SignUp = () => {
   const [firstName, setFirstname] = useState("");
   const [lastName, setLastname] = useState("");
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
+  const pathname = usePathname();
+  const tenantDetails = useSelector(
+    (state: RootState) => state.tenant.details
+  );
+  const isTenantIncluded = pathname.includes(tenantDetails.name);
 
   console.log(passwordError);
 
@@ -53,7 +60,7 @@ const SignUp = () => {
 
     try {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/register`, {
-        tenantId: "e74cce10-48ed-4483-82fb-ff2b6e0dfbd8",
+        tenantId: tenantDetails.id,
         firstName,
         lastName,
         email,
@@ -63,7 +70,11 @@ const SignUp = () => {
       if (response) {
         // If registration was successful, sign in to establish a session
         await signIn("credentials", { redirect: false, email, password });
-        router.push("/dashboard")
+        if (isTenantIncluded) {
+          router.push(`/${tenantDetails.name}/dashboard`);
+        } else {
+          router.push("/dashboard");
+        }
       } else {
         // Handle registration error
       }

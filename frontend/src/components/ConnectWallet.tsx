@@ -1,10 +1,15 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { TruncatedWalletAddress } from "./TruncateFunction";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 
 const ConnectWallet = () => {
+  const pathname = usePathname();
+  const tenantDetails = useSelector(
+    (state: RootState) => state.tenant.details
+  );
+  const isTenantIncluded = pathname.includes(tenantDetails.name);
   const MetaMaskAccount = useSelector(
     (state: RootState) => state.metaMask.account
   );
@@ -12,7 +17,11 @@ const ConnectWallet = () => {
   const router = useRouter();
 
   const handleConnect = () => {
-    router.push("/wallet")
+    if (isTenantIncluded) {
+      router.push(`/${tenantDetails.name}/wallet`);
+    } else {
+      router.push("/wallet");
+    }
   };
   return (
     <div className="flex items-center gap-4">

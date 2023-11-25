@@ -1,11 +1,14 @@
 'use client'
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateTenantFromResponse } from '../features/TenantSlice';
 import axios from 'axios';
 
 export const useValidation = (slug) => {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -17,6 +20,7 @@ export const useValidation = (slug) => {
         
         if (foundTenant) {
           setIsLoading(false);
+          dispatch(updateTenantFromResponse(foundTenant));
         } else {
           router.push('/');
         }

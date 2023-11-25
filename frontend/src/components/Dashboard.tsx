@@ -11,9 +11,15 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@heroicons/react/24/solid";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 const Dashboard = ({ children }) => {
   const pathname = usePathname();
+  const tenantDetails = useSelector(
+    (state: RootState) => state.tenant.details
+  );
+  const isTenantIncluded = pathname.includes(tenantDetails.name);
 
   // This function checks if the path is the active route
   const isActive = (path) => {
@@ -90,11 +96,11 @@ const Dashboard = ({ children }) => {
 
             {isSidebarOpen && transitionComplete && (
               <Link
-                href="/dashboard"
-                className={`block p-2 px-4 text-sm rounded-[100px] transition duration-200 font-semibold  ${isActive("/dashboard")
+                href={isTenantIncluded ? `/${tenantDetails.name}/dashboard` : "/dashboard"}
+                className={`block p-2 px-4 text-sm rounded-[100px] transition duration-200 font-semibold  ${isActive("/dashboard") || isActive(`/${tenantDetails.name}/dashboard`)
                   ? "bg-[#c2e7ff] text-black"
                   : "hover:bg-gray-300"
-                  } `}
+                  }  `}
               >
                 <div className={`flex items-center `}>
                   <img
@@ -108,7 +114,7 @@ const Dashboard = ({ children }) => {
               </Link>
             )}  {!isSidebarOpen && (
               <Link
-                href="/dashboard">
+                href={isTenantIncluded ? `/${tenantDetails.name}/dashboard` : "/dashboard"}>
                 <img
                   src="https://cdn-icons-png.flaticon.com/512/1828/1828765.png"
                   width={20}
@@ -117,10 +123,10 @@ const Dashboard = ({ children }) => {
                 />
               </Link>
             )}
-            {isSidebarOpen && transitionComplete && (
+            {isSidebarOpen && transitionComplete && !isTenantIncluded && (
               <Link
-                href="/admin/sharepage"
-                className={`block p-2 px-4 text-sm rounded-[100px] transition duration-200 font-semibold  ${isActive("/admin/sharepage")
+                href={isTenantIncluded ? `/${tenantDetails.name}/admin/sharepage` : "/admin/sharepage"}
+                className={`block p-2 px-4 text-sm rounded-[100px] transition duration-200 font-semibold  ${isActive("/admin/sharepage") || isActive(`/${tenantDetails.name}/admin/sharepage`)
                   ? "bg-[#c2e7ff] text-black"
                   : "hover:bg-gray-300"
                   } `}
@@ -135,9 +141,9 @@ const Dashboard = ({ children }) => {
                   <span className="text-sm font-semibold ml-2">Share Invite</span>
                 </div>
               </Link>
-            )}  {!isSidebarOpen && (
+            )}  {!isSidebarOpen && !isTenantIncluded && (
               <Link
-                href="/admin/sharepage">
+                href={isTenantIncluded ? `/${tenantDetails.name}/admin/sharepage` : "/admin/sharepage"}>
                 <img
                   src="https://cdn-icons-png.flaticon.com/512/1828/1828765.png"
                   width={20}

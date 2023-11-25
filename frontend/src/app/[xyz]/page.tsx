@@ -11,6 +11,7 @@ import loading from "../loading";
 export default function HeroSection({ params }) {
 
     const isLoading = useValidation(params.xyz)
+    console.log(params.xyz)
 
     if (isLoading) {
         return loading

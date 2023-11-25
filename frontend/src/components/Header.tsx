@@ -9,15 +9,24 @@ import { RootState } from "@/store/store";
 import { Menu, Transition } from "@headlessui/react"; // If using Headless UI
 import { TruncatedWalletAddress } from "./TruncateFunction";
 import { cn } from "@/lib/utils";
+import { usePathname, useSearchParams } from "next/navigation";
 
 const Header = ({ className }: any) => {
   const { data: session, status } = useSession();
+  const pathname = usePathname();
+
   const MetaMaskAccount = useSelector(
     (state: RootState) => state.metaMask.account
   );
   const Logo = useSelector(
     (state: RootState) => state.organisationSettings.logo
   );
+  const tenantDetails = useSelector(
+    (state: RootState) => state.tenant.details
+  );
+
+  const isTenantIncluded = pathname.includes(tenantDetails.name);
+
   const [showCopied, setShowCopied] = useState(false);
   console.log(status, session);
 
@@ -38,19 +47,19 @@ const Header = ({ className }: any) => {
         className={` transform max-w-screen-xl mx-auto  container  flex justify-between items-center px-6`}
       >
         <div className="flex items-center space-x-4">
-          <Link href={"/"}>
+          <Link href={isTenantIncluded ? `/${tenantDetails.name}` : "/"}>
             {" "}
             <div className="text-2xl font-bold">{Logo}</div>
           </Link>
         </div>
 
         <div className="flex items-center space-x-4">
-          {status === "authenticated" && <Link href={"/dashboard"}>
+          {status === "authenticated" && <Link href={isTenantIncluded ? `/${tenantDetails.name}/dashboard` : "/dashboard"}>
 
             <span className="text-sm font-semibold">Dashboard</span>
           </Link>}
           <ConnectWallet />
-          {status !== "authenticated" && <Link href={"/tenant"}>
+          {status !== "authenticated" && !isTenantIncluded && <Link href={"/tenant"}>
             <span className="py-[5.5px] px-4 mb-4 text-white text-sm bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 font-semibold rounded-md">Try it free</span>
           </Link>}
           {status === "authenticated" ? (
@@ -76,7 +85,7 @@ const Header = ({ className }: any) => {
                   <Menu.Item>
                     {({ active }) => (
                       <Link
-                        href={"/profile"}
+                        href={isTenantIncluded ? `/${tenantDetails.name}/profile` : "/profile"}
                         className={`${active ? "bg-gray-100" : ""
                           } block px-2 py-2 text-sm text-gray-700`}
                       >
@@ -144,7 +153,7 @@ const Header = ({ className }: any) => {
                   <Menu.Item>
                     {({ active }) => (
                       <Link
-                        href={"/profile"}
+                        href={isTenantIncluded ? `/${tenantDetails.name}/profile` : "/profile"}
                         className={`${active ? "bg-gray-100" : ""
                           } block px-2 py-2 text-sm text-gray-700`}
                       >
@@ -161,10 +170,10 @@ const Header = ({ className }: any) => {
                       </Link>
                     )}
                   </Menu.Item>
-                  <Menu.Item>
+                  {!isTenantIncluded&&<><Menu.Item>
                     {({ active }) => (
                       <Link
-                        href={"/admin/adminpage"}
+                        href={isTenantIncluded ? `/${tenantDetails.name}/admin/adminpage` : "/admin/adminpage"}
                         className={`${active ? "bg-gray-100" : ""
                           } block px-2 py-2 text-sm text-gray-700`}
                       >
@@ -184,7 +193,7 @@ const Header = ({ className }: any) => {
                   <Menu.Item>
                     {({ active }) => (
                       <Link
-                        href={"/admin/adminprofile"}
+                        href={isTenantIncluded ? `/${tenantDetails.name}/admin/adminprofile` : "/admin/adminprofile"}
                         className={`${active ? "bg-gray-100" : ""
                           } block px-2 py-2 text-sm text-gray-700`}
                       >
@@ -204,7 +213,7 @@ const Header = ({ className }: any) => {
                   <Menu.Item>
                     {({ active }) => (
                       <Link
-                        href={"/admin/sharepage"}
+                        href={isTenantIncluded ? `/${tenantDetails.name}/admin/sharepage` : "/admin/sharepage"}
                         className={`${active ? "bg-gray-100" : ""
                           } block px-2 py-2 text-sm text-gray-700`}
                       >
@@ -220,11 +229,14 @@ const Header = ({ className }: any) => {
                         </div>
                       </Link>
                     )}
-                  </Menu.Item>
+                  </Menu.Item></>}
                   <Menu.Item>
                     {({ active }) => (
                       <button
-                        onClick={() => signOut({ callbackUrl: "/" })}
+                        onClick={() => {
+                          const callbackUrl = isTenantIncluded ? `/${tenantDetails.name}/` : "/";
+                          signOut({ callbackUrl });
+                        }}
                         className={`w-full mt-1 ${active ? "bg-red-400" : "bg-red-500"
                           } block px-2 py-2 text-sm text-white`}
                       >
@@ -235,7 +247,7 @@ const Header = ({ className }: any) => {
                 </Menu.Items>
               </Transition>
             </Menu>
-          ) : <Link href={"/signin"}><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 cursor-pointer fill-[#5f03de] hover:shadow-2xl hover:fill-[#8364e2]" viewBox="0 0 448 512"><path d="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z" /></svg></Link>}
+          ) : <Link href={isTenantIncluded ? `/${tenantDetails.name}/signin` : "/signin"}><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 cursor-pointer fill-[#5f03de] hover:shadow-2xl hover:fill-[#8364e2]" viewBox="0 0 448 512"><path d="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z" /></svg></Link>}
         </div>
       </div>
     </nav>

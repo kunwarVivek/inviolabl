@@ -3,12 +3,19 @@ import loading from '@/app/loading'
 import GoogleLogin from '@/components/Authentication'
 import Header from '@/components/Header'
 import { useValidation } from '@/components/Validation'
+import { RootState } from '@/store/store'
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 
-const Auth = (params) => {
+const Auth = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
+  const tenantDetails = useSelector(
+    (state: RootState) => state.tenant.details
+  );
+  const isTenantIncluded = pathname.includes(tenantDetails.name);
   console.log(window.location.hostname);
   useEffect(() => {
     // Function to handle scroll event
@@ -38,7 +45,7 @@ const Auth = (params) => {
   };
 
   if (status === "authenticated") {
-    router.push("/dashboard")
+    router.push(`/${tenantDetails.name}/dashboard`);
   }
   if (status === "loading") {
     return (

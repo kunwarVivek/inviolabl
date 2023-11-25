@@ -5,11 +5,12 @@ import { useState } from "react";
 import { ethers } from "ethers";
 import axios from "axios";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
+import { usePathname, useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
 import { setAccount } from "@/features/MetaMaskSlice";
 import UserAuthenticationABI from "../../public/UserAuthentication.json";
 import contractConfig from "./../../public/contractAddress.json";
+import { RootState } from "@/store/store";
 
 declare global {
   interface Window {
@@ -43,6 +44,12 @@ export const getContract = async () => {
 const MetaMask = () => {
   const dispatch = useDispatch();
   const [isRegistered, setIsRegistered] = useState(false);
+
+  const pathname = usePathname();
+  const tenantDetails = useSelector(
+    (state: RootState) => state.tenant.details
+  );
+  const isTenantIncluded = pathname.includes(tenantDetails.name);
 
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -129,8 +136,13 @@ const MetaMask = () => {
     }
   }
   const handleConnect = () => {
-    session ? connectToMetaMask() : router.push("/signin");
+    if (isTenantIncluded) {
+      session ? connectToMetaMask() : router.push(`/${tenantDetails.name}/signin`);
+    } else {
+      session ? connectToMetaMask() : router.push("/signin");
+    }
   };
+  
   return (
     <div
       onClick={handleConnect}
