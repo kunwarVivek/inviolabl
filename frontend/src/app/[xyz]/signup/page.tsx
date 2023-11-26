@@ -1,9 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
 import GoogleLogin from "@/components/Authentication";
 import Header from "@/components/Header";
-import { useValidation } from "@/components/Validation";
-import loading from "@/app/loading";
+import { useEffect, useState } from "react";
 
 const SignUp = (params) => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -40,7 +38,7 @@ const SignUp = (params) => {
       >
         <div className="w-1/2">
           <h1 className="text-5xl font-bold max-w-lg text-white mb-6">
-            Create, sell or collect digital items.
+            Share information securely.
           </h1>
           <p className="text-white max-w-lg text-lg mb-6">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do

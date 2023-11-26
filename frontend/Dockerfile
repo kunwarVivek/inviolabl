@@ -1,9 +1,34 @@
-FROM node:18-alpine
-RUN mkdir -p /app
-WORKDIR /app
-COPY . .
-RUN npm install
-RUN npm run build
-EXPOSE 3000
-CMD ["npm", "start"]
+# Stage 1: Building the application
+FROM node:lts-alpine AS builder
 
+# Set working directory
+WORKDIR /app
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of your app's source code
+COPY . .
+
+# Build the application
+RUN npm run build
+
+# Stage 2: Run the application
+FROM node:lts-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Copy built assets from the builder stage
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+
+# Expose the port the app runs on
+EXPOSE 3000
+
+# Define the command to run the app
+CMD ["npm", "start"]

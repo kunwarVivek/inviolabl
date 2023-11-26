@@ -1,12 +1,12 @@
+import { authOptions } from "auth";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import Provider from "./context/client-provider";
 import { getServerSession } from "next-auth";
-import { authOptions } from "./api/auth/[...nextauth]/route";
+import { Inter } from "next/font/google";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { ReduxProvider } from "./context/ReduxToolkitProvider";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import Provider from "./context/client-provider";
+import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
@@ -18,18 +18,16 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang="en">
-
       <body className={inter.className}>
         <ReduxProvider>
-          <Provider session={session}>
-
-            {children}
-
-          </Provider>
+          <Provider session={session}>{children}</Provider>
         </ReduxProvider>
-        <ToastContainer style={{             // Custom styles
-          width: '30rem',
-        }} />
+        <ToastContainer
+          style={{
+            // Custom styles
+            width: "30rem",
+          }}
+        />
       </body>
     </html>
   );
