@@ -1,27 +1,29 @@
-version: "3"
+version: "3.8" # Upgrade to a more recent version if possible for better features and performance
+
 services:
   nginx:
-    image: nginx:latest
+    image: nginx:stable-alpine # Use the alpine version for a smaller image size
     restart: unless-stopped
     container_name: ${PROJECT_SLUG}_nginx
     ports:
-      - 80:80
-      - 443:443
+      - "80:80"
+      - "443:443"
     networks:
       - internal
     volumes:
-      - ./backend:/app/backend
+      - ./backend:/app/backend # Add read-only if no modification is needed
       - ./conf/nginx/:/etc/nginx:ro
       - ./logs/nginx/:/var/log/nginx
       - /etc/localtime:/etc/localtime:ro
     depends_on:
       - backend
+
   backend:
     env_file:
       - .env
     container_name: ${PROJECT_SLUG}_backend
     restart: unless-stopped
-    build: './backend/'
+    build: ./backend/
     ports:
       - "${PORT}:${PORT}"
     environment:
@@ -34,26 +36,23 @@ services:
       NODE_ENV: ${NODE_ENV}
     networks:
       - internal
-    links:
-      - postgres
     depends_on:
       - postgres
+
   frontend:
     container_name: ${PROJECT_SLUG}_frontend
     restart: unless-stopped
-    build: './frontend/'
+    build: ./frontend/
     ports:
-      - 3000:3000    
+      - "3000:3000"
     networks:
       - internal
-    links:
-      - backend
     depends_on:
       - backend
+
   postgres:
-    image: postgres:12.0-alpine
+    image: postgres:alpine # Use alpine for smaller image size
     container_name: ${PROJECT_SLUG}_postgres
-    platform: linux/amd64
     restart: unless-stopped
     env_file: .env
     environment:
@@ -61,17 +60,15 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_DATABASE}
     volumes:
-      - postgres:/var/lib/postgresql/data/
+      - postgres:/var/lib/postgresql/data
     networks:
       - internal
 
 volumes:
   postgres:
-    # driver: local
+    # driver: local  # Uncomment and specify if needed
 
 networks:
   internal:
     name: ${PROJECT_SLUG}_internal
-    driver: bridge    
-
-
+    driver: bridge

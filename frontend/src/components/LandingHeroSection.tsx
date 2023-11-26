@@ -1,5 +1,3 @@
-import React from 'react';
-
 const LandingHeroSection = () => {
   return (
     <div className="flex flex-col md:flex-row justify-between items-center max-w-screen-xl mx-auto px-4">
@@ -8,7 +6,7 @@ const LandingHeroSection = () => {
           Inov Market
         </p>
         <h1 className="text-3xl md:text-5xl leading-tight font-bold mt-3">
-          Create, sell or collect digital items.
+          Share information securely.
         </h1>
         <p className="text-gray-500 mt-4 leading-6">
           Unit of data stored on a digital ledger, called a blockchain, that
