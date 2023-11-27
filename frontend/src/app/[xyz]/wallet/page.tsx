@@ -2,13 +2,13 @@
 import loading from "@/app/loading";
 import Header from "@/components/Header";
 import MetaMask from "@/components/MetaMask";
-import { useValidation } from "@/components/Validation";
+// import { useValidation } from "@/components/Validation";
 import { useEffect, useState } from "react";
 
 export default function Home({ params }) {
   const [isScrolled, setIsScrolled] = useState(false);
 
-  const isLoading = useValidation(params.xyz)
+  // const isLoading = useValidation(params.xyz)
   useEffect(() => {
 
     const handleScroll = () => {
@@ -29,9 +29,9 @@ export default function Home({ params }) {
     };
   }, []);
 
-  if (isLoading) {
-    return loading
-  }
+  // if (isLoading) {
+  //   return loading
+  // }
 
   return (
     <div className="bg-white min-h-screen">
