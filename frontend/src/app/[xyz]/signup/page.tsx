@@ -28,9 +28,8 @@ const SignUp = (params) => {
   return (
     <div className="background-url min-h-screen">
       <Header
-        className={`text-white sticky z-50 py-5 ${
-          isScrolled && "bg-[#403f83]"
-        }`}
+        className={`text-white sticky z-50 py-5 ${isScrolled && "bg-[#403f83]"
+          }`}
       />
 
       <div
@@ -46,7 +45,7 @@ const SignUp = (params) => {
           </p>
         </div>
         <div className="w-1/2 max-w-md">
-          <GoogleLogin />
+          <SignUp path="/:xyz/signup" routing="path" signInUrl="/xyz/signin" afterSignUpUrl="/organization" />
         </div>
       </div>
     </div>

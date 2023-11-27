@@ -1,4 +1,5 @@
 "use client";
+import loading from "@/app/loading";
 import BrowseCategory from "@/components/BrowseCategory";
 import Header from "@/components/Header";
 import HotCollections from "@/components/HotCollections";
@@ -6,7 +7,7 @@ import LandingHeroSection from "@/components/LandingHeroSection";
 import NFTCards from "@/components/NFTCards";
 import NewCollections from "@/components/NewItems";
 // import { useValidation } from "@/components/Validation";
-import loading from "../loading";
+
 
 export default function HeroSection({ params }) {
 

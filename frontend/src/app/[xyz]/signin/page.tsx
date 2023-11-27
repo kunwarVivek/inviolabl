@@ -2,6 +2,7 @@
 import GoogleLogin from "@/components/Authentication";
 import Header from "@/components/Header";
 import { RootState } from "@/store/store";
+import { SignIn } from "@clerk/nextjs";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -55,15 +56,13 @@ const Auth = () => {
       <>
         <div className="background-url min-h-screen">
           <Header
-            className={`text-white sticky z-50 py-5 ${
-              isScrolled && "bg-[#403f83]"
-            }`}
+            className={`text-white sticky z-50 py-5 ${isScrolled && "bg-[#403f83]"
+              }`}
           />
 
           <div
-            className={`container mx-auto flex justify-between items-center px-6 ${
-              isSignUp ? "pt-10" : "py-16"
-            } max-w-7xl`}
+            className={`container mx-auto flex justify-between items-center px-6 ${isSignUp ? "pt-10" : "py-16"
+              } max-w-7xl`}
           >
             <div className="w-1/2">
               <h1 className="text-5xl font-bold max-w-lg text-white mb-6">
@@ -76,7 +75,7 @@ const Auth = () => {
               </p>
             </div>
             <div className="w-1/2 max-w-md">
-              <GoogleLogin />
+              <SignIn path="/:xyz/signin" routing="path" signUpUrl="/xyz/signup" afterSignInUrl="/organization" />
             </div>
           </div>
         </div>
@@ -87,3 +86,9 @@ const Auth = () => {
 };
 
 export default Auth;
+
+
+
+
+
+

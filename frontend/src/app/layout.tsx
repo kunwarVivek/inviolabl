@@ -7,6 +7,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { ReduxProvider } from "./context/ReduxToolkitProvider";
 import Provider from "./context/client-provider";
 import "./globals.css";
+import { ClerkProvider } from "@clerk/nextjs";
+
 
 const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
@@ -17,18 +19,20 @@ export default async function RootLayout({ children }) {
   const session = await getServerSession(authOptions);
 
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <ReduxProvider>
-          <Provider session={session}>{children}</Provider>
-        </ReduxProvider>
-        <ToastContainer
-          style={{
-            // Custom styles
-            width: "30rem",
-          }}
-        />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body className={inter.className}>
+          <ReduxProvider>
+            <Provider session={session}>{children}</Provider>
+          </ReduxProvider>
+          <ToastContainer
+            style={{
+              // Custom styles
+              width: "30rem",
+            }}
+          />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
