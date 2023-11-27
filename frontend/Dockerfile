@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Build the application
-RUN npm run build
+# RUN npm run build
 
 # Stage 2: Run the application
 FROM node:lts-alpine
@@ -31,4 +31,4 @@ COPY --from=builder /app/package.json ./package.json
 EXPOSE 3000
 
 # Define the command to run the app
-CMD ["npm", "start"]
+CMD ["npm", "run dev"]
