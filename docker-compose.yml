@@ -51,7 +51,7 @@ services:
       - backend
 
   postgres:
-    image: postgres:alpine # Use alpine for smaller image size
+    image: postgres:12.0-alpine # Use alpine for smaller image size
     container_name: ${PROJECT_SLUG}_postgres
     restart: unless-stopped
     env_file: .env
