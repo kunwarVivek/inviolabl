@@ -1,7 +1,7 @@
-version: '3'
+version: "3"
 services:
   nginx:
-    image: nginx:stable
+    image: nginx:latest
     restart: unless-stopped
     container_name: ${PROJECT_SLUG}_nginx
     ports:
@@ -23,7 +23,7 @@ services:
     restart: unless-stopped
     build: .
     ports:
-      - '${PORT}:${PORT}'
+      - "${PORT}:${PORT}"
     environment:
       DATABASE_CLIENT: postgres
       DATABASE_HOST: postgres
@@ -37,7 +37,7 @@ services:
     links:
       - postgres
     depends_on:
-      - postgres
+      - postgres  
   postgres:
     image: postgres:12.0-alpine
     container_name: ${PROJECT_SLUG}_postgres
@@ -60,4 +60,6 @@ volumes:
 networks:
   internal:
     name: ${PROJECT_SLUG}_internal
-    driver: bridge
+    driver: bridge    
+
+

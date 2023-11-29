@@ -1,11 +1,25 @@
 "use client";
+import { useOrganization, useUser } from "@clerk/nextjs";
 import { Dialog, Transition } from "@headlessui/react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 import React, { Fragment, useCallback, useRef, useState } from "react";
+import { toast } from "react-toastify";
+
+
 const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
   const [files, setFiles] = useState<File[]>([]);
   const [totalSize, setTotalSize] = useState<number>(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const maxTotalSize = 500 * 1024 * 1024; // 500MB in bytes
+  const router = useRouter()
+
+  const { isLoaded, isSignedIn, user } = useUser();
+  console.log(user?.primaryEmailAddress.emailAddress)
+
+  const {
+    organization: currentOrganization,
+  } = useOrganization();
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -48,7 +62,51 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    // Implement the upload logic
+
+    if (files.length === 0) {
+      // Handle the case where no file is selected
+      alert('Please select one or more files to upload.');
+      return;
+    }
+
+    const formData = new FormData();
+
+    files.forEach((file) => {
+      formData.append('files', file);
+    });
+
+    formData.append('email', user?.primaryEmailAddress.emailAddress);
+    formData.append('domainId', currentOrganization.id);
+
+    try {
+      const response = await axios.post('http://localhost:3001/tenants/files', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      // Handle the response as needed
+      console.log('File upload success:', response.data);
+      toast.success(`file uploaded`, {
+        pauseOnHover: true,
+        theme: 'colored',
+        progressStyle: { background: 'rgb(216 180 254)' },
+        style: { background: 'rgb(126 34 206)' },
+      });
+      await window.location.reload()
+
+      // Clear the state after successful upload
+      setFiles([]);
+      setTotalSize(0);
+
+      // Close the modal
+      closeModal();
+
+
+    } catch (error) {
+      // Handle errors
+      console.error('File upload failed:', error);
+    }
   };
 
   const triggerFileInput = () => {
@@ -94,9 +152,9 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all">
                 <div className="bg-transparent w-full">
-                  <div className="container mx-auto max-w-screen-sm p-4">
+                  <div className="container mx-auto max-w-screen-sm p-6">
                     <form
                       onSubmit={onSubmit}
                       className="text-black flex flex-col items-center justify-center rounded-lg w-full"
@@ -104,7 +162,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
                       <div
                         onDragOver={onDragOver}
                         onDrop={onDrop}
-                        className="w-full h-32 flex flex-col items-center justify-center cursor-pointer border-2 border-dashed border-blue-500 bg-gray-100 hover:bg-blue-50 rounded-md"
+                        className="w-full h-32 flex flex-col items-center justify-center cursor-pointer border-2 border-dashed border-grey-500 bg-gray-100 hover:bg-blue-50 rounded-md"
                         onClick={triggerFileInput}
                       >
                         <svg
@@ -140,7 +198,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
                       <button
                         type="button"
                         onClick={triggerFileInput}
-                        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                        className="mt-4 px-4 py-2 bg-purple-500 text-white rounded-lg shadow-lg hover:bg-purple-700"
                       >
                         Select Files
                       </button>
@@ -184,7 +242,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
 
                       <button
                         type="submit"
-                        className="mt-4 px-6 py-2 bg-green-500 text-white rounded-lg shadow-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300"
+                        className="mt-4 px-6 py-2 bg-green-500 text-white rounded-lg shadow-lg hover:bg-green-600"
                       >
                         Upload Files
                       </button>

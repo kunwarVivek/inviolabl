@@ -1,31 +1,67 @@
 "use client";
 import Dashboard from "@/components/Dashboard";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ShareIcon } from "@heroicons/react/24/solid";
 import DropdownMenu from "@/components/DropdownMenu";
 // import { useValidation } from "@/components/Validation";
 import loading from "@/app/loading";
+import { OrganizationList, useOrganization, useOrganizationList, useUser } from "@clerk/nextjs";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import axios from "axios";
 
-const page = ({params}) => {
+const page = ({ params }) => {
+
+  const userDetails = useSelector(
+    (state: RootState) => state.user.details
+  );
+
+  const {
+    organization: currentOrganization,
+    membership,
+    isLoaded,
+  } = useOrganization();
+
+
+  console.log(userDetails)
+
+  const { user } = useUser(); // Assuming you have a way to get the user ID
+
+  const [userFiles, setUserFiles] = useState([]);
+  console.log(userFiles)
+
+  useEffect(() => {
+    const fetchUserFiles = async () => {
+      
+      try {
+        if (currentOrganization.id) {
+          const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tenants/${currentOrganization.id}/files`);
+          setFileHistory(response.data);
+          setUserFiles(response.data)
+        }
+      } catch (error) {
+        console.error('Error fetching user files:', error);
+      }
+    };
+
+    fetchUserFiles();
+  }, [user]);
+
   const [filter, setFilter] = useState('all');
   const [fileHistory, setFileHistory] = useState([
-    { name: "resume.pdf", size: "1mb", uploadedOn: "yesterday", status: "Success" },
-    { name: "housedocument.pdf", size: "3.5mb", uploadedOn: "today", status: "Success" },
-    { name: "photo.png", size: "2mb", uploadedOn: "last week", status: "Success" },
-    { name: "image.jpg", size: "2.5mb", uploadedOn: "two days ago", status: "Success" },
-    { name: "image.jpeg", size: "2.5mb", uploadedOn: "two days ago", status: "Success" },
+    // { filename: "resume.pdf", size: "1mb", createdAt: "yesterday", status: "Success" },
   ]);
   console.log(filter);
 
   // const isLoading = useValidation(params.xyz)
 
-  //   if (isLoading) {
-  //       return loading
-  //     }
+  // if (isLoading) {
+  //     return loading
+  //   }
 
   const filteredFileHistory = filter === 'all'
     ? fileHistory
-    : fileHistory.filter(file => file.name.endsWith(`.${filter.toLowerCase()}`));
+    : fileHistory.filter(file => file && file.filename && file.filename.endsWith(`.${filter.toLowerCase()}`));
 
   const handleFilterChange = (selectedFilter) => {
     setFilter(selectedFilter.toLowerCase());
@@ -34,6 +70,7 @@ const page = ({params}) => {
   const modifiedOptions = ["Today", "Last Week", "Last Month"];
 
   return (
+
     <div className="bg-white min-h-screen">
       <Dashboard>
         <div className="overflow-x-auto min-h-screen bg-white rounded-md border shadow-2xl">
@@ -76,6 +113,12 @@ const page = ({params}) => {
                 >
                   UPLOADED ON
                 </th>
+
+                <th
+                  className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                >
+                  UPLOADED BY
+                </th>
                 <th
                   className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
                 >
@@ -83,11 +126,12 @@ const page = ({params}) => {
                 </th>
               </tr>
             </thead>
+
             <tbody className="text-gray-700">
               {filteredFileHistory.map((file, index) => (
                 <tr key={index}>
                   <td className="px-5 py-5 pl-10 border-b border-gray-200 bg-white text-sm">
-                    <span>{file.name}</span>
+                    <span>{file.fileName}</span>
                     <button
                       onClick={() => {/* Implement share functionality */ }}
                       className="ml-2 hover:text-blue-500"
@@ -95,9 +139,11 @@ const page = ({params}) => {
                       <ShareIcon className="h-4 w-4" aria-hidden="true" />
                     </button>
                   </td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.size}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.uploadedOn}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.status}</td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.fileSize}</td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.createdAt}</td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.uploadedBy}</td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">success</td>
+
                 </tr>
               ))}
             </tbody>
@@ -105,6 +151,7 @@ const page = ({params}) => {
         </div>
       </Dashboard>
     </div>
+
   );
 };
 

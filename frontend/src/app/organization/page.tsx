@@ -5,10 +5,36 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { CreateOrganization } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
+import { useDispatch } from "react-redux";
+import { updateUserFromResponse } from "@/features/LoginSlice";
+import OrganizationList from "@/components/OrganizationList";
+import CreateOrganization from "@/components/CreateOrganization";
 
 
 export default function Home() {
+
+    const { isLoaded, isSignedIn, user } = useUser();
+    console.log(user?.primaryEmailAddress.emailAddress)
+
+
+    // const registerUser = async () => {
+    //     try {
+    //         // Make an HTTP POST request using Axios
+    //         const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user`, {
+    //             email: user?.primaryEmailAddress.emailAddress,
+    //             password: "12345678",
+    //         });
+
+    //         // Handle the response, e.g., show a success message
+    //         console.log('Registration successful:', response.data);
+    //         dispatch(updateUserFromResponse(response.data));
+    //     } catch (error) {
+    //         // Handle errors, e.g., show an error message
+    //         console.error('Registration failed:', error.message);
+    //     }
+    // };
+
 
     const [organizationName, setOrganizationName] = useState('');
     const [name, setName] = useState('');
@@ -87,8 +113,12 @@ export default function Home() {
                         <img className="w-[62.7%]" src="nft.png" alt="" />
                     </div>
                 </div>
-                <div className="flex justify-center items-center">
-                    <CreateOrganization routing="path" path="/organization" afterCreateOrganizationUrl=":slug" />
+                <div className="">
+                    {/* <CreateOrganization routing="path" path="/organization" afterCreateOrganizationUrl=":slug" /> */}
+                    <CreateOrganization />
+                    <div className="mt-10">
+                        <OrganizationList />
+                    </div>
                 </div>
             </div>
         </div>

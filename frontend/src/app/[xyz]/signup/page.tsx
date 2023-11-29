@@ -1,9 +1,10 @@
 "use client";
 import GoogleLogin from "@/components/Authentication";
 import Header from "@/components/Header";
+import { SignUp } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 
-const SignUp = (params) => {
+const Signup = (params) => {
   const [isScrolled, setIsScrolled] = useState(false);
   console.log(window.location.hostname);
   useEffect(() => {
@@ -52,4 +53,4 @@ const SignUp = (params) => {
   );
 };
 
-export default SignUp;
+export default Signup;

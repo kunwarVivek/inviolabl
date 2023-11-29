@@ -3,9 +3,12 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 
 import { UUIDParam } from '../../decorators';
@@ -14,10 +17,16 @@ import { type TenantDto } from './dtos/tenant.dto';
 import { UpdateTenantDto } from './dtos/update-tenant.dto';
 import { type TenantEntity } from './tenant.entity';
 import { TenantService } from './tenant.service';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileService } from '../fileUpload/file.service';
+import { FileEntity } from 'modules/fileUpload/file.entity';
 
 @Controller('tenants')
 export class TenantController {
-  constructor(private readonly tenantService: TenantService) {}
+  constructor(
+    private readonly tenantService: TenantService,
+    private readonly fileService: FileService,
+  ) { }
 
   @Post()
   create(@Body() createUserDto: CreateTenantDto): Promise<TenantEntity> {
@@ -48,4 +57,32 @@ export class TenantController {
   getTenantIdByDomain(@Param('domain') domain: string): Promise<string | null> {
     return this.tenantService.getTenantIdByDomain(domain);
   }
+
+  @Post('/files')
+  @UseInterceptors(FilesInterceptor('files'))
+  async uploadFiles(
+
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body('email') email: string,
+    @Body('domainId') domainId: string,
+  ) {
+    const tenant = await this.tenantService.getTenantIdByDomain(domainId);
+    if (!tenant) {
+      throw new NotFoundException('Tenant not found');
+    } else {
+      return this.fileService.uploadFiles(files, email, domainId);
+    }
+  }
+
+  @Get(':domainId/files')
+  getFilesByDomainId(@Param('domainId') domainId: string): Promise<FileEntity[]> {
+    return this.fileService.getFilesByDomainId(domainId);
+  }
+
+  @Get('/files')
+  getAllFiles(): Promise<FileEntity[]> {
+    return this.fileService.getAllFiles();
+  }
+
+
 }

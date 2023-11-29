@@ -5,6 +5,7 @@ import { UseDto } from '../../decorators';
 import { TenantDto, type TenantDtoOptions } from './dtos/tenant.dto';
 import { TenantSettingsEntity } from './tenant-settings.entity';
 import { UserEntity } from '../user/user.entity';
+import { FileEntity } from '../fileUpload/file.entity';
 
 
 @Entity({ name: 'tenants' })
@@ -17,11 +18,14 @@ export class TenantEntity extends AbstractEntity<TenantDto, TenantDtoOptions> {
   @Column({ unique: true, nullable: true, type: 'varchar' })
   domain!: string;
 
-  @Column({ unique: true, nullable: true, type: 'varchar' })
+  @Column({ nullable: true, type: 'varchar' })
   email!: string;
 
   @Column({ nullable: true, type: 'varchar' })
   phone!: string | null;
+
+  @OneToMany(() => FileEntity, (file) => file.tenant, { eager: true, cascade: true })
+  files?: FileEntity[];
 
   @OneToOne(
     () => TenantSettingsEntity,

@@ -7,12 +7,15 @@ import { TenantEntity } from './tenant.entity';
 import { TenantService } from './tenant.service';
 import { TenantSettingsEntity } from './tenant-settings.entity';
 
+import { FileService } from '../fileUpload/file.service';
+import { FileEntity } from '../fileUpload/file.entity';
+
 // const handlers = [CreateSettingsHandler];
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TenantEntity, TenantSettingsEntity])],
+  imports: [TypeOrmModule.forFeature([TenantEntity, TenantSettingsEntity,FileEntity])],
   controllers: [TenantController],
   exports: [TenantService],
-  providers: [TenantService],
+  providers: [TenantService, FileService],
 })
 export class TenantModule {}
