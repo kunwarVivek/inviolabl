@@ -5,7 +5,7 @@ import { ShareIcon } from "@heroicons/react/24/solid";
 import DropdownMenu from "@/components/DropdownMenu";
 // import { useValidation } from "@/components/Validation";
 import loading from "@/app/loading";
-import { useOrganization, useUser } from "@clerk/nextjs";
+import { OrganizationList, useOrganization, useOrganizationList, useUser } from "@clerk/nextjs";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import axios from "axios";
@@ -15,6 +15,12 @@ const page = ({ params }) => {
   const userDetails = useSelector(
     (state: RootState) => state.user.details
   );
+
+  const {
+    organization: currentOrganization,
+    membership,
+    isLoaded,
+  } = useOrganization();
 
 
   console.log(userDetails)
@@ -26,12 +32,12 @@ const page = ({ params }) => {
 
   useEffect(() => {
     const fetchUserFiles = async () => {
+      
       try {
-        if (user) {
-          const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/files/all`);
-          const filteredData = response.data.filter(item => item.userId === (user?.primaryEmailAddress.emailAddress === userDetails.email ? 20 : 21));
-          setFileHistory(filteredData);
-          setUserFiles(filteredData)
+        if (currentOrganization.id) {
+          const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tenants/${currentOrganization.id}/files`);
+          setFileHistory(response.data);
+          setUserFiles(response.data)
         }
       } catch (error) {
         console.error('Error fetching user files:', error);
@@ -55,7 +61,7 @@ const page = ({ params }) => {
 
   const filteredFileHistory = filter === 'all'
     ? fileHistory
-    : fileHistory.filter(file => file.filename.endsWith(`.${filter.toLowerCase()}`));
+    : fileHistory.filter(file => file && file.filename && file.filename.endsWith(`.${filter.toLowerCase()}`));
 
   const handleFilterChange = (selectedFilter) => {
     setFilter(selectedFilter.toLowerCase());
@@ -64,7 +70,7 @@ const page = ({ params }) => {
   const modifiedOptions = ["Today", "Last Week", "Last Month"];
 
   return (
-    
+
     <div className="bg-white min-h-screen">
       <Dashboard>
         <div className="overflow-x-auto min-h-screen bg-white rounded-md border shadow-2xl">
@@ -97,15 +103,21 @@ const page = ({ params }) => {
                 >
                   FILE NAME
                 </th>
-                {/* <th
+                <th
                   className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
                 >
                   SIZE
-                </th> */}
+                </th>
                 <th
                   className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
                 >
                   UPLOADED ON
+                </th>
+
+                <th
+                  className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                >
+                  UPLOADED BY
                 </th>
                 <th
                   className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
@@ -119,7 +131,7 @@ const page = ({ params }) => {
               {filteredFileHistory.map((file, index) => (
                 <tr key={index}>
                   <td className="px-5 py-5 pl-10 border-b border-gray-200 bg-white text-sm">
-                    <span>{file.filename}</span>
+                    <span>{file.fileName}</span>
                     <button
                       onClick={() => {/* Implement share functionality */ }}
                       className="ml-2 hover:text-blue-500"
@@ -127,9 +139,11 @@ const page = ({ params }) => {
                       <ShareIcon className="h-4 w-4" aria-hidden="true" />
                     </button>
                   </td>
-                  {/* <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">1mb</td> */}
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.fileSize}</td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.createdAt}</td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.uploadedBy}</td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">success</td>
+
                 </tr>
               ))}
             </tbody>
@@ -137,7 +151,7 @@ const page = ({ params }) => {
         </div>
       </Dashboard>
     </div>
-    
+
   );
 };
 

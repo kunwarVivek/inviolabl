@@ -3,7 +3,7 @@ import Dashboard from "@/components/Dashboard";
 import React, { useState } from "react";
 import { ShareIcon } from "@heroicons/react/24/solid";
 import DropdownMenu from "@/components/DropdownMenu";
-import { useValidation } from "@/components/Validation";
+// import { useValidation } from "@/components/Validation";
 import loading from "@/app/loading";
 
 const page = ({params}) => {
@@ -17,11 +17,11 @@ const page = ({params}) => {
   ]);
   console.log(filter);
 
-  const isLoading = useValidation(params.xyz)
+  // const isLoading = useValidation(params.xyz)
 
-    if (isLoading) {
-        return loading
-      }
+  //   if (isLoading) {
+  //       return loading
+  //     }
 
   const filteredFileHistory = filter === 'all'
     ? fileHistory

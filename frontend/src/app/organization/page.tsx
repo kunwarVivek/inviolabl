@@ -5,9 +5,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { CreateOrganization, useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { useDispatch } from "react-redux";
 import { updateUserFromResponse } from "@/features/LoginSlice";
+import OrganizationList from "@/components/OrganizationList";
+import CreateOrganization from "@/components/CreateOrganization";
 
 
 export default function Home() {
@@ -111,8 +113,12 @@ export default function Home() {
                         <img className="w-[62.7%]" src="nft.png" alt="" />
                     </div>
                 </div>
-                <div className="flex justify-center items-center">
-                    <CreateOrganization routing="path" path="/organization" afterCreateOrganizationUrl=":slug" />
+                <div className="">
+                    {/* <CreateOrganization routing="path" path="/organization" afterCreateOrganizationUrl=":slug" /> */}
+                    <CreateOrganization />
+                    <div className="mt-10">
+                        <OrganizationList />
+                    </div>
                 </div>
             </div>
         </div>

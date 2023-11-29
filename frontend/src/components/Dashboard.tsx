@@ -15,8 +15,9 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useSession } from "next-auth/react";
 
-const Dashboard = ({ children }) => {
+const Dashboard = ({ children },params) => {
   const pathname = usePathname();
+  console.log(params.abc)
   const { data: session, status } = useSession();
   const tenantDetails = useSelector(
     (state: RootState) => state.tenant.details
@@ -101,8 +102,8 @@ const Dashboard = ({ children }) => {
 
             {isSidebarOpen && transitionComplete && (
               <Link
-                href={isTenantIncluded ? `/${tenantDetails.name}/dashboard` : "/dashboard"}
-                className={`block p-2 px-4 text-sm rounded-[100px] transition duration-200 font-semibold  ${isActive("/dashboard") || isActive(`/${tenantDetails.name}/dashboard`)
+                href={`/organizations/${params.abc}/dashboard`}
+                className={`block p-2 px-4 text-sm rounded-[100px] transition duration-200 font-semibold  ${isActive(`/organizations/${params.abc}/dashboard`)
                   ? "bg-[#c2e7ff] text-black"
                   : "hover:bg-gray-300"
                   }  `}

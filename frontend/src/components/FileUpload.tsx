@@ -1,15 +1,25 @@
 "use client";
+import { useOrganization, useUser } from "@clerk/nextjs";
 import { Dialog, Transition } from "@headlessui/react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import React, { Fragment, useCallback, useRef, useState } from "react";
 import { toast } from "react-toastify";
+
+
 const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
   const [files, setFiles] = useState<File[]>([]);
   const [totalSize, setTotalSize] = useState<number>(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const maxTotalSize = 500 * 1024 * 1024; // 500MB in bytes
   const router = useRouter()
+
+  const { isLoaded, isSignedIn, user } = useUser();
+  console.log(user?.primaryEmailAddress.emailAddress)
+
+  const {
+    organization: currentOrganization,
+  } = useOrganization();
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -62,11 +72,14 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
     const formData = new FormData();
 
     files.forEach((file) => {
-      formData.append('file', file);
+      formData.append('files', file);
     });
 
+    formData.append('email', user?.primaryEmailAddress.emailAddress);
+    formData.append('domainId', currentOrganization.id);
+
     try {
-      const response = await axios.post('http://localhost:3001/user/file', formData, {
+      const response = await axios.post('http://localhost:3001/tenants/files', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -79,7 +92,8 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
         theme: 'colored',
         progressStyle: { background: 'rgb(216 180 254)' },
         style: { background: 'rgb(126 34 206)' },
-    });
+      });
+      await window.location.reload()
 
       // Clear the state after successful upload
       setFiles([]);
@@ -87,8 +101,8 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
 
       // Close the modal
       closeModal();
-      
-      
+
+
     } catch (error) {
       // Handle errors
       console.error('File upload failed:', error);
