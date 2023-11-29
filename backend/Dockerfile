@@ -1,31 +1,30 @@
-# Build stage
-FROM node:lts-alpine AS builder
-WORKDIR /app
-
-# Copy package files and install dependencies
+FROM node:lts AS dist
 COPY package.json yarn.lock ./
+
 RUN yarn install
 
-# Copy the rest of your app's source code from your host to your image filesystem.
 COPY . ./
 
-# Build the application
 RUN yarn build:prod
 
-# Production stage
-FROM node:lts-alpine
-WORKDIR /usr/src/app
-
-# Copy built assets from builder stage
-COPY --from=builder /app/dist ./dist
-
-# Install only production dependencies
+FROM node:lts AS node_modules
 COPY package.json yarn.lock ./
+
 RUN yarn install --prod
 
-# Set the default port for the container
+FROM node:lts
+
 ARG PORT=3000
+
+RUN mkdir -p /usr/src/app
+
+WORKDIR /usr/src/app
+
+COPY --from=dist dist /usr/src/app/dist
+COPY --from=node_modules node_modules /usr/src/app/node_modules
+
+COPY . /usr/src/app
+
 EXPOSE $PORT
 
-# Start the application
 CMD [ "yarn", "start:prod" ]
