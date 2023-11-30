@@ -5,6 +5,15 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import { Icon } from "@iconify/react";
+import  collimg1  from '../../public/coll-1.jpg';
+import  collimg2  from '../../public/coll-2.jpg';
+import  collimg3  from '../../public/coll-3.jpg';
+import  collimg4  from '../../public/coll-4.jpg';
+import  collimg5  from '../../public/coll-5.jpg';
+import dummyProfileImg from "../../public/dummy-profile-image-1.jpg"
+
+
+
 
 const HotCollections = () => {
   const settings = {
@@ -42,7 +51,7 @@ const HotCollections = () => {
             <div className="max-w-xs mx-auto bg-white border border-gray-200 rounded-lg shadow">
               <div className="relative w-full">
                 <Image
-                  src="/coll-1.jpg"
+                  src={collimg1}
                   alt=""
                   height={300} width={300}
                   objectFit="cover" // Ensures the image covers the area nicely
@@ -51,7 +60,7 @@ const HotCollections = () => {
                 <div className="absolute z-20 -bottom-4 left-[40%] ">
                   <div className="rounded-full bg-white border-2 p-0.5 border-white">
                     <Image
-                      src="/dummy-profile-image-1.jpg"
+                      src={dummyProfileImg}
                       width={40}
                       height={40}
                       alt=""
@@ -75,11 +84,11 @@ const HotCollections = () => {
           <div className="p-4 slick-slide">
             <div className="max-w-sm mb-5 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
               <div className="relative">
-                <Image height={300} width={300} src="/coll-2.jpg" alt="" />
+                <Image height={300} width={300} src={collimg2} alt="" />
                 <div className="absolute z-20 -bottom-4 left-[40%] ">
                   <div className="rounded-full bg-white border-2 p-0.5 border-white">
                     <Image
-                      src="/dummy-profile-image-1.jpg"
+                      src={dummyProfileImg}
                       width={40}
                       height={40}
                       alt=""
@@ -104,11 +113,11 @@ const HotCollections = () => {
           <div className="p-4 slick-slide">
             <div className="max-w-sm mb-5 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
               <div className="relative">
-                <Image height={300} width={300} src="/coll-4.jpg" alt="" />
+                <Image height={300} width={300} src={collimg4} alt="" />
                 <div className="absolute z-20 -bottom-4 left-[40%] ">
                   <div className="rounded-full bg-white border-2 p-0.5 border-white">
                     <Image
-                      src="/dummy-profile-image-1.jpg"
+                      src={dummyProfileImg}
                       width={40}
                       height={40}
                       alt=""
@@ -132,11 +141,11 @@ const HotCollections = () => {
           <div className="p-4 slick-slide">
             <div className="max-w-sm mb-5 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
               <div className="relative">
-                <Image height={300} width={300} src="/coll-5.jpg" alt="" />
+                <Image height={300} width={300} src={collimg5} alt="" />
                 <div className="absolute z-20 -bottom-4 left-[40%] ">
                   <div className="rounded-full bg-white border-2 p-0.5 border-white">
                     <Image
-                      src="/dummy-profile-image-1.jpg"
+                      src={dummyProfileImg}
                       width={40}
                       height={40}
                       alt=""
@@ -160,11 +169,11 @@ const HotCollections = () => {
           <div className="p-4 slick-slide">
             <div className="max-w-sm mb-5 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
               <div className="relative">
-                <img height={300} width={300} src="/coll-3.jpg" alt="" />
+                <Image height={300} width={300} src={collimg3} alt="" />
                 <div className="absolute z-20 -bottom-4 left-[40%] ">
                   <div className="rounded-full bg-white border-2 p-0.5 border-white">
                     <Image
-                      src="/dummy-profile-image-1.jpg"
+                      src={dummyProfileImg}
                       width={40}
                       height={40}
                       alt=""

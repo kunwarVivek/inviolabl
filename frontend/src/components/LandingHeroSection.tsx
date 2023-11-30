@@ -1,3 +1,6 @@
+import Image from "next/image";
+import nftImg from "../../public/nft.png"
+
 const LandingHeroSection = () => {
   return (
     <div className="flex flex-col md:flex-row justify-between items-center max-w-screen-xl mx-auto px-4">
@@ -18,7 +21,7 @@ const LandingHeroSection = () => {
         </button>
       </div>
       <div className="w-full md:w-1/2">
-        <img src="/nft.png" alt="" className="w-full object-contain" />
+        <Image src={nftImg} alt="" className="w-full object-contain" />
       </div>
     </div>
   );

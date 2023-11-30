@@ -4,14 +4,16 @@ import Image from "next/image";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Icon } from "@iconify/react";
+import backgroundImg from "../../public/background-image.png";
+import dummyProfileImg from "../../public/dummy-profile-image-1.jpg"
 
 const items = [
   // Assuming this is your data structure
-  { id: 1, name: "Pinky Ocean", likes: 51, image: "/background-image.png" },
-  { id: 2, name: "Deep Sea Phantasy", likes: 81, image: "/background-image.png" },
-  { id: 3, name: "Rainbow Style", likes: 51, image: "/background-image.png" },
-  { id: 4, name: "Two Tigers", likes: 81, image: "/background-image.png" },
-  { id: 5, name: "Granden Lamb", likes: 41, image: "/background-image.png" },
+  { id: 1, name: "Pinky Ocean", likes: 51, image: backgroundImg },
+  { id: 2, name: "Deep Sea Phantasy", likes: 81, image: backgroundImg },
+  { id: 3, name: "Rainbow Style", likes: 51, image: backgroundImg },
+  { id: 4, name: "Two Tigers", likes: 81, image: backgroundImg },
+  { id: 5, name: "Granden Lamb", likes: 41, image: backgroundImg },
 
 ];
 
@@ -69,7 +71,7 @@ const NewCollections = () => {
           <div key={item.id} className="p-4">
           <div className="bg-white rounded-lg shadow-lg">
             <div className="px-8 py-10 relative">
-              <img
+              <Image
                 src={item.image}
                 alt={item.name}
                 width={500}
@@ -79,7 +81,7 @@ const NewCollections = () => {
               <div className="absolute z-20 top-5  left-4 ">
                   <div className="rounded-full bg-white border-2 border-white">
                     <Image
-                      src="/dummy-profile-image-1.jpg"
+                      src={dummyProfileImg}
                       width={40}
                       height={40}
                       alt=""
