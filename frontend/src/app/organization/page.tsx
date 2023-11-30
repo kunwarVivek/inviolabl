@@ -110,7 +110,7 @@ export default function Home() {
                         </div>
                     </div>
                     <div className="flex mt-10 justify-center items-center text-center">
-                        <img className="w-[62.7%]" src="nft.png" alt="" />
+                        <img className="w-[62.7%]" src="\nft.png" alt="" />
                     </div>
                 </div>
                 <div className="">
