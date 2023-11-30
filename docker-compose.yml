@@ -41,6 +41,8 @@ services:
       - postgres
 
   frontend:
+    env_file:
+      - .env
     container_name: ${PROJECT_SLUG}_frontend
     restart: unless-stopped
     build: ./frontend/
