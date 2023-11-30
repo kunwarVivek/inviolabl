@@ -13,6 +13,7 @@ services:
     volumes:
       - ./backend:/app/backend # Add read-only if no modification is needed
       - ./conf/nginx/:/etc/nginx:ro
+      - /etc/nginx/data/certs:/etc/nginx/data/certs
       - ./logs/nginx/:/var/log/nginx
       - /etc/localtime:/etc/localtime:ro
     depends_on:
