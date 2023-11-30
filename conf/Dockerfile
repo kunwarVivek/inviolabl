@@ -4,6 +4,8 @@ FROM nginx:stable-alpine
 RUN mkdir -p /etc/nginx/certs
 
 # Copy SSL certificates from the host to the container
-COPY ./data/certs /etc/nginx/certs
+COPY /conf/nginx/data/certs /etc/nginx/certs
+
+
 
 
