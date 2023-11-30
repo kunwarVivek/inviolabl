@@ -42,7 +42,7 @@ const Auth = () => {
   };
 
   if (status === "authenticated") {
-    router.push(`/${tenantDetails.name}/dashboard`);
+    router.push(`/${tenantDetails?.name}/dashboard`);
   }
   if (status === "loading") {
     return (
