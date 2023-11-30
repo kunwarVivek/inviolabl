@@ -2,6 +2,7 @@ version: "3.8" # Upgrade to a more recent version if possible for better feature
 
 services:
   nginx:
+    build: ./conf/
     image: nginx:stable-alpine # Use the alpine version for a smaller image size
     restart: unless-stopped
     container_name: ${PROJECT_SLUG}_nginx
@@ -14,11 +15,9 @@ services:
       - ./backend:/app/backend # Add read-only if no modification is needed
       - ./conf/nginx/:/etc/nginx:ro
       - ./logs/nginx/:/var/log/nginx
-      -  certs:/etc/nginx/certs
       - /etc/localtime:/etc/localtime:ro
     depends_on:
       - backend
-    command: /bin/sh -c "mkdir -p /etc/nginx/certs && nginx -g 'daemon off;'"  
 
   backend:
     env_file:
@@ -68,7 +67,6 @@ services:
 
 volumes:
   postgres:
-  certs: ./conf/nginx/data/certs
     # driver: local  # Uncomment and specify if needed
 
 networks:
