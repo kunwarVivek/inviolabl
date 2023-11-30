@@ -79,7 +79,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
     formData.append('domainId', currentOrganization.id);
 
     try {
-      const response = await axios.post('http://localhost:3001/tenants/files', formData, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tenants/files`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
