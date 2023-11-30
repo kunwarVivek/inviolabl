@@ -10,6 +10,8 @@ import { useDispatch } from "react-redux";
 import { updateUserFromResponse } from "@/features/LoginSlice";
 import OrganizationList from "@/components/OrganizationList";
 import CreateOrganization from "@/components/CreateOrganization";
+import nftImg from "../../../public/nft.png"
+import Image from "next/image";
 
 
 export default function Home() {
@@ -110,7 +112,8 @@ export default function Home() {
                         </div>
                     </div>
                     <div className="flex mt-10 justify-center items-center text-center">
-                        <img className="w-[62.7%]" src="\nft.png" alt="" />
+                        {/* <img className="w-[62.7%]" src={nftImg} alt="" /> */}
+                        <Image src={nftImg} alt="NFT Image" className="w-[62.7%]" />
                     </div>
                 </div>
                 <div className="">
