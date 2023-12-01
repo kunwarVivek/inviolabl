@@ -75,7 +75,7 @@ const Auth = () => {
               </p>
             </div>
             <div className="w-1/2 max-w-md">
-              <SignIn path="/xyz/signin" routing="path" signUpUrl="/xyz/signup" afterSignInUrl="/organization" />
+              <SignIn afterSignInUrl="/organization" />
             </div>
           </div>
         </div>

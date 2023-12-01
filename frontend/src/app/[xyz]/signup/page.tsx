@@ -46,7 +46,7 @@ const Signup = (params) => {
           </p>
         </div>
         <div className="w-1/2 max-w-md">
-          <SignUp path="/xyz/signup" routing="path" signInUrl="/xyz/signin" afterSignUpUrl="/organization" />
+          <SignUp afterSignUpUrl="/organization" />
         </div>
       </div>
     </div>
