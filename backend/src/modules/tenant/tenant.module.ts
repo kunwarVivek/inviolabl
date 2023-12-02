@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 // import { CreateSettingsHandler } from './commands/create-settings.command';
@@ -9,13 +9,19 @@ import { TenantSettingsEntity } from './tenant-settings.entity';
 
 import { FileService } from '../fileUpload/file.service';
 import { FileEntity } from '../fileUpload/file.entity';
+import { ClerkSessionMiddleware } from '../../middleware/middleware';
 
 // const handlers = [CreateSettingsHandler];
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TenantEntity, TenantSettingsEntity,FileEntity])],
+  imports: [TypeOrmModule.forFeature([TenantEntity, TenantSettingsEntity, FileEntity])],
   controllers: [TenantController],
   exports: [TenantService],
   providers: [TenantService, FileService],
 })
-export class TenantModule {}
+export class TenantModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    // Apply the ClerkSessionMiddleware to all routes or specific routes
+    consumer.apply(ClerkSessionMiddleware).forRoutes('tenants'); // Add your route path
+  }
+}
