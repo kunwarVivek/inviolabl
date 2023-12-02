@@ -16,7 +16,7 @@
     "@reduxjs/toolkit": "^1.9.7",
     "axios": "^1.6.2",
     "clsx": "^2.0.0",
-    "ethers": "^6.8.1",
+    "ethers": "^6.9.0",
     "heroicons": "^2.0.18",
     "micro": "^10.0.1",
     "next": "14.0.3",
@@ -32,7 +32,7 @@
     "slick-carousel": "^1.8.1",
     "svix": "^1.14.0",
     "tailwind-merge": "^2.0.0",
-    "viem": "^1.19.9",
+    "viem": "^1.19.11",
     "wagmi": "^1.4.7"
   },
   "devDependencies": {
