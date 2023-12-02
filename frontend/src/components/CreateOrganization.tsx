@@ -30,7 +30,7 @@ export default function CreateOrganization() {
 
         axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tenants`, tenantData, {
             headers: {
-              'session_id': sessionId,
+              'Session_id': sessionId,
             },})
             .then(tenantResponse => {
 

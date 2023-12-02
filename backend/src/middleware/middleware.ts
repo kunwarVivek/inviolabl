@@ -8,7 +8,7 @@ export class ClerkSessionMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: NextFunction) {
     try {
       // Retrieve the particular session ID from a header
-      const session_id = req.header('session_id');
+      const session_id = req.header('Session_id');
 
       const clerkClient = Clerk({ secretKey: process.env.CLERK_SECRET_KEY });
 

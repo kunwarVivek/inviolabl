@@ -84,7 +84,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tenants/files`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          'session_id': sessionId,
+          'Session_id': sessionId,
         },
       });
       // Handle the response as needed
