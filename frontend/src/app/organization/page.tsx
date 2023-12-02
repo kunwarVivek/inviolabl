@@ -5,13 +5,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useSessionList, useUser } from "@clerk/nextjs";
 import { useDispatch } from "react-redux";
 import { updateUserFromResponse } from "@/features/LoginSlice";
 import OrganizationList from "@/components/OrganizationList";
 import CreateOrganization from "@/components/CreateOrganization";
 import nftImg from "../../../public/nft.png"
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 
 export default function Home() {
@@ -19,6 +20,9 @@ export default function Home() {
     const { isLoaded, isSignedIn, user } = useUser();
     console.log(user?.primaryEmailAddress.emailAddress)
 
+    const {  userId, sessionId, getToken } = useAuth();
+    console.log(sessionId, userId, getToken)
+    
 
     // const registerUser = async () => {
     //     try {

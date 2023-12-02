@@ -1,5 +1,5 @@
 "use client";
-import { useOrganization, useUser } from "@clerk/nextjs";
+import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
 import { Dialog, Transition } from "@headlessui/react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -13,6 +13,8 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const maxTotalSize = 500 * 1024 * 1024; // 500MB in bytes
   const router = useRouter()
+  const {  userId, sessionId, getToken } = useAuth();
+
 
   const { isLoaded, isSignedIn, user } = useUser();
   console.log(user?.primaryEmailAddress.emailAddress)
@@ -82,9 +84,9 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tenants/files`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          'session_id': sessionId,
         },
       });
-
       // Handle the response as needed
       console.log('File upload success:', response.data);
       toast.success(`file uploaded`, {

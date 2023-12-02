@@ -1,4 +1,4 @@
-import { useOrganizationList, useUser } from "@clerk/nextjs";
+import { useAuth, useOrganizationList, useUser } from "@clerk/nextjs";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { FormEventHandler, useState } from "react";
@@ -8,6 +8,7 @@ export default function CreateOrganization() {
     const { createOrganization, setActive } = useOrganizationList();
     const [organizationName, setOrganizationName] = useState("");
     const { isLoaded, isSignedIn, user } = useUser();
+    const {  userId, sessionId, getToken } = useAuth();
 
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -27,7 +28,10 @@ export default function CreateOrganization() {
             "phone": "12345678"
         };
 
-        axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tenants`, tenantData)
+        axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tenants`, tenantData, {
+            headers: {
+              'session_id': sessionId,
+            },})
             .then(tenantResponse => {
 
                 console.log(tenantResponse.data);
