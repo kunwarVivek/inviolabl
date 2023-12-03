@@ -5,7 +5,7 @@ import { ShareIcon } from "@heroicons/react/24/solid";
 import DropdownMenu from "@/components/DropdownMenu";
 // import { useValidation } from "@/components/Validation";
 import loading from "@/app/loading";
-import { OrganizationList, useOrganization, useOrganizationList, useUser } from "@clerk/nextjs";
+import { OrganizationList, useAuth, useOrganization, useOrganizationList, useUser } from "@clerk/nextjs";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import axios from "axios";
@@ -15,6 +15,9 @@ const page = ({ params }) => {
   const userDetails = useSelector(
     (state: RootState) => state.user.details
   );
+
+  const {  userId, sessionId, getToken } = useAuth();
+
 
   const {
     organization: currentOrganization,
@@ -35,7 +38,11 @@ const page = ({ params }) => {
       
       try {
         if (currentOrganization.id) {
-          const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tenants/${currentOrganization.id}/files`);
+          const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tenants/${currentOrganization.id}/files`,
+          {
+            headers: {
+              'Session_id': sessionId,
+            }});
           setFileHistory(response.data);
           setUserFiles(response.data)
         }
