@@ -85,7 +85,7 @@ const page = ({ params }) => {
             <thead className="bg-white text-black ">
               <tr>
                 <th colSpan={4} className="py-2">
-                  <div className="pl-10 py-5 bg-slate-100 text-start space-x-4 mt-[4.5rem] mb-2">
+                  <div className="pl-10 py-5 bg-slate-100 text-start space-x-4 mt-14 mb-2">
                     <span className="font-semibold text-xl">File History</span>
                   </div>
                 </th>

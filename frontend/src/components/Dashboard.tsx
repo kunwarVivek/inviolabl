@@ -14,10 +14,12 @@ import {
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useSession } from "next-auth/react";
+import { useOrganization } from "@clerk/nextjs";
 
-const Dashboard = ({ children },params) => {
+const Dashboard = ({ children }, params) => {
   const pathname = usePathname();
-  console.log(params.abc)
+  const { organization } = useOrganization();
+
   const { data: session, status } = useSession();
   const tenantDetails = useSelector(
     (state: RootState) => state.tenant.details
@@ -76,7 +78,7 @@ const Dashboard = ({ children },params) => {
           </button>
 
           {/* Navigation Links */}
-          <nav className={`flex flex-col ${!isSidebarOpen && "items-center"} px-2 pt-10 gap-3`}>
+          <nav className={`flex flex-col ${!isSidebarOpen && "items-center"} px-2 pt-10 ${!isSidebarOpen ? "gap-10" : "gap-4"}`}>
             {/* Conditional rendering based on sidebar state */}
             {isSidebarOpen && transitionComplete && (
               <button
@@ -102,9 +104,9 @@ const Dashboard = ({ children },params) => {
 
             {isSidebarOpen && transitionComplete && (
               <Link
-                href={`/organizations/${params.abc}/dashboard`}
-                className={`block p-2 px-4 text-sm rounded-[100px] transition duration-200 font-semibold  ${isActive(`/organizations/${params.abc}/dashboard`)
-                  ? "bg-[#c2e7ff] text-black"
+                href={`/organization/${organization?.name}/dashboard`}
+                className={`block p-2 px-4 text-sm rounded-[100px] transition duration-200 font-semibold  ${isActive(`/organization/${organization?.name}/dashboard`)
+                  ? "bg-[#c1acff] text-black"
                   : "hover:bg-gray-300"
                   }  `}
               >
@@ -120,7 +122,7 @@ const Dashboard = ({ children },params) => {
               </Link>
             )}  {!isSidebarOpen && (
               <Link
-                href={isTenantIncluded ? `/${tenantDetails.name}/dashboard` : "/dashboard"}>
+                href={organization ? `/organization/${organization?.name}/dashboard` : "/dashboard"}>
                 <img
                   src="https://cdn-icons-png.flaticon.com/512/1828/1828765.png"
                   width={20}
@@ -129,33 +131,24 @@ const Dashboard = ({ children },params) => {
                 />
               </Link>
             )}
-            {isSidebarOpen && transitionComplete && status === "authenticated" && userDetails?.role === 'ADMIN' && (
+            {isSidebarOpen && transitionComplete && (
               <Link
-                href={isTenantIncluded ? `/${tenantDetails.name}/admin/sharepage` : "/admin/sharepage"}
-                className={`block p-2 px-4 text-sm rounded-[100px] transition duration-200 font-semibold  ${isActive("/admin/sharepage") || isActive(`/${tenantDetails.name}/admin/sharepage`)
-                  ? "bg-[#c2e7ff] text-black"
+                href={organization ? `/organization/${organization?.name}/sharepage` : "/admin/sharepage"}
+                className={`block p-2 px-4 text-sm rounded-[100px] transition duration-200 font-semibold  ${isActive(`/organization/${organization?.name}/sharepage`)
+                  ? "bg-[#c1acff] text-black"
                   : "hover:bg-gray-300"
                   } `}
               >
                 <div className={`flex items-center `}>
-                  <img
-                    src="https://cdn-icons-png.flaticon.com/512/1828/1828765.png"
-                    width={17}
-                    height={17}
-                    alt=""
-                  />
-                  <span className="text-sm font-semibold ml-2">Share Invite</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 512 512"><path d="M215.4 96H144 107.8 96v8.8V144v40.4 89L.2 202.5c1.6-18.1 10.9-34.9 25.7-45.8L48 140.3V96c0-26.5 21.5-48 48-48h76.6l49.9-36.9C232.2 3.9 243.9 0 256 0s23.8 3.9 33.5 11L339.4 48H416c26.5 0 48 21.5 48 48v44.3l22.1 16.4c14.8 10.9 24.1 27.7 25.7 45.8L416 273.4v-89V144 104.8 96H404.2 368 296.6 215.4zM0 448V242.1L217.6 403.3c11.1 8.2 24.6 12.7 38.4 12.7s27.3-4.4 38.4-12.7L512 242.1V448v0c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64v0zM176 160H336c8.8 0 16 7.2 16 16s-7.2 16-16 16H176c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H336c8.8 0 16 7.2 16 16s-7.2 16-16 16H176c-8.8 0-16-7.2-16-16s7.2-16 16-16z" /></svg>
+
+                  <span className="text-sm font-semibold ml-2">Invite</span>
                 </div>
               </Link>
-            )}  {!isSidebarOpen && status === "authenticated" && userDetails?.role === 'ADMIN' && (
+            )}  {!isSidebarOpen && status === "authenticated" && (
               <Link
-                href={isTenantIncluded ? `/${tenantDetails.name}/admin/sharepage` : "/admin/sharepage"}>
-                <img
-                  src="https://cdn-icons-png.flaticon.com/512/1828/1828765.png"
-                  width={20}
-                  height={20}
-                  alt=""
-                />
+                href={organization ? `/organization/${organization?.name}/sharepage` : "/admin/sharepage"}>
+                <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 512 512"><path d="M215.4 96H144 107.8 96v8.8V144v40.4 89L.2 202.5c1.6-18.1 10.9-34.9 25.7-45.8L48 140.3V96c0-26.5 21.5-48 48-48h76.6l49.9-36.9C232.2 3.9 243.9 0 256 0s23.8 3.9 33.5 11L339.4 48H416c26.5 0 48 21.5 48 48v44.3l22.1 16.4c14.8 10.9 24.1 27.7 25.7 45.8L416 273.4v-89V144 104.8 96H404.2 368 296.6 215.4zM0 448V242.1L217.6 403.3c11.1 8.2 24.6 12.7 38.4 12.7s27.3-4.4 38.4-12.7L512 242.1V448v0c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64v0zM176 160H336c8.8 0 16 7.2 16 16s-7.2 16-16 16H176c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H336c8.8 0 16 7.2 16 16s-7.2 16-16 16H176c-8.8 0-16-7.2-16-16s7.2-16 16-16z" /></svg>
               </Link>
             )}
             {/* More links */}
