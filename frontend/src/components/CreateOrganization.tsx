@@ -18,22 +18,23 @@ export default function CreateOrganization() {
 
     const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
-        const organization = await createOrganization({ name: organizationName });
-        setOrganizationName("");
-        setActive({ organization });
-        const tenantData = {
-            "name": organization.name,
-            "domain": organization.id,
-            "email": user?.primaryEmailAddress.emailAddress,
-            "phone": "12345678"
-        };
+        try {
+            const organization = await createOrganization({ name: organizationName });
+            setOrganizationName("");
+            setActive({ organization });
+            const tenantData = {
+                "name": organization.name,
+                "domain": organization.id,
+                "email": user?.primaryEmailAddress.emailAddress,
+                "phone": "12345678"
+            };
 
-        axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tenants`, tenantData, {
-            headers: {
-              'Session_id': sessionId,
-            },})
+            await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tenants`, tenantData, {
+                headers: {
+                  'Session_id': sessionId,
+                },
+            })
             .then(tenantResponse => {
-
                 console.log(tenantResponse.data);
                 // toast.success(`Hi ${name}, a tenant with the domain ${organizationName}.inviolabl.com has been created, and a user has been associated. You will receive an email notification.`, {
                 //     pauseOnHover: true,
@@ -41,12 +42,11 @@ export default function CreateOrganization() {
                 //     progressStyle: { background: 'rgb(216 180 254)' },
                 //     style: { background: 'rgb(126 34 206)' },
                 // });
-
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                toast.error('Error');
             });
+        } catch (error) {
+            console.error('Error:', error);
+            toast.error('Error');
+        }
     };
 
     return (
