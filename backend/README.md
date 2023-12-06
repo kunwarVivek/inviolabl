@@ -1,93 +1,55 @@
-# Awesome NestJS Boilerplate v10
 
-[![Awesome NestJS](https://img.shields.io/badge/Awesome-NestJS-blue.svg?longCache=true&style=flat-square)](https://github.com/juliandavidmr/awesome-nestjs)
+## NestJs Backend with PostgreSQL
 
-> This is an ever-evolving, very opinionated architecture and dev environment for new node projects using [NestJS](https://nestjs.com). Questions, feedback, and for now, even bikeshedding are welcome. 😄
+This project is a backend application built with NestJS framework and uses PostgreSQL as the database and clerk-sdk to handle clerk frontend accounts user details and organizations. It provides a robust and scalable foundation for building modern web applications.
 
-## Getting started
+## Getting Started
 
-```bash
-# 1. Clone the repository or click on "Use this template" button.
-npx degit NarHakobyan/awesome-nest-boilerplate my-nest-app
+# Prerequisites
 
-# 2. Enter your newly-cloned folder.
-cd my-nest-app
+Before you begin, make sure you have the following installed on your machine:
 
-# 3. Create Environment variables file.
-cp .env.example .env
+Node.js
+npm or Yarn
+PostgreSQL database server
 
-# 3. Install dependencies. (Make sure yarn is installed: https://yarnpkg.com/lang/en/docs/install)
+# Install dependencies:
+
 yarn
-```
 
-## Checklist
+# Configuration
 
-When you use this template, try follow the checklist to update your info properly
+Create a .env file in the root of your project and configure the PostgreSQL database connection:
 
-- [ ] Change the author name in `LICENSE`
-- [ ] Change configurations in `.env`
-- [ ] Remove the `.github` folder which contains the funding info
-- [ ] Clean up the README.md file
+DATABASE_HOST=your-postgres-host
+DATABASE_PORT=your-postgres-port
+DATABASE_USERNAME=your-postgres-username
+DATABASE_PASSWORD=your-postgres-password
+DATABASE_NAME=your-postgres-database
 
-And, enjoy :)
+CLERK_SECRET_KEY=your-clerk-next-frontend-secret-key
 
+# Usage
 
-### Development
-```bash
-# 4. Run development server and open http://localhost:3000
+To start the development server, run:
+
 yarn start:dev
 
-# 5. Read the documentation linked below for "Setup and development".
-```
+Visit http://localhost:3001 in your browser to see your app.
 
-### Build
+check the api's and test it in postman or any other tool to further use it.
 
-To build the App, run
+please note that for every api call, you need to pass active Session-id in the request header with key as "Session-id" from frontend. It will be authenticated here in the backend using clerk-sdk-node. Both frontend and backend are connected with clerk using CLERK_SECRET_KEY.
 
-```bash
-yarn build:prod
-```
+you can get the session id of the user from the console of the frontend.
 
-And you will see the generated file in `dist` that ready to be served.
+# Project Structure
 
-## Features
+src/: Contains the NestJS application code.
+src/modules/: NestJS modules with controllers, services, and other related files.
+src/database/: Database-related files, including migrations.
+src/main.ts: Entry point for the application.
 
-<dl>
-  <!-- <dt><b>Quick scaffolding</b></dt>
-  <dd>Create modules, services, controller - right from the CLI!</dd> -->
+# Learn More
 
-  <dt><b>Instant feedback</b></dt>
-  <dd>Enjoy the best DX (Developer eXperience) and code your app at the speed of thought! Your saved changes are reflected instantaneously.</dd>
-
-  <dt><b>JWT Authentication</b></dt>
-  <dd>Installed and configured JWT authentication.</dd>
-
-  <dt><b>Next generation Typescript</b></dt>
-  <dd>Always up to date typescript version.</dd>
-
-  <dt><b>Industry-standard routing</b></dt>
-  <dd>It's natural to want to add pages (e.g. /about`) to your application, and routing makes this possible.</dd>
-
-  <dt><b>Environment Configuration</b></dt>
-  <dd>development, staging and production environment configurations</dd>
-
-  <dt><b>Swagger Api Documentation</b></dt>
-  <dd>Already integrated API documentation. To see all available endpoints visit http://localhost:3000/documentation</dd>
-
-  <dt><b>Linter</b></dt>
-  <dd>eslint + prettier = ❤️</dd>
-</dl>
-
-## Documentation
-
-This project includes a `docs` folder with more details on:
-
-1.  [Setup and development](https://narhakobyan.github.io/awesome-nest-boilerplate/docs/development.html#first-time-setup)
-1.  [Architecture](https://narhakobyan.github.io/awesome-nest-boilerplate/docs/architecture.html)
-1.  [Naming Cheatsheet](https://narhakobyan.github.io/awesome-nest-boilerplate/docs/naming-cheatsheet.html)
-
-## Community
-
-For help, discussion about best practices, or any other conversation that would benefit from being searchable:
-
-[Discuss Awesome NestJS Boilerplate on GitHub](https://github.com/NarHakobyan/awesome-nest-boilerplate/discussions)
+To learn more about NestJS, take a look at the NestJS Documentation https://docs.nestjs.com/.
