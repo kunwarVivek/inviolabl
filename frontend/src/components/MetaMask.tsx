@@ -11,6 +11,7 @@ import { setAccount } from "@/features/MetaMaskSlice";
 import UserAuthenticationABI from "../../public/UserAuthentication.json";
 import contractConfig from "./../../public/contractAddress.json";
 import { RootState } from "@/store/store";
+import { useAuth } from "@clerk/nextjs";
 
 declare global {
   interface Window {
@@ -52,6 +53,7 @@ const MetaMask = () => {
   const isTenantIncluded = tenantDetails && pathname.includes(tenantDetails?.name);
 
   const { data: session, status } = useSession();
+  const { sessionId } = useAuth();
   const router = useRouter();
 
   const onConnected = async (account) => {
@@ -137,9 +139,9 @@ const MetaMask = () => {
   }
   const handleConnect = () => {
     if (isTenantIncluded) {
-      session ? connectToMetaMask() : router.push(`/${tenantDetails.name}/signin`);
+      sessionId ? connectToMetaMask() : router.push(`/${tenantDetails.name}/signin`);
     } else {
-      session ? connectToMetaMask() : router.push("/signin");
+      sessionId ? connectToMetaMask() : router.push("/signin");
     }
   };
   

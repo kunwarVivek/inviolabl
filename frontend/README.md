@@ -27,6 +27,24 @@ Create a .env file in the root of your project to add clerk api keys:
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=Your-clerk-public-publishable-key
 CLERK_SECRET_KEY=your-clerk-secret-key
 
+# Connecting Wallet
+
+There are many ways to make requests to the Ethereum chain. For simplicity, we’ll use a free account on Alchemy, a blockchain developer platform, and API that allows us to communicate with the Ethereum chain without running our own nodes.
+
+Create an Alchemy account, you can generate an API key by creating an app.
+
+Hardhat is a development environment to compile, deploy, test, and debug your Ethereum software. It helps developers build smart contracts and dApps locally before deploying to the live chain.
+
+Ethers.js is a library that makes it easier to interact and make requests to Ethereum by wrapping standard JSON-RPC methods with more user-friendly methods.
+
+Hardhat makes it super easy to integrate Plugins for additional tooling and extended functionality. We’ll be taking advantage of the Ethers plugin for contract deployment (Ethers.js has some super clean contract deployment methods).
+
+Update your hardhat.config.js file with your Alchemy Api url inside blockchain directory inside project root.
+
+To deploy our smart contract, navigate to the command line from the root directory of the blockchain project and run the following command: npx hardhat run scripts/deploy.js --network sepolia and your contract will be deployed.
+
+When each user is connecting their wallet, their public address will be stored in the database under our smart contract and we can monitor the each transactions in alchemy application we created.
+
 # Usage
 
 To start the development server, run:
