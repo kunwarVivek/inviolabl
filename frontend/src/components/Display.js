@@ -1,9 +1,11 @@
 import { useState } from "react";
 import "./Display.css";
-import icon from "../../public/permission-icon.jpg"
-import Image from "next/image";
+import lighthouse from "@lighthouse-web3/sdk";
+
+
 const Display = ({ contract, account }) => {
   const [data, setData] = useState("");
+  const [fileDetails, setFileDetails] = useState([]);
   const getdata = async () => {
     let dataArray;
     const Otheraddress = document.querySelector(".address").value;
@@ -25,9 +27,43 @@ const Display = ({ contract, account }) => {
       const str_array = str.split(",");
       // console.log(str);
       // console.log(str_array);
+      const getCIDFromUrl = (url) => {
+        const parts = url.split('/');
+        return parts[parts.length - 1];
+      };
+
+      const lighthouseUrls = str_array.filter(url => url.includes('lighthouse.storage'));
+
+      const cids = lighthouseUrls.map(getCIDFromUrl);
+      // console.log(cids);
+      const fileInfoArray = [];
+
+      const fileInfo = async (cid) => {
+        try {
+          const fileInfoResult = await lighthouse.getFileInfo(cid);
+          fileInfoArray.push(fileInfoResult.data);
+        } catch (error) {
+          console.error(`Error retrieving file info for CID ${cid}: ${error.message}`);
+        }
+      };
+
+      // Loop through each CID and retrieve file details
+      const retrieveFileInfoForCids = async () => {
+        for (const cid of cids) {
+          await fileInfo(cid);
+        }
+
+        // Now, fileInfoArray contains an array of file details for each CID
+        console.log(fileInfoArray);
+        setFileDetails(fileInfoArray)
+      };
+
+      // Call the function to retrieve file details for each CID
+      retrieveFileInfoForCids();
+      console.log(fileDetails)
       const images = str_array.map((item, i) => {
         return (
-          <a href={item} key={i} target="_blank">
+          <a href={`https://gateway.lighthouse.storage/ipfs/${item.cid}`} key={i} target="_blank">
             {/* <Image
               key={i}
               src={icon}
@@ -41,6 +77,8 @@ const Display = ({ contract, account }) => {
 
               </span>
             </div>
+            <span>{item.fileName}</span>
+            <span>{item.mimeType}</span>
           </a>
         );
       });

@@ -9,14 +9,90 @@ import { OrganizationList, useAuth, useOrganization, useOrganizationList, useUse
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import axios from "axios";
+import { ethers } from "ethers";
+import Upload from "../../../../artifacts/contracts/Upload.sol/Upload.json";
+import lighthouse from "@lighthouse-web3/sdk";
+import { fileInfoType } from "@lighthouse-web3/sdk/dist/Lighthouse/getFileInfo";
 
-const page = ({ params }) => {
+
+interface FileInfoType {
+  fileSizeInBytes: string;
+  cid: string;
+  encryption: boolean;
+  fileName: string;
+  mimeType: string;
+  
+}
+
+
+
+const page = async ({ params }) => {
+  const [account, setAccount] = useState("");
+  const [contract, setContract] = useState(null);
+  const [provider, setProvider] = useState(null);
+  const [data, setData] = useState("");
+  const [fileDetails, setFileDetails] = useState(null);
 
   const userDetails = useSelector(
     (state: RootState) => state.user.details
   );
 
-  const {  userId, sessionId, getToken } = useAuth();
+  const { userId, sessionId, getToken } = useAuth();
+
+  useEffect(() => {
+    const fetchFileDetails = async () => {
+      try {
+        // Example: Array of CIDs
+        const cids = ["QmTmGqgVUGf37dgEm3Uig1cuRe75zjpkWSPVGTYBduM198", /* ... other CIDs */];
+
+        const fileInfoArray = await Promise.all(cids.map(async (cid) => {
+          const fileInfoResult = await lighthouse.getFileInfo(cid);
+          return fileInfoResult.data;
+        }));
+
+        setFileDetails(fileInfoArray);
+      } catch (error) {
+        console.error(`Error retrieving file details: ${error.message}`);
+      }
+    };
+
+    fetchFileDetails();
+  }, []);
+
+  console.log(fileDetails)
+
+  useEffect(() => {
+    const provider = new ethers.BrowserProvider(window.ethereum);
+
+    const loadProvider = async () => {
+      if (provider) {
+        window.ethereum.on("chainChanged", () => {
+          window.location.reload();
+        });
+
+        window.ethereum.on("accountsChanged", () => {
+          window.location.reload();
+        });
+        await provider.send("eth_requestAccounts", []);
+        const signer = await provider.getSigner();
+        const address = await signer.getAddress();
+        setAccount(address);
+        let contractAddress = "0xA2C019a3DC84801B575C2a24c16D2820469C9F3d";
+
+        const contract = new ethers.Contract(
+          contractAddress,
+          Upload.abi,
+          signer
+        );
+        //console.log(contract);
+        setContract(contract);
+        setProvider(provider);
+      } else {
+        console.error("Metamask is not installed");
+      }
+    };
+    provider && loadProvider();
+  }, []);
 
 
   const {
@@ -35,14 +111,15 @@ const page = ({ params }) => {
 
   useEffect(() => {
     const fetchUserFiles = async () => {
-      
+
       try {
         if (currentOrganization.id) {
           const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tenants/${currentOrganization.id}/files`,
-          {
-            headers: {
-              'Session_id': sessionId,
-            }});
+            {
+              headers: {
+                'Session_id': sessionId,
+              }
+            });
           setFileHistory(response.data);
           setUserFiles(response.data)
         }
@@ -50,9 +127,11 @@ const page = ({ params }) => {
         console.error('Error fetching user files:', error);
       }
     };
+    
 
     fetchUserFiles();
   }, [user]);
+
 
   const [filter, setFilter] = useState('all');
   const [fileHistory, setFileHistory] = useState([
@@ -65,6 +144,9 @@ const page = ({ params }) => {
   // if (isLoading) {
   //     return loading
   //   }
+
+  const cid = "QmTmGqgVUGf37dgEm3Uig1cuRe75zjpkWSPVGTYBduM198"
+  const fileInfo = await lighthouse.getFileInfo(cid)
 
   const filteredFileHistory = filter === 'all'
     ? fileHistory
@@ -115,7 +197,7 @@ const page = ({ params }) => {
                 >
                   SIZE
                 </th>
-                <th
+                {/* <th
                   className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
                 >
                   UPLOADED ON
@@ -125,7 +207,7 @@ const page = ({ params }) => {
                   className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
                 >
                   UPLOADED BY
-                </th>
+                </th> */}
                 <th
                   className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
                 >
@@ -135,10 +217,11 @@ const page = ({ params }) => {
             </thead>
 
             <tbody className="text-gray-700">
-              {filteredFileHistory.map((file, index) => (
+              {fileDetails?.map((file, index) => (
+                
                 <tr key={index}>
                   <td className="px-5 py-5 pl-10 border-b border-gray-200 bg-white text-sm">
-                    <span>{file.fileName}</span>
+                  <a href={`https://gateway.lighthouse.storage/ipfs/${file.cid}`}> <span>{file.fileName}</span></a>
                     <button
                       onClick={() => {/* Implement share functionality */ }}
                       className="ml-2 hover:text-blue-500"
@@ -146,9 +229,9 @@ const page = ({ params }) => {
                       <ShareIcon className="h-4 w-4" aria-hidden="true" />
                     </button>
                   </td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.fileSize}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.createdAt}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.uploadedBy}</td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.fileSizeInBytes}</td>
+                  {/* <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.createdAt}</td> */}
+                  {/* <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.uploadedBy}</td> */}
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">success</td>
 
                 </tr>

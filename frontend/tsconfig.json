@@ -25,6 +25,6 @@
       }
     ]
   },
-  "include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx", "scripts/deploy.js"],
+  "include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx", "scripts/deploy.js", "src/components/FileUpload1.js"],
   "exclude": ["node_modules"]
 }
