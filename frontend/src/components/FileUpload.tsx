@@ -5,6 +5,13 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import React, { Fragment, useCallback, useRef, useState } from "react";
 import { toast } from "react-toastify";
+import lighthouse from "@lighthouse-web3/sdk";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { ethers } from "ethers";
+import Upload from "../artifacts/contracts/Upload.sol/Upload.json"
+
+
 
 
 const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
@@ -13,7 +20,58 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const maxTotalSize = 500 * 1024 * 1024; // 500MB in bytes
   const router = useRouter()
-  const {  userId, sessionId, getToken } = useAuth();
+  const { userId, sessionId, getToken } = useAuth();
+
+  const MetaMaskAccount = useSelector(
+    (state: RootState) => state.metaMask.account
+  );
+
+  const [fileName, setFileName] = useState("No File selected");
+  const lightapi = "609989b0.b85f2616ce1a490eb457e1fd4d7bc994";
+  const [loading, setLoading] = useState(false)
+
+
+  const progressCallback = (progressData) => {
+    let percentageDone =
+      100 - ((progressData?.total || 0) / (progressData?.uploaded || 1)) * 100;
+    console.log(percentageDone);
+  };
+
+
+  const uploadFile = async (file) => {
+    setFileName(file[0].name)
+    setLoading(true);
+    try {
+      const output = await lighthouse.upload(
+        file,
+        lightapi,
+        false,
+        null,
+        progressCallback
+      );
+      console.log("File Status:", output);
+      console.log(
+        "Visit at https://gateway.lighthouse.storage/ipfs/" + output.data.Hash
+      );
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      const signer = await provider.getSigner();
+      let contractAddress = "0xA2C019a3DC84801B575C2a24c16D2820469C9F3d";
+
+      const contract = new ethers.Contract(
+        contractAddress,
+        Upload.abi,
+        signer
+      );
+      contract.add(MetaMaskAccount, `https://gateway.lighthouse.storage/ipfs/${output.data.Hash}`);
+      alert("Successfully Image Uploaded");
+      return output.data.Hash;
+    } finally {
+      setLoading(false);
+      setIsModalOpen(false);
+      setFileName("No File selected") // Set loading back to false when uploading is complete
+    }
+  };
 
 
   const { isLoaded, isSignedIn, user } = useUser();
@@ -158,97 +216,39 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
                 <div className="bg-transparent w-full">
                   <div className="container mx-auto max-w-screen-sm p-6">
                     <form
-                      onSubmit={onSubmit}
+                      
                       className="text-black flex flex-col items-center justify-center rounded-lg w-full"
                     >
-                      <div
-                        onDragOver={onDragOver}
-                        onDrop={onDrop}
-                        className="w-full h-32 flex flex-col items-center justify-center cursor-pointer border-2 border-dashed border-grey-500 bg-gray-100 hover:bg-blue-50 rounded-md"
-                        onClick={triggerFileInput}
+                      
+                      <label
+                        htmlFor="file-upload"
+                        className="mb-5 cursor-pointer py-2 flex justify-center text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold"
                       >
-                        <svg
-                          className="w- 10 h-10 text-blue-500 mb-2"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M4 7v10m4 0h12M8 7l4-4m0 0l4 4m-4-4v18"
-                          />
-                        </svg>
-                        <p className="text-lg text-blue-700 font-semibold">
-                          Drag 'n' drop files here, or click to select files
-                        </p>
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          multiple
-                          className="hidden"
-                          onChange={onChange}
-                        />
-                        <div className="w-full text-center my-2">
-                          <span className="text-xs text-gray-500">
-                            Maximum total file size: 500MB
-                          </span>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={triggerFileInput}
-                        className="mt-4 px-4 py-2 bg-purple-500 text-white rounded-lg shadow-lg hover:bg-purple-700"
-                      >
-                        Select Files
-                      </button>
-                      {files.length > 0 && (
-                        <div className="mt-4 w-full">
-                          <p className="text-sm text-gray-600">
-                            Files to be uploaded:
-                          </p>
-                          <div className="mt-4 w-full grid grid-cols-1 gap-4 text-white">
-                            {files.map((file, index) => (
-                              <div
-                                key={index}
-                                className="border bg-gray-600 rounded-md p-4 flex justify-between items-center"
-                              >
-                                <span className="truncate ...">
-                                  {file.name}
-                                </span>
-                                <span className="flex items-center">
-                                  <span className="text-sm text-slate-200 mr-4">
-                                    {formatBytes(file.size)}
-                                  </span>
-                                  <button
-                                    onClick={() => removeFile(file.name)}
-                                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded inline-flex items-center"
-                                  >
-                                    <svg
-                                      className="fill-current w-4 h-4 mr-2"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      viewBox="0 0 20 20"
-                                    >
-                                      <path d="M10 2C5.589 2 2 5.589 2 10s3.589 8 8 8 8-3.589 8-8-3.589-8-8-8zm0 15c-3.866 0-7-3.134-7-7s3.134-7 7-7 7 3.134 7 7-3.134 7-7 7zm3.707-10.293l-1.414 1.414L10 11.586 7.707 9.293 6.293 10.707l2.293 2.293-2.293 2.293 1.414 1.414L10 13.414l2.293 2.293 1.414-1.414-2.293-2.293 2.293-2.293z" />
-                                    </svg>
-                                    <span>Remove</span>
-                                  </button>
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                        {loading ? "Uploading..." : "Choose File"}
+                      </label>
+                      <input
+                        disabled={!MetaMaskAccount}
+                        type="file"
+                        className="hidden"
+                        id="file-upload"
+                        name="data"
+                        onChange={(e) => {
+                          uploadFile(e.target.files);
+                        }}
+                      />
 
-                      <button
-                        type="submit"
-                        className="mt-4 px-6 py-2 bg-green-500 text-white rounded-lg shadow-lg hover:bg-green-600"
-                      >
-                        Upload Files
-                      </button>
+                      <span className="flex justify-center items-center font-semibold text-black">
+                        File: {fileName}
+                      </span>
+                      {/* <button
+          type="submit"
+          className="cursor-pointer mt-5 w-full py-2 flex justify-center text-white items-center bg-green-500 hover:shadow-xl hover:bg-green-600 rounded-md px-4 text-sm font-semibold"
+          disabled={!file}
+        >
+          Upload File
+        </button> */}
                     </form>
+
                   </div>
                 </div>
               </Dialog.Panel>
@@ -256,7 +256,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
           </div>
         </div>
       </Dialog>
-    </Transition>
+    </Transition >
   );
 };
 

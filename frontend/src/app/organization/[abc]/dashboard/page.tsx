@@ -21,23 +21,25 @@ interface FileInfoType {
   encryption: boolean;
   fileName: string;
   mimeType: string;
-  
+
 }
 
-
-
 const page = async ({ params }) => {
-  const [account, setAccount] = useState("");
-  const [contract, setContract] = useState(null);
-  const [provider, setProvider] = useState(null);
-  const [data, setData] = useState("");
   const [fileDetails, setFileDetails] = useState(null);
 
   const userDetails = useSelector(
     (state: RootState) => state.user.details
   );
 
-  const { userId, sessionId, getToken } = useAuth();
+  const MetaMaskAccount = useSelector(
+    (state: RootState) => state.metaMask.account
+  );
+
+  console.log(MetaMaskAccount)
+
+
+  
+
 
   useEffect(() => {
     const fetchFileDetails = async () => {
@@ -47,6 +49,59 @@ const page = async ({ params }) => {
 
         const fileInfoArray = await Promise.all(cids.map(async (cid) => {
           const fileInfoResult = await lighthouse.getFileInfo(cid);
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          await provider.send("eth_requestAccounts", []);
+          const signer = await provider.getSigner();
+          let contractAddress = "0xA2C019a3DC84801B575C2a24c16D2820469C9F3d";
+
+          const contract = new ethers.Contract(
+            contractAddress,
+            Upload.abi,
+            signer
+          );
+
+
+
+          console.log(contract)
+
+
+          let dataArray = await contract.display(MetaMaskAccount);
+          const str = dataArray.toString();
+          const str_array = str.split(",");
+          console.log(str_array)
+          const getCIDFromUrl = (url) => {
+            const parts = url.split('/');
+            return parts[parts.length - 1];
+          };
+
+          const lighthouseUrls = str_array.filter(url => url.includes('lighthouse.storage'));
+
+          const cids = lighthouseUrls.map(getCIDFromUrl);
+          // console.log(cids);
+          const fileInfoArray = [];
+
+          const fileInfo = async (cid) => {
+            try {
+              const fileInfoResult = await lighthouse.getFileInfo(cid);
+              fileInfoArray.push(fileInfoResult.data);
+            } catch (error) {
+              console.error(`Error retrieving file info for CID ${cid}: ${error.message}`);
+            }
+          };
+
+          // Loop through each CID and retrieve file details
+          const retrieveFileInfoForCids = async () => {
+            for (const cid of cids) {
+              await fileInfo(cid);
+            }
+
+            // Now, fileInfoArray contains an array of file details for each CID
+            console.log(fileInfoArray);
+            setFileDetails(fileInfoArray)
+          };
+
+          // Call the function to retrieve file details for each CID
+          retrieveFileInfoForCids();
           return fileInfoResult.data;
         }));
 
@@ -61,45 +116,8 @@ const page = async ({ params }) => {
 
   console.log(fileDetails)
 
-  useEffect(() => {
-    const provider = new ethers.BrowserProvider(window.ethereum);
-
-    const loadProvider = async () => {
-      if (provider) {
-        window.ethereum.on("chainChanged", () => {
-          window.location.reload();
-        });
-
-        window.ethereum.on("accountsChanged", () => {
-          window.location.reload();
-        });
-        await provider.send("eth_requestAccounts", []);
-        const signer = await provider.getSigner();
-        const address = await signer.getAddress();
-        setAccount(address);
-        let contractAddress = "0xA2C019a3DC84801B575C2a24c16D2820469C9F3d";
-
-        const contract = new ethers.Contract(
-          contractAddress,
-          Upload.abi,
-          signer
-        );
-        //console.log(contract);
-        setContract(contract);
-        setProvider(provider);
-      } else {
-        console.error("Metamask is not installed");
-      }
-    };
-    provider && loadProvider();
-  }, []);
 
 
-  const {
-    organization: currentOrganization,
-    membership,
-    isLoaded,
-  } = useOrganization();
 
 
   console.log(userDetails)
@@ -109,28 +127,28 @@ const page = async ({ params }) => {
   const [userFiles, setUserFiles] = useState([]);
   console.log(userFiles)
 
-  useEffect(() => {
-    const fetchUserFiles = async () => {
+  // useEffect(() => {
+  //   const fetchUserFiles = async () => {
 
-      try {
-        if (currentOrganization.id) {
-          const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tenants/${currentOrganization.id}/files`,
-            {
-              headers: {
-                'Session_id': sessionId,
-              }
-            });
-          setFileHistory(response.data);
-          setUserFiles(response.data)
-        }
-      } catch (error) {
-        console.error('Error fetching user files:', error);
-      }
-    };
-    
+  //     try {
+  //       if (currentOrganization.id) {
+  //         const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tenants/${currentOrganization.id}/files`,
+  //           {
+  //             headers: {
+  //               'Session_id': sessionId,
+  //             }
+  //           });
+  //         setFileHistory(response.data);
+  //         setUserFiles(response.data)
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching user files:', error);
+  //     }
+  //   };
 
-    fetchUserFiles();
-  }, [user]);
+
+  //   fetchUserFiles();
+  // }, [user]);
 
 
   const [filter, setFilter] = useState('all');
@@ -138,15 +156,6 @@ const page = async ({ params }) => {
     // { filename: "resume.pdf", size: "1mb", createdAt: "yesterday", status: "Success" },
   ]);
   console.log(filter);
-
-  // const isLoading = useValidation(params.xyz)
-
-  // if (isLoading) {
-  //     return loading
-  //   }
-
-  const cid = "QmTmGqgVUGf37dgEm3Uig1cuRe75zjpkWSPVGTYBduM198"
-  const fileInfo = await lighthouse.getFileInfo(cid)
 
   const filteredFileHistory = filter === 'all'
     ? fileHistory
@@ -218,10 +227,10 @@ const page = async ({ params }) => {
 
             <tbody className="text-gray-700">
               {fileDetails?.map((file, index) => (
-                
+
                 <tr key={index}>
                   <td className="px-5 py-5 pl-10 border-b border-gray-200 bg-white text-sm">
-                  <a href={`https://gateway.lighthouse.storage/ipfs/${file.cid}`}> <span>{file.fileName}</span></a>
+                    <a href={`https://gateway.lighthouse.storage/ipfs/${file.cid}`}> <span>{file.fileName}</span></a>
                     <button
                       onClick={() => {/* Implement share functionality */ }}
                       className="ml-2 hover:text-blue-500"

@@ -16,7 +16,7 @@ import { RootState } from "@/store/store";
 import { useSession } from "next-auth/react";
 import { useOrganization } from "@clerk/nextjs";
 
-const Dashboard = ({ children }, params) => {
+const Dashboard = ({ children }) => {
   const pathname = usePathname();
   const { organization } = useOrganization();
 
