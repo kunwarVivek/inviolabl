@@ -29,7 +29,7 @@ const NFTCards = () => {
               height="30"
             />
           </div>
-          <p className="font-bold text-lg">Add your NFT's</p>
+          <p className="font-bold text-lg">Add your NFTs</p>
           <p className="pt-4">
             Sed ut perspiciatis unde omnis iste natus error sit voluptatem
             accusantium doloremque laudantium, totam rem.
@@ -47,7 +47,7 @@ const NFTCards = () => {
             />
           </div>
 
-          <p className="font-bold text-lg">Sell your NFT's</p>
+          <p className="font-bold text-lg">Sell your NFTs</p>
           <p className="pt-4">
             Sed ut perspiciatis unde omnis iste natus error sit voluptatem
             accusantium doloremque laudantium, totam rem.
