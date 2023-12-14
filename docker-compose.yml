@@ -54,7 +54,7 @@ services:
       - backend
 
   postgres:
-    image: postgres:16-alpine # Updated to a newer version, ensure compatibility
+    image: postgres:12-alpine # Updated to a newer version, ensure compatibility
     container_name: ${PROJECT_SLUG}_postgres
     restart: unless-stopped
     env_file: .env
