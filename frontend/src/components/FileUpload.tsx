@@ -17,6 +17,7 @@ import Upload from "../artifacts/contracts/Upload.sol/Upload.json"
 const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
   const [files, setFiles] = useState<File[]>([]);
   const [totalSize, setTotalSize] = useState<number>(0);
+  const [account, setAccount] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null);
   const maxTotalSize = 500 * 1024 * 1024; // 500MB in bytes
   const router = useRouter()
@@ -56,6 +57,8 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       const provider = new ethers.BrowserProvider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
+      const address = await signer.getAddress();
+      setAccount(address);
       let contractAddress = "0xA2C019a3DC84801B575C2a24c16D2820469C9F3d";
 
       const contract = new ethers.Contract(
@@ -63,7 +66,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
         Upload.abi,
         signer
       );
-      contract.add(MetaMaskAccount, `https://gateway.lighthouse.storage/ipfs/${output.data.Hash}`);
+      contract.add(address, `https://gateway.lighthouse.storage/ipfs/${output.data.Hash}`);
       alert("Successfully Image Uploaded");
       return output.data.Hash;
     } finally {
@@ -216,10 +219,10 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
                 <div className="bg-transparent w-full">
                   <div className="container mx-auto max-w-screen-sm p-6">
                     <form
-                      
+
                       className="text-black flex flex-col items-center justify-center rounded-lg w-full"
                     >
-                      
+
                       <label
                         htmlFor="file-upload"
                         className="mb-5 cursor-pointer py-2 flex justify-center text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold"
@@ -227,7 +230,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
                         {loading ? "Uploading..." : "Choose File"}
                       </label>
                       <input
-                        disabled={!MetaMaskAccount}
+                        // disabled={!account}
                         type="file"
                         className="hidden"
                         id="file-upload"

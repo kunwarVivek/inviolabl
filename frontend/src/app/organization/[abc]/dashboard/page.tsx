@@ -26,6 +26,8 @@ interface FileInfoType {
 
 const page = async ({ params }) => {
   const [fileDetails, setFileDetails] = useState(null);
+  const [account, setAccount] = useState("")
+
 
   const userDetails = useSelector(
     (state: RootState) => state.user.details
@@ -38,7 +40,7 @@ const page = async ({ params }) => {
   console.log(MetaMaskAccount)
 
 
-  
+
 
 
   useEffect(() => {
@@ -52,6 +54,8 @@ const page = async ({ params }) => {
           const provider = new ethers.BrowserProvider(window.ethereum);
           await provider.send("eth_requestAccounts", []);
           const signer = await provider.getSigner();
+          const address = await signer.getAddress();
+          setAccount(address);
           let contractAddress = "0xA2C019a3DC84801B575C2a24c16D2820469C9F3d";
 
           const contract = new ethers.Contract(
@@ -65,7 +69,7 @@ const page = async ({ params }) => {
           console.log(contract)
 
 
-          let dataArray = await contract.display(MetaMaskAccount);
+          let dataArray = await contract.display(address);
           const str = dataArray.toString();
           const str_array = str.split(",");
           console.log(str_array)
