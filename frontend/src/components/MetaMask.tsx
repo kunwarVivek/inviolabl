@@ -12,10 +12,12 @@ import UserAuthenticationABI from "../../public/UserAuthentication.json";
 import contractConfig from "./../../public/contractAddress.json";
 import { RootState } from "@/store/store";
 import { useAuth } from "@clerk/nextjs";
+import Image from "next/image";
+import metamaskIcon from "../../public/metamask-icon.svg"
 
 declare global {
   interface Window {
-    ethereum?: any; // Using `any` for simplicity, but you should define the proper type.
+    ethereum?: any; 
   }
 }
 export const getProvider = () => {
@@ -151,8 +153,8 @@ const MetaMask = () => {
       className="cursor-pointer w-1/4 max-w-sm rounded-xl overflow-hidden shadow-lg border border-gray-300 p-5 m-10"
     >
       <div className="">
-        <img
-          src="/metamask-icon.svg"
+        <Image
+          src={metamaskIcon}
           alt="Metamask Logo"
           width={60}
           height={60}

@@ -48,7 +48,7 @@ body {
 }
 
 .wallet_background {
-  background-image: url(/walletBackground.jpg);
+  background-image: url(../../public/walletBackground.jpg);
   background-size: cover;
   background-repeat: no-repeat;
 }

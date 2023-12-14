@@ -29,9 +29,8 @@ export default function Home() {
   return (
     <div className="bg-white min-h-screen">
       <Header
-        className={`text-white ${
-          isScrolled && "bg-[#403f83] border-b border-cyan-900"
-        }`}
+        className={`text-white ${isScrolled && "bg-[#403f83] border-b border-cyan-900"
+          }`}
       />
       <div className="wallet_background h-72 flex justify-center items-center mb-10">
         <h1 className="text-5xl text-white font-bold">Wallet</h1>
