@@ -21,7 +21,6 @@ export class TenantService {
     tenant.email = createUserDto.email;
     tenant.phone = createUserDto.phone;
 
-
     return this.tenantRepository.save(tenant);
   }
 
@@ -35,11 +34,11 @@ export class TenantService {
 
   // In TenantService
 
-async getTenantIdByDomain(domain: string): Promise<string | null> {
-  const tenant = await this.tenantRepository.findOne({ where: { domain } });
-  return tenant ? tenant.id : null;
-}
+  async getTenantIdByDomain(domain: string): Promise<string | null> {
+    const tenant = await this.tenantRepository.findOne({ where: { domain } });
 
+    return tenant ? tenant.id : null;
+  }
 
   async getTenant(tenantId: Uuid): Promise<TenantEntity> {
     const queryBuilder = this.tenantRepository.createQueryBuilder('tenant');

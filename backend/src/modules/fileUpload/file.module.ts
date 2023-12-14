@@ -1,12 +1,14 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  type MiddlewareConsumer,
+  Module,
+  type NestModule,
+} from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { ClerkSessionMiddleware } from '../../middleware/middleware';
 // import { CreateSettingsHandler } from './commands/create-settings.command';
-
 import { FileEntity } from '../fileUpload/file.entity';
 import { FileService } from '../fileUpload/file.service';
-import { ClerkSessionMiddleware } from '../../middleware/middleware';
-
 
 // const handlers = [CreateSettingsHandler];
 

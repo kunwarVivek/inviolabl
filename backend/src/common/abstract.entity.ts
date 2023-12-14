@@ -48,7 +48,7 @@ export abstract class AbstractEntity<
     }
 
     return new dtoClass(this, options);
-}
+  }
 }
 export class AbstractTranslationEntity<
   DTO extends AbstractTranslationDto = AbstractTranslationDto,

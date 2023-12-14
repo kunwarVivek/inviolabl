@@ -1,17 +1,16 @@
-import { Column, Entity, OneToMany, OneToOne  } from 'typeorm';
+import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
+
 import { AbstractEntity } from '../../common/abstract.entity';
 import { UseDto } from '../../decorators';
+import { FileEntity } from '../fileUpload/file.entity';
+import { UserEntity } from '../user/user.entity';
 // import { PostEntity } from '../post/post.entity';
 import { TenantDto, type TenantDtoOptions } from './dtos/tenant.dto';
 import { TenantSettingsEntity } from './tenant-settings.entity';
-import { UserEntity } from '../user/user.entity';
-import { FileEntity } from '../fileUpload/file.entity';
-
 
 @Entity({ name: 'tenants' })
 @UseDto(TenantDto)
 export class TenantEntity extends AbstractEntity<TenantDto, TenantDtoOptions> {
-
   @Column({ nullable: true, type: 'varchar' })
   name!: string;
 
@@ -24,7 +23,10 @@ export class TenantEntity extends AbstractEntity<TenantDto, TenantDtoOptions> {
   @Column({ nullable: true, type: 'varchar' })
   phone!: string | null;
 
-  @OneToMany(() => FileEntity, (file) => file.tenant, { eager: true, cascade: true })
+  @OneToMany(() => FileEntity, (file) => file.tenant, {
+    eager: true,
+    cascade: true,
+  })
   files?: FileEntity[];
 
   @OneToOne(
@@ -35,5 +37,4 @@ export class TenantEntity extends AbstractEntity<TenantDto, TenantDtoOptions> {
 
   @OneToMany(() => UserEntity, (user) => user.tenant)
   users!: UserEntity[];
-
 }

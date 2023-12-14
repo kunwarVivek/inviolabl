@@ -23,6 +23,6 @@ export class TenantDto extends AbstractDto {
     this.name = tenant.name;
     this.domain = tenant.domain;
     this.email = tenant.email;
-    this.phone = tenant.phone
+    this.phone = tenant.phone;
   }
 }

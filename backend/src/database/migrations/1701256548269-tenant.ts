@@ -9,7 +9,7 @@
 
 //     public async down(queryRunner: QueryRunner): Promise<void> {
 //         await queryRunner.query('ALTER TABLE "tenants" ADD CONSTRAINT "UQ_155c343439adc83ada6ee3f48be" UNIQUE ("email")');
-        
+
 //     }
 
 // }

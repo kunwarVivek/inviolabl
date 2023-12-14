@@ -10,23 +10,23 @@ import {
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { type FileEntity } from 'modules/fileUpload/file.entity';
 
 import { UUIDParam } from '../../decorators';
+import { FileService } from '../fileUpload/file.service';
 import { CreateTenantDto } from './dtos/create-tenant.dto';
 import { type TenantDto } from './dtos/tenant.dto';
 import { UpdateTenantDto } from './dtos/update-tenant.dto';
 import { type TenantEntity } from './tenant.entity';
 import { TenantService } from './tenant.service';
-import { FilesInterceptor } from '@nestjs/platform-express';
-import { FileService } from '../fileUpload/file.service';
-import { FileEntity } from 'modules/fileUpload/file.entity';
 
 @Controller('tenants')
 export class TenantController {
   constructor(
     private readonly tenantService: TenantService,
     private readonly fileService: FileService,
-  ) { }
+  ) {}
 
   @Post()
   create(@Body() createUserDto: CreateTenantDto): Promise<TenantEntity> {
@@ -61,21 +61,23 @@ export class TenantController {
   @Post('/files')
   @UseInterceptors(FilesInterceptor('files'))
   async uploadFiles(
-
     @UploadedFiles() files: Express.Multer.File[],
     @Body('email') email: string,
     @Body('domainId') domainId: string,
   ) {
     const tenant = await this.tenantService.getTenantIdByDomain(domainId);
-    if (!tenant) {
-      throw new NotFoundException('Tenant not found');
-    } else {
+
+    if (tenant) {
       return this.fileService.uploadFiles(files, email, domainId);
     }
+
+    throw new NotFoundException('Tenant not found');
   }
 
   @Get(':domainId/files')
-  getFilesByDomainId(@Param('domainId') domainId: string): Promise<FileEntity[]> {
+  getFilesByDomainId(
+    @Param('domainId') domainId: string,
+  ): Promise<FileEntity[]> {
     return this.fileService.getFilesByDomainId(domainId);
   }
 
@@ -83,6 +85,4 @@ export class TenantController {
   getAllFiles(): Promise<FileEntity[]> {
     return this.fileService.getAllFiles();
   }
-
-
 }

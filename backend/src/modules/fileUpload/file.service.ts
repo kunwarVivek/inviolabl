@@ -1,40 +1,41 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { FileEntity } from './file.entity';
 
+import { FileEntity } from './file.entity';
 
 @Injectable()
 export class FileService {
-    constructor(
-        @InjectRepository(FileEntity)
-        private readonly fileRepository: Repository<FileEntity>,
-    ) { }
+  constructor(
+    @InjectRepository(FileEntity)
+    private readonly fileRepository: Repository<FileEntity>,
+  ) {}
 
-    async uploadFiles(
-        files: Express.Multer.File[],
-        email: string,
-        domainId: string
-    ): Promise<void> {
-        const fileEntities: FileEntity[] = files.map(file => {
-            const fileEntity = new FileEntity();
-            fileEntity.fileName = file.originalname;
-            fileEntity.fileSize = file.size;
-            fileEntity.domainId = domainId;
-            fileEntity.data = file.buffer
-            fileEntity.email = email;
-            fileEntity.uploadedBy = email;
-            return fileEntity;
-        });
+  async uploadFiles(
+    files: Express.Multer.File[],
+    email: string,
+    domainId: string,
+  ): Promise<void> {
+    const fileEntities: FileEntity[] = files.map((file) => {
+      const fileEntity = new FileEntity();
+      fileEntity.fileName = file.originalname;
+      fileEntity.fileSize = file.size;
+      fileEntity.domainId = domainId;
+      fileEntity.data = file.buffer;
+      fileEntity.email = email;
+      fileEntity.uploadedBy = email;
 
-        await this.fileRepository.save(fileEntities);
-    }
+      return fileEntity;
+    });
 
-    async getFilesByDomainId(domainId: string): Promise<FileEntity[]> {
-        return this.fileRepository.find({ where: { domainId } });
-    }
+    await this.fileRepository.save(fileEntities);
+  }
 
-    async getAllFiles(): Promise<FileEntity[]> {
-        return this.fileRepository.find();
-      }
+  async getFilesByDomainId(domainId: string): Promise<FileEntity[]> {
+    return this.fileRepository.find({ where: { domainId } });
+  }
+
+  async getAllFiles(): Promise<FileEntity[]> {
+    return this.fileRepository.find();
+  }
 }

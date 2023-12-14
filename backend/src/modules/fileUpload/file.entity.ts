@@ -1,4 +1,5 @@
-import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+
 import { AbstractEntity } from '../../common/abstract.entity';
 import { TenantEntity } from '../tenant/tenant.entity';
 
@@ -7,8 +8,8 @@ export class FileEntity extends AbstractEntity<any, any> {
   @Column({ type: 'varchar' })
   fileName!: string;
 
-  @Column({ type: "bytea"})
-  data?: Buffer
+  @Column({ type: 'bytea' })
+  data?: Buffer;
 
   @Column({ type: 'varchar' })
   uploadedBy!: string;

@@ -30,7 +30,7 @@
     "docs:dev": "vuepress dev -p 7070",
     "docs:build": "DEPLOY_ENV=gh-pages vuepress build",
     "docs:deploy": "yarn docs:build && gh-pages -d .vuepress/dist",
-    "prepare": "cd .. && husky install [child-folder]/.husky",
+    "prepare": "cd .. && husky install backend/.husky",
     "release": "release-it"
   },
   "dependencies": {
