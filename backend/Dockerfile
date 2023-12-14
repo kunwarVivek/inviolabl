@@ -1,30 +1,55 @@
-FROM node:lts AS dist
+# Stage 1: Building the application
+FROM node:lts-alpine AS dist
+WORKDIR /app
+
+# Copy package.json and yarn.lock
 COPY package.json yarn.lock ./
 
-RUN yarn install
+# Install dependencies
+RUN yarn install --frozen-lockfile
 
+# Copy the rest of your app's source code
 COPY . ./
 
+# Build the application
 RUN yarn build:prod
 
-FROM node:lts AS node_modules
+# Stage 2: Building the node_modules for production
+FROM node:lts-alpine AS node_modules
+WORKDIR /app
+
 COPY package.json yarn.lock ./
 
-RUN yarn install --prod
+# Install only production dependencies
+RUN yarn install --prod --frozen-lockfile
 
-FROM node:lts
+# Stage 3: Run the application
+FROM node:lts-alpine
 
-ARG PORT=3000
+# Create a non-root user and set directory permissions
+RUN mkdir -p /usr/src/app && chown -R node:node /usr/src/app
 
-RUN mkdir -p /usr/src/app
-
+# Set working directory
 WORKDIR /usr/src/app
 
-COPY --from=dist dist /usr/src/app/dist
-COPY --from=node_modules node_modules /usr/src/app/node_modules
+# Switch to non-root user
+USER node
 
-COPY . /usr/src/app
+# Copy built assets from the dist stage
+COPY --from=dist --chown=node:node /app/dist ./dist
 
+# Copy node_modules from the node_modules stage
+COPY --from=node_modules --chown=node:node /app/node_modules ./node_modules
+
+# Copy application files
+COPY --chown=node:node . .
+
+# Set the environment variable for the port
+ARG PORT=3000
+ENV PORT=$PORT
+
+# Expose the port
 EXPOSE $PORT
 
-CMD [ "yarn", "start:prod" ]
+# Define the command to run the app
+CMD ["yarn", "start:prod"]

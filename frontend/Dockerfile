@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci --only=production
 
 # Copy the rest of your app's source code
 COPY . .
@@ -29,6 +29,9 @@ COPY --from=builder /app/package.json ./package.json
 
 # Expose the port the app runs on
 EXPOSE 3000
+
+# Run the app as a non-root user for security
+USER node
 
 # Define the command to run the app
 CMD ["npm", "start"]
