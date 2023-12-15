@@ -11,7 +11,7 @@ import { setAccount } from "@/features/MetaMaskSlice";
 import UserAuthenticationABI from "../../public/UserAuthentication.json";
 import contractConfig from "./../../public/contractAddress.json";
 import { RootState } from "@/store/store";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import metamaskIcon from "../../public/metamask-icon.svg"
 
@@ -47,6 +47,8 @@ export const getContract = async () => {
 const MetaMask = () => {
   const dispatch = useDispatch();
   const [isRegistered, setIsRegistered] = useState(false);
+
+  const { isLoaded, isSignedIn, user } = useUser();
 
   const pathname = usePathname();
   const tenantDetails = useSelector(
@@ -93,11 +95,12 @@ const MetaMask = () => {
   async function verifyAddressWithBackend(walletAddress, signature) {
     try {
       const response = await axios.post(
-        "http://34.234.201.170:3001/wallet/connect-wallet",
+        "http://localhost:3001/wallet/connect-wallet",
         {
           address: walletAddress,
           signature: signature,
           message: "Please sign this message to confirm your identity.",
+          email: user?.emailAddresses[0]?.emailAddress
         }
       );
       if (response.data.success) {

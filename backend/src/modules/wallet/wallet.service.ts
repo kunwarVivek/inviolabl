@@ -1,10 +1,17 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
 import { ethers } from 'ethers';
+import { WalletEntity } from './wallet.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class WalletService {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    @InjectRepository(WalletEntity)
+    private readonly walletRepository: Repository<WalletEntity>,
+  ) { }
 
   // This method assumes that you've asked the client to sign a message with their private key
   // and you've received the signature and the address from the client.
@@ -48,4 +55,26 @@ export class WalletService {
       throw new InternalServerErrorException('Error generating access token');
     }
   }
+
+  async getAllWallets(): Promise<WalletEntity[]> {
+    return this.walletRepository.find();
+  }
+
+  async addWallet(address: string, email: string): Promise<WalletEntity> {
+    const wallet = this.walletRepository.create({ address, email });
+    return this.walletRepository.save(wallet);
+  }
+
+  async getWalletsByEmail(email: string): Promise<WalletEntity[]> {
+    try {
+      
+      const wallets = await this.walletRepository.find({ where: { email } });
+      return wallets;
+    } catch (error) {
+      console.error('Error fetching wallets by email:', error);
+
+      throw new InternalServerErrorException('Error fetching wallets by email');
+    }
+  }
+
 }

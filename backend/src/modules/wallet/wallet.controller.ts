@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Get,
   HttpException,
   HttpStatus,
+  Param,
   Post,
 } from '@nestjs/common';
 
@@ -10,14 +12,14 @@ import { WalletService } from './wallet.service';
 
 @Controller('wallet')
 export class WalletController {
-  constructor(private readonly walletService: WalletService) {}
+  constructor(private readonly walletService: WalletService) { }
 
   @Post('connect-wallet')
   async connectWallet(
-    @Body() body: { address: string; signature: string; message: string },
+    @Body() body: { email: string; address: string; signature: string; message: string },
   ) {
     try {
-      const { address, signature, message } = body;
+      const { email, address, signature, message } = body;
       // Use the WalletService to verify the signature
       const isValidSignature = await this.walletService.verifySignature(
         address,
@@ -34,7 +36,10 @@ export class WalletController {
         const token = await this.walletService.login(address);
         console.log('bye', token);
 
-        return { success: true, token };
+        const wallet = await this.walletService.addWallet(address, email);
+
+
+        return { success: true, token, wallet };
       }
 
       // If the signature is invalid, throw an exception
@@ -43,4 +48,25 @@ export class WalletController {
       throw new HttpException('Invalid requests', HttpStatus.FORBIDDEN);
     }
   }
+
+  @Get('all-wallets')
+  async getAllWallets() {
+    try {
+      const wallets = await this.walletService.getAllWallets();
+      return { success: true, wallets };
+    } catch (error) {
+      throw new HttpException('Error fetching wallets', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Get('wallet-by-email/:email')
+  async getSpecificWalletByEmail(@Param('email') email: string) {
+    try {
+      const wallets = await this.walletService.getWalletsByEmail(email);
+      return { success: true, wallets };
+    } catch (error) {
+      throw new HttpException('Error fetching wallet by email', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
 }
