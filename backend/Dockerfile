@@ -49,7 +49,7 @@ ARG PORT=3001
 ENV PORT=$PORT
 
 # Expose the port
-EXPOSE $PORT
+EXPOSE 3001
 
 # Define the command to run the app
 CMD ["yarn", "start:prod"]
