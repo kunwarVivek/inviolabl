@@ -95,7 +95,7 @@ const MetaMask = () => {
   async function verifyAddressWithBackend(walletAddress, signature) {
     try {
       const response = await axios.post(
-        "http://localhost:3001/wallet/connect-wallet",
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/wallet/connect-wallet`,
         {
           address: walletAddress,
           signature: signature,

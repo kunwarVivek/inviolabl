@@ -37,7 +37,7 @@ const ConnectWallet = () => {
         {MetaMaskAccount && (
           <p className="text-center  p-2 w-fit rounded-md font-semibold">
             <span className="inline-block mt-1 bg-slate-300 p-1 rounded-md text-black px-4">
-              {TruncatedWalletAddress(MetaMaskAccount)}
+              Connected
             </span>
           </p>
         )}

@@ -20,9 +20,24 @@ const Modal = () => {
         membershipList: {},
     });
 
-
     const sharing = async () => {
-        await contract.allow(addressValue);
+        const wallets = walletData ?? [];
+
+
+        const matchedWallet = wallets.find(wallet => wallet.email === addressValue);
+        console.log(matchedWallet.address)
+        if (matchedWallet) {
+            try {
+                // Call the 'allow' method with the matched wallet address
+                await contract.allow(matchedWallet.address);
+                console.log("Access granted successfully!");
+            } catch (error) {
+                console.error("Error granting access:", error);
+            }
+        } else {
+            console.warn("No wallet found for the provided email address.");
+        }
+
     };
 
     console.log(contract)
@@ -40,7 +55,7 @@ const Modal = () => {
                 signer
             );
 
-            const wallRes = await axios.get("http://localhost:3001/wallet/all-wallets")
+            const wallRes = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/wallet/all-wallets`)
 
             setWalletData(wallRes.data.wallets)
 
