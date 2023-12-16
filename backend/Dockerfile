@@ -45,7 +45,7 @@ COPY --from=node_modules --chown=node:node /app/node_modules ./node_modules
 COPY --chown=node:node . .
 
 # Set the environment variable for the port
-ARG PORT=3000
+ARG PORT=3001
 ENV PORT=$PORT
 
 # Expose the port
