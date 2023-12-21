@@ -14,6 +14,8 @@ const ConnectWallet = () => {
     (state: RootState) => state.metaMask.account
   );
 
+  
+
   const router = useRouter();
 
   const handleConnect = () => {
@@ -25,7 +27,7 @@ const ConnectWallet = () => {
   };
   return (
     <div className="flex items-center gap-4">
-      <div className={`${MetaMaskAccount && "w-48"} text-white`}>
+      <div className={` text-white`}>
         {!MetaMaskAccount && (
           <button
             className="p-1 bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold"

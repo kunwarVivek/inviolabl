@@ -10,6 +10,10 @@ interface userDetails {
   email: string;
   phone: string;
   role: string;
+  primaryEmailAddress: {
+    emailAddress: string;
+  };
+  
 }
 
 interface UserState {

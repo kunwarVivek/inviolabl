@@ -17,7 +17,7 @@ import metamaskIcon from "../../public/metamask-icon.svg"
 
 declare global {
   interface Window {
-    ethereum?: any; 
+    ethereum?: any;
   }
 }
 export const getProvider = () => {
@@ -131,6 +131,7 @@ const MetaMask = () => {
           // Verify address with backend if signature is obtained
           if (signature) {
             await verifyAddressWithBackend(tempAccount, signature);
+            dispatch(setAccount(tempAccount));
           }
         } catch (signError) {
           console.error("Error signing message with MetaMask:", signError);
@@ -149,7 +150,7 @@ const MetaMask = () => {
       sessionId ? connectToMetaMask() : router.push("/signin");
     }
   };
-  
+
   return (
     <div
       onClick={handleConnect}

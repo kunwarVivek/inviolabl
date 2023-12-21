@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ConnectWallet from "./ConnectWallet";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
@@ -10,14 +10,31 @@ import { Menu, Transition } from "@headlessui/react"; // If using Headless UI
 import { TruncatedWalletAddress } from "./TruncateFunction";
 import { cn } from "@/lib/utils";
 import { usePathname, useSearchParams } from "next/navigation";
-import { clearUser } from "@/features/LoginSlice";
-import { SignInButton, SignedIn, SignedOut, UserButton, useAuth } from "@clerk/nextjs";
+import { clearUser, setUser } from "@/features/LoginSlice";
+import { SignInButton, SignedIn, SignedOut, UserButton, useAuth, useUser } from "@clerk/nextjs";
+import MagicBell, { FloatingNotificationInbox } from '@magicbell/magicbell-react';
+
 
 const Header = ({ className }: any) => {
+
+  const [userEmail, setUserEmail] = useState('')
   const { data: session, status } = useSession();
   const { isLoaded, userId, sessionId, getToken } = useAuth();
   const pathname = usePathname();
   const dispatch = useDispatch();
+
+  const { user } = useUser();
+  console.log(user)
+  console.log(user?.primaryEmailAddress.emailAddress)
+
+  useEffect(() => {
+    // Check if user exists before dispatching
+    if (user) {
+      dispatch(setUser(user));
+    }
+  }, [dispatch, user]);
+
+
 
   const MetaMaskAccount = useSelector(
     (state: RootState) => state.metaMask.account
@@ -33,6 +50,10 @@ const Header = ({ className }: any) => {
   );
 
   console.log(userDetails)
+
+  console.log(userDetails?.primaryEmailAddress.emailAddress)
+
+
 
   const isTenantIncluded = tenantDetails && pathname.includes(tenantDetails?.name);
   console.log(isTenantIncluded)
@@ -259,6 +280,26 @@ const Header = ({ className }: any) => {
               </Transition>
             </Menu>
           ) : <Link href={isTenantIncluded ? `/${tenantDetails.name}/signin` : "/signin"}><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 cursor-pointer fill-[#5f03de] hover:shadow-2xl hover:fill-[#8364e2]" viewBox="0 0 448 512"><path d="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z" /></svg></Link>} */}
+
+
+          <MagicBell
+            apiKey={'644b158683d2a357dc593625a99be3edc344a6fe'}
+            userEmail={userDetails?.primaryEmailAddress.emailAddress}
+            theme={{
+              icon: { borderColor: 'white' },
+            }}
+          >
+            {(props) => (
+              <FloatingNotificationInbox
+                height={350}
+                placement="bottom-start"
+                closeOnClickOutside={true}
+                {...props}
+              />
+            )}
+          </MagicBell>
+
+
           <SignedIn>
             {/* Mount the UserButton component */}
             <UserButton />

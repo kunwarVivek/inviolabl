@@ -17,8 +17,11 @@ import { useSession } from "next-auth/react";
 
 export default function Home() {
 
-    const { isLoaded, isSignedIn, user } = useUser();
-    console.log(user?.primaryEmailAddress.emailAddress)
+   const dispatch = useDispatch();
+
+
+    
+
 
     const {  userId, sessionId, getToken } = useAuth();
     console.log(sessionId, userId, getToken)

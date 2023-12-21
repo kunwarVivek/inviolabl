@@ -7,18 +7,35 @@ import Upload from "../../../../artifacts/contracts/Upload.sol/Upload.json";
 import MemberList from "@/components/MemberList";
 import { useOrganization } from "@clerk/nextjs";
 import axios from "axios";
+import MagicBellClient, { Notification } from '@magicbell/core';
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+
 
 
 const Modal = () => {
+
+    MagicBellClient.configure({ apiKey: '644b158683d2a357dc593625a99be3edc344a6fe', apiSecret: '8zQx0ykxUj89n9A7G6CmY5U+lcsjqNsqe7e/3VE0' });
+
     const [addressValue, setAddressValue] = useState("");
     const [contract, setcontract] = useState(null);
     const [walletData, setWalletData] = useState();
+
+    console.log(addressValue)
 
     console.log(walletData)
 
     const { membershipList, membership } = useOrganization({
         membershipList: {},
     });
+
+    const userDetails = useSelector(
+        (state: RootState) => state.user.details
+      );
+    
+      console.log(userDetails)
+    
+      console.log(userDetails?.primaryEmailAddress.emailAddress)
 
     const sharing = async () => {
         const wallets = walletData ?? [];
@@ -31,6 +48,13 @@ const Modal = () => {
                 // Call the 'allow' method with the matched wallet address
                 await contract.allow(matchedWallet.address);
                 console.log("Access granted successfully!");
+                const not=Notification.create({
+                    title: 'File Access Granted.',
+                    content: `You can now check files uploaded by ${userDetails.primaryEmailAddress.emailAddress} `,
+                    recipients: [{ email: addressValue }],
+                });
+                console.log(not);
+
             } catch (error) {
                 console.error("Error granting access:", error);
             }
