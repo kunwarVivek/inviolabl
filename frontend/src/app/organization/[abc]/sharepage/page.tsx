@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react';
 import AddRoleModal from '@/components/AddRoleModal';
-import RolesTable from '@/components/RolesTable'; // Component that renders roles in a table
+import RolesTable from '@/components/RolesTable'; 
 import Dashboard from '@/components/Dashboard';
 import ShareTable from '@/components/ShareTable';
 import { ShareIcon } from '@heroicons/react/24/solid'
