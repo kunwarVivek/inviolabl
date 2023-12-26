@@ -141,7 +141,8 @@ const Modal = () => {
                         </select>
                     </div>
                     <div className="footer">
-                        <button className="py-2 mt-5 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold" onClick={() => sharing()}>Share</button>
+                        <button className="py-2 mt-5 mb-5 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold" onClick={() => sharing()}>Share</button>
+                        <span className="font-medium"><span className="font-semibold mr-2">Note:</span>Both the Admin and member should have their wallets connected, to use file access and share access.</span>
                     </div>
 
                 </div>

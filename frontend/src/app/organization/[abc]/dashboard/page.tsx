@@ -24,7 +24,7 @@ interface FileInfoType {
 
 }
 
-const page = async ({ params }) => {
+const page =  ({ params }) => {
   const [fileDetails, setFileDetails] = useState(null);
   const [account, setAccount] = useState("")
 
