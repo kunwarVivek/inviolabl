@@ -289,7 +289,7 @@ const Header = ({ className }: any) => {
             apiKey={'644b158683d2a357dc593625a99be3edc344a6fe'}
             userEmail={userDetails?.primaryEmailAddress.emailAddress}
             theme={{
-              icon: { borderColor: 'white' },
+              icon: { borderColor: '#8B5CF6', },
             }}
           >
             {(props) => (
