@@ -11,8 +11,9 @@ import { TruncatedWalletAddress } from "./TruncateFunction";
 import { cn } from "@/lib/utils";
 import { usePathname, useSearchParams } from "next/navigation";
 import { clearUser, setUser } from "@/features/LoginSlice";
-import { SignInButton, SignedIn, SignedOut, UserButton, useAuth, useUser } from "@clerk/nextjs";
+import { SignInButton, SignedIn, SignedOut, UserButton, useAuth, useClerk, useUser } from "@clerk/nextjs";
 import MagicBell, { FloatingNotificationInbox } from '@magicbell/magicbell-react';
+import { ethers } from "ethers";
 
 
 const Header = ({ className }: any) => {
@@ -21,11 +22,15 @@ const Header = ({ className }: any) => {
   const { data: session, status } = useSession();
   const { isLoaded, userId, sessionId, getToken } = useAuth();
   const pathname = usePathname();
+  const { signOut } = useClerk();
   const dispatch = useDispatch();
+
+  console.log(signOut)
 
   const { user } = useUser();
   console.log(user)
   console.log(user?.primaryEmailAddress.emailAddress)
+
 
   useEffect(() => {
     // Check if user exists before dispatching
@@ -63,6 +68,7 @@ const Header = ({ className }: any) => {
 
   const handleCopy = (e) => {
     e.stopPropagation();
+    
     navigator.clipboard.writeText(MetaMaskAccount);
     setShowCopied(true);
     setTimeout(() => setShowCopied(false), 3000); // Hide message after 3 seconds
@@ -289,7 +295,7 @@ const Header = ({ className }: any) => {
             apiKey={'644b158683d2a357dc593625a99be3edc344a6fe'}
             userEmail={userDetails?.primaryEmailAddress.emailAddress}
             theme={{
-              icon: { borderColor: 'white' },
+              icon: { borderColor: '#8B5CF6', },
             }}
           >
             {(props) => (

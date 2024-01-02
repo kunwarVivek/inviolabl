@@ -42,12 +42,7 @@ export default function Page() {
     <Dashboard>
 
       <div className="min-h-screen bg-white">
-        {invitationList?.length > 0 && <div className="flex items-center gap-3 bg-white">
-          <h1 className="text-xl font-bold mt-14 pl-10 py-5 w-full bg-slate-100">Pending Invitations</h1>
-          {/* <ShareIcon height={18} width={18} onClick={() => setIsModalOpen(true)} className='cursor-pointer text-blue-700'/> */}
-        </div>}
-
-        {invitationList?.length > 0 && <ShareTable shares={invitationList} />}
+        
         {/* <ShareModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSend={sendInvite} /> */}
         <div className="flex items-center gap-3 bg-white">
           <h1 className="text-xl font-bold mt-14 pl-10 py-5 w-full bg-slate-100">Invite</h1>
@@ -92,6 +87,12 @@ export default function Page() {
             </button>
           </form>
         </div>
+        {invitationList?.length > 0 && <div className="flex items-center gap-3 bg-white">
+          <h1 className="text-xl font-bold mt-14 pl-10 py-5 w-full bg-slate-100">Pending Invitations</h1>
+          {/* <ShareIcon height={18} width={18} onClick={() => setIsModalOpen(true)} className='cursor-pointer text-blue-700'/> */}
+        </div>}
+
+        {invitationList?.length > 0 && <ShareTable shares={invitationList} />}
       </div>
     </Dashboard>
   );

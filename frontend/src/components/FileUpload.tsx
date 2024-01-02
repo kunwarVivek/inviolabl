@@ -67,7 +67,10 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
         signer
       );
       contract.add(address, `https://gateway.lighthouse.storage/ipfs/${output.data.Hash}`);
-      alert("Successfully Image Uploaded");
+      
+      toast.info('File Uploading to blockchain - Processing...', {
+        position: toast.POSITION.BOTTOM_RIGHT,
+      });
       return output.data.Hash;
     } finally {
       setLoading(false);

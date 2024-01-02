@@ -187,7 +187,7 @@ const page =  ({ params }) => {
               </tr>
               <tr>
                 <th colSpan={4} className="py-2">
-                  <div className="ml-10 text-start space-x-4 mb-5">
+                  <div className="mr-10 flex justify-end text-start space-x-4 mb-5">
                     <DropdownMenu buttonText="Type" options={typeOptions} onSelect={handleFilterChange} />
                     <DropdownMenu
                       buttonText="Modified"
