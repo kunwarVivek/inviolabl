@@ -28,6 +28,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
   );
 
   const [fileName, setFileName] = useState("No File selected");
+  const [fileSize, setFileSize] = useState()
   const lightapi = "609989b0.b85f2616ce1a490eb457e1fd4d7bc994";
   const [loading, setLoading] = useState(false)
 
@@ -41,6 +42,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
 
   const uploadFile = async (file) => {
     setFileName(file[0].name)
+    setFileSize(file[0].size)
     setLoading(true);
     try {
       const output = await lighthouse.upload(
@@ -59,14 +61,14 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       const signer = await provider.getSigner();
       const address = await signer.getAddress();
       setAccount(address);
-      let contractAddress = "0xA2C019a3DC84801B575C2a24c16D2820469C9F3d";
+      let contractAddress = "0x82074bFb2F39E93b93a6dD6071Bb725727A1B664";
 
       const contract = new ethers.Contract(
         contractAddress,
         Upload.abi,
         signer
       );
-      contract.add(address, `https://gateway.lighthouse.storage/ipfs/${output.data.Hash}`);
+      contract.uploadFile(`https://gateway.lighthouse.storage/ipfs/${output.data.Hash}`,file[0].name,file[0].size.toString(),user?.primaryEmailAddress.emailAddress );
       
       toast.info('File Uploading to blockchain - Processing...', {
         position: toast.POSITION.BOTTOM_RIGHT,
@@ -76,6 +78,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       setLoading(false);
       setIsModalOpen(false);
       setFileName("No File selected") // Set loading back to false when uploading is complete
+      setFileSize(null)
     }
   };
 
@@ -116,6 +119,8 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
     setFiles((prevFiles) => [...prevFiles, ...filesArray]);
     setTotalSize((prevTotalSize) => prevTotalSize + sizeOfNewFiles);
   };
+
+  console.log(fileSize)
 
   const removeFile = (fileName: string) => {
     setFiles(files.filter((file) => file.name !== fileName));

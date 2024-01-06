@@ -24,135 +24,150 @@ interface FileInfoType {
 
 }
 
-const page =  ({ params }) => {
+const page = ({ params }) => {
   const [fileDetails, setFileDetails] = useState(null);
-  const [account, setAccount] = useState("")
+  const [account, setAccount] = useState("");
+  const [data, setData] = useState()
+  const [contract, setContract] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [triggerEffect, setTriggerEffect] = useState(false);
+  const [triggerDownload, setTriggerDownload] = useState(false)
+
+  console.log(data)
+
 
 
   const userDetails = useSelector(
     (state: RootState) => state.user.details
   );
 
-  const MetaMaskAccount = useSelector(
-    (state: RootState) => state.metaMask.account
-  );
-
-  console.log(MetaMaskAccount)
-
-
-
+  console.log(userDetails?.primaryEmailAddress?.emailAddress)
 
 
   useEffect(() => {
     const fetchFileDetails = async () => {
       try {
-        // Example: Array of CIDs
-        const cids = ["QmTmGqgVUGf37dgEm3Uig1cuRe75zjpkWSPVGTYBduM198", /* ... other CIDs */];
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        const signer = await provider.getSigner();
+        const address = await signer.getAddress();
+        setAccount(address);
 
-        const fileInfoArray = await Promise.all(cids.map(async (cid) => {
-          const fileInfoResult = await lighthouse.getFileInfo(cid);
-          const provider = new ethers.BrowserProvider(window.ethereum);
-          await provider.send("eth_requestAccounts", []);
-          const signer = await provider.getSigner();
-          const address = await signer.getAddress();
-          setAccount(address);
-          let contractAddress = "0xA2C019a3DC84801B575C2a24c16D2820469C9F3d";
+        const contractAddress = "0x82074bFb2F39E93b93a6dD6071Bb725727A1B664";
+        const wallRes = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/wallet/all-wallets`);
+        setData(wallRes.data.wallets);
 
-          const contract = new ethers.Contract(
-            contractAddress,
-            Upload.abi,
-            signer
-          );
+        const contract = new ethers.Contract(contractAddress, Upload.abi, signer);
+        setContract(contract)
 
+        const matchingObject = wallRes.data.wallets.find(obj => obj.email === userDetails?.primaryEmailAddress?.emailAddress);
 
+        const dataArray = await contract.display(matchingObject.address);
+        const str = dataArray.toString();
+        const str_array = str.split(",");
+        console.log(dataArray);
 
-          console.log(contract)
+        const getCIDFromUrl = (url) => {
+          const parts = url.split('/');
+          return parts[parts.length - 1];
+        };
 
+        const lighthouseUrls = str_array.filter(url => url.includes('lighthouse.storage'));
+        const cids = lighthouseUrls.map(getCIDFromUrl);
 
-          let dataArray = await contract.display(address);
-          const str = dataArray.toString();
-          const str_array = str.split(",");
-          console.log(str_array)
-          const getCIDFromUrl = (url) => {
-            const parts = url.split('/');
-            return parts[parts.length - 1];
-          };
-
-          const lighthouseUrls = str_array.filter(url => url.includes('lighthouse.storage'));
-
-          const cids = lighthouseUrls.map(getCIDFromUrl);
-          // console.log(cids);
+        const retrieveFileInfoForCids = async () => {
           const fileInfoArray = [];
 
-          const fileInfo = async (cid) => {
+          for (const cid of cids) {
             try {
               const fileInfoResult = await lighthouse.getFileInfo(cid);
               fileInfoArray.push(fileInfoResult.data);
             } catch (error) {
               console.error(`Error retrieving file info for CID ${cid}: ${error.message}`);
             }
-          };
+          }
 
-          // Loop through each CID and retrieve file details
-          const retrieveFileInfoForCids = async () => {
-            for (const cid of cids) {
-              await fileInfo(cid);
-            }
+          console.log(fileInfoArray);
+          setFileDetails(dataArray);
+        };
 
-            // Now, fileInfoArray contains an array of file details for each CID
-            console.log(fileInfoArray);
-            setFileDetails(fileInfoArray)
-          };
-
-          // Call the function to retrieve file details for each CID
-          retrieveFileInfoForCids();
-          return fileInfoResult.data;
-        }));
-
-        setFileDetails(fileInfoArray);
+        retrieveFileInfoForCids();
+        setTriggerEffect(false);
+        setTriggerDownload(false)
       } catch (error) {
         console.error(`Error retrieving file details: ${error.message}`);
       }
     };
 
     fetchFileDetails();
-  }, []);
+  }, [triggerEffect,triggerDownload]);
+
 
   console.log(fileDetails)
 
+  const [pdfOpened, setPdfOpened] = useState(false);
+
+  const handleFileClick = async (file, index, account) => {
+
+    try {
+
+      setLoading(true);
+
+      const transaction = await contract.addView(account, index);
 
 
+      await transaction.wait();
 
+      console.log('addview function called successfully');
+    } catch (error) {
+      console.error('Error calling addview function:', error);
+      return;
+    } finally {
+
+      setLoading(false);
+      setTriggerEffect(true);
+    }
+
+
+    window.open(file.url, '_blank');
+    setPdfOpened(true);
+  };
+
+  const handleFileDownload = async (file, index, account) => {
+
+    try {
+      const transaction = await contract.addDownload(account, index);
+      await transaction.wait();
+      console.log('addDownload function called successfully');
+    } catch (error) {
+      console.error('Error calling addDownload function:', error);
+      return;
+    }
+
+    fetch(file.fileName).then((response) => {
+      response.blob().then((blob) => {
+
+        // Creating new object of PDF file
+        const fileURL =
+          window.URL.createObjectURL(blob);
+
+        // Setting various property values
+        let alink = document.createElement("a");
+        alink.href = fileURL;
+        alink.download = file.fileName;
+        alink.click();
+      });
+    });
+    setTriggerDownload(true);
+  };
 
   console.log(userDetails)
 
-  const { user } = useUser(); // Assuming you have a way to get the user ID
+  const { user } = useUser();
 
   const [userFiles, setUserFiles] = useState([]);
   console.log(userFiles)
 
-  // useEffect(() => {
-  //   const fetchUserFiles = async () => {
-
-  //     try {
-  //       if (currentOrganization.id) {
-  //         const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tenants/${currentOrganization.id}/files`,
-  //           {
-  //             headers: {
-  //               'Session_id': sessionId,
-  //             }
-  //           });
-  //         setFileHistory(response.data);
-  //         setUserFiles(response.data)
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching user files:', error);
-  //     }
-  //   };
-
-
-  //   fetchUserFiles();
-  // }, [user]);
 
 
   const [filter, setFilter] = useState('all');
@@ -179,14 +194,14 @@ const page =  ({ params }) => {
           <table className="min-w-full bg-white ">
             <thead className="bg-white text-black ">
               <tr>
-                <th colSpan={4} className="py-2">
+                <th colSpan={5} className="py-2">
                   <div className="pl-10 py-5 bg-slate-100 text-start space-x-4 mt-14 mb-2">
                     <span className="font-semibold text-xl">File History</span>
                   </div>
                 </th>
               </tr>
               <tr>
-                <th colSpan={4} className="py-2">
+                <th colSpan={5} className="py-2">
                   <div className="mr-10 flex justify-end text-start space-x-4 mb-5">
                     <DropdownMenu buttonText="Type" options={typeOptions} onSelect={handleFilterChange} />
                     <DropdownMenu
@@ -210,6 +225,21 @@ const page =  ({ params }) => {
                 >
                   SIZE
                 </th>
+                <th
+                  className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                >
+                  UPLOADED BY
+                </th>
+                <th
+                  className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                >
+                  NO OF VIEWS
+                </th>
+                <th
+                  className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                >
+                  NO OF DOWNLOADS
+                </th>
                 {/* <th
                   className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
                 >
@@ -221,31 +251,33 @@ const page =  ({ params }) => {
                 >
                   UPLOADED BY
                 </th> */}
-                <th
-                  className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                >
-                  STATUS
-                </th>
+
               </tr>
             </thead>
 
             <tbody className="text-gray-700">
               {fileDetails?.map((file, index) => (
 
+
                 <tr key={index}>
                   <td className="px-5 py-5 pl-10 border-b border-gray-200 bg-white text-sm">
-                    <a href={`https://gateway.lighthouse.storage/ipfs/${file.cid}`}> <span>{file.fileName}</span></a>
                     <button
-                      onClick={() => {/* Implement share functionality */ }}
+
+                      onClick={() => handleFileClick(file, index, account)}
+                    >
+                      <span>{file.fileName}</span>
+                    </button>
+                    <button
+                      onClick={() => handleFileDownload(file, index, account)}
                       className="ml-2 hover:text-blue-500"
                     >
-                      <ShareIcon className="h-4 w-4" aria-hidden="true" />
+                      <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z" /></svg>
                     </button>
                   </td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.fileSizeInBytes}</td>
-                  {/* <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.createdAt}</td> */}
-                  {/* <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.uploadedBy}</td> */}
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">success</td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.fileSize}</td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.emailAddress}</td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.views == 0 ? "no views" : Number(file.views)}</td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.downloads == 0 ? "no downloads" : Number(file.downloads)}</td>
 
                 </tr>
               ))}

@@ -53,7 +53,7 @@ const page = ({ params }) => {
         const signer = await provider.getSigner();
         const address = await signer.getAddress();
         setAccount(address);
-        let contractAddress = "0xA2C019a3DC84801B575C2a24c16D2820469C9F3d";
+        let contractAddress = "0x82074bFb2F39E93b93a6dD6071Bb725727A1B664";
 
         const contract = new ethers.Contract(
           contractAddress,

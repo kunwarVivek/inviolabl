@@ -71,7 +71,7 @@ const Modal = () => {
             const provider = new ethers.BrowserProvider(window.ethereum);
             await provider.send("eth_requestAccounts", []);
             const signer = await provider.getSigner();
-            let contractAddress = "0xA2C019a3DC84801B575C2a24c16D2820469C9F3d";
+            let contractAddress = "0x82074bFb2F39E93b93a6dD6071Bb725727A1B664";
 
             const newContract = new ethers.Contract(
                 contractAddress,
