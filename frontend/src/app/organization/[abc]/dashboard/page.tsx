@@ -12,6 +12,7 @@ import axios from "axios";
 import { ethers } from "ethers";
 import Upload from "../../../../artifacts/contracts/Upload.sol/Upload.json";
 import lighthouse from "@lighthouse-web3/sdk";
+import { toast } from "react-toastify";
 import { fileInfoType } from "@lighthouse-web3/sdk/dist/Lighthouse/getFileInfo";
 
 
@@ -100,7 +101,7 @@ const page = ({ params }) => {
     };
 
     fetchFileDetails();
-  }, [triggerEffect,triggerDownload]);
+  }, [triggerEffect, triggerDownload]);
 
 
   console.log(fileDetails)
@@ -111,14 +112,26 @@ const page = ({ params }) => {
 
     try {
 
+      
+
       setLoading(true);
 
       const transaction = await contract.addView(account, index);
 
+      toast.info('Processing transaction...', {
+        position: toast.POSITION.BOTTOM_RIGHT,
+        autoClose: false,
+      });
 
       await transaction.wait();
 
       console.log('addview function called successfully');
+      toast.dismiss();
+
+      toast.success('transaction successfull', {
+        position: toast.POSITION.BOTTOM_RIGHT,
+        autoClose: 1000,
+      });
     } catch (error) {
       console.error('Error calling addview function:', error);
       return;
@@ -136,9 +149,20 @@ const page = ({ params }) => {
   const handleFileDownload = async (file, index, account) => {
 
     try {
+      
       const transaction = await contract.addDownload(account, index);
+      toast.info('Processing transaction...', {
+        position: toast.POSITION.BOTTOM_RIGHT,
+        autoClose: false,
+      });
       await transaction.wait();
       console.log('addDownload function called successfully');
+      toast.dismiss();
+
+      toast.success('transaction successfull', {
+        position: toast.POSITION.BOTTOM_RIGHT,
+        autoClose: 1000,
+      });
     } catch (error) {
       console.error('Error calling addDownload function:', error);
       return;
