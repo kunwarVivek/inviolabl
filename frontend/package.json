@@ -16,6 +16,7 @@
     "@magicbell/core": "^5.0.12",
     "@magicbell/magicbell-react": "^10.9.10",
     "@prisma/client": "^5.7.0",
+    "@privy-io/react-auth": "^1.52.5",
     "@reduxjs/toolkit": "^1.9.7",
     "axios": "^1.6.2",
     "clsx": "^2.0.0",

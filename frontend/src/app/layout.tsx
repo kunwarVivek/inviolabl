@@ -8,6 +8,7 @@ import { ReduxProvider } from "./context/ReduxToolkitProvider";
 import Provider from "./context/client-provider";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
+import PrivyProviderWrapper from "@/components/privy-provider-wrapper";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -22,9 +23,11 @@ export default async function RootLayout({ children }) {
     <ClerkProvider>
       <html lang="en">
         <body className={inter.className}>
-          <ReduxProvider>
-            <Provider session={session}>{children}</Provider>
-          </ReduxProvider>
+          <PrivyProviderWrapper>
+            <ReduxProvider>
+              <Provider session={session}>{children}</Provider>
+            </ReduxProvider>
+          </PrivyProviderWrapper>
           <ToastContainer
             style={{
               // Custom styles
