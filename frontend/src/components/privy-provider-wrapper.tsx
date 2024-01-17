@@ -1,6 +1,6 @@
 'use client';
 import { PrivyProvider } from "@privy-io/react-auth";
-import { baseSepolia, sepolia } from "viem/chains";
+import { baseGoerli, baseSepolia, sepolia } from "viem/chains";
 
 export default function PrivyProviderWrapper({
   children,
@@ -24,7 +24,7 @@ export default function PrivyProviderWrapper({
             noPromptOnSignature: true
         },
         // Import your desired chain from `viem/chains` and pass it to `defaultChain`
-        defaultChain: sepolia,
+        defaultChain: baseGoerli,
     }}
     >
       {children}

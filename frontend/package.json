@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@alchemy/aa-accounts": "^1.2.4",
+    "@alchemy/aa-alchemy": "^1.2.4",
+    "@alchemy/aa-core": "^1.2.4",
     "@clerk/nextjs": "^4.28.0",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
@@ -16,7 +19,7 @@
     "@magicbell/core": "^5.0.12",
     "@magicbell/magicbell-react": "^10.9.10",
     "@prisma/client": "^5.7.0",
-    "@privy-io/react-auth": "^1.52.5",
+    "@privy-io/react-auth": "^1.52.6",
     "@reduxjs/toolkit": "^1.9.7",
     "axios": "^1.6.2",
     "clsx": "^2.0.0",
@@ -36,7 +39,7 @@
     "slick-carousel": "^1.8.1",
     "svix": "^1.15.0",
     "tailwind-merge": "^2.1.0",
-    "viem": "^1.19.15",
+    "viem": "^1.21.4",
     "wagmi": "^1.4.11"
   },
   "devDependencies": {
