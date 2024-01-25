@@ -40,7 +40,8 @@
     "svix": "^1.15.0",
     "tailwind-merge": "^2.1.0",
     "viem": "^1.21.4",
-    "wagmi": "^1.4.11"
+    "wagmi": "^1.4.11",
+    "web3": "^4.4.0"
   },
   "devDependencies": {
     "@iconify/react": "^4.1.1",

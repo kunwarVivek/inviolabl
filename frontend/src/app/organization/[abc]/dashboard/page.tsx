@@ -53,6 +53,7 @@ const page = ({ params }) => {
         const signer = await provider.getSigner();
         const address = await signer.getAddress();
         setAccount(address);
+        console.log(signer)
 
         const contractAddress = "0x82074bFb2F39E93b93a6dD6071Bb725727A1B664";
         const wallRes = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/wallet/all-wallets`);

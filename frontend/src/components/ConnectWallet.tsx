@@ -51,7 +51,7 @@ const ConnectWallet = () => {
           <>
           <p className="text-center  p-2 w-fit rounded-md font-semibold">
             <span className="text-sm font-semibold bg-slate-300 p-1 rounded-md text-black px-4">
-              {TruncatedWalletAddress(user?.wallet?.address)}
+              {(user?.wallet?.address)}
             </span>
             <button onClick={logout} className="p-1 bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold ms-6">Disconnect</button>
           </p>

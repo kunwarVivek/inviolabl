@@ -11,9 +11,12 @@ import { ToastContainer, toast } from "react-toastify";
 import { Alert } from "../../components/AlertWithLink";
 import Header from "@/components/Header";
 
+
 export default function DashboardPage() {
   const router = useRouter();
   const { ready, authenticated, user, logout } = usePrivy();
+  const { sendTransaction } = usePrivy();
+
   const {
     smartAccountAddress,
     smartAccountProvider,
@@ -91,6 +94,35 @@ export default function DashboardPage() {
     setIsMinting(false);
   };
 
+
+ function SendTransactionButton() {
+
+  // Replace this with the UnsignedTransactionRequest you'd like your user to send
+  const unsignedTx = {
+    to: '0x82074bFb2F39E93b93a6dD6071Bb725727A1B664',
+    chainId: 1,
+    value: '0x3B9ACA00',
+  };
+
+  // Replace this with the text you'd like on your transaction modal
+  const uiConfig = {
+    header: 'Sample header text',
+    description: 'Transaction',
+    buttonText: 'Confirm'
+  };
+
+  // Users must have an embedded wallet at `user.wallet` to send a transaction.
+  return (
+    <button disabled={!user.wallet} onClick={async () => {
+        const txReceipt = await sendTransaction(unsignedTx, uiConfig);
+        // `txReceipt` is an object of type `TransactionReceipt`. From this object, you can
+        // access your transaction's `transactionHash`, `blockNumber`, `gasUsed`, and
+        // more.
+    }}>
+        Send ETH
+    </button>);
+}
+
   return (
     <>
     
@@ -113,12 +145,13 @@ export default function DashboardPage() {
             </div>
             <div className="mt-12 flex gap-4 flex-wrap">
               <button
-                onClick={onMint}
+                onClick={SendTransactionButton}
                 className="text-sm bg-violet-600 hover:bg-violet-700 disabled:bg-violet-400 py-2 px-4 rounded-md text-white"
-                disabled={isLoading || isMinting}
+                
               >
-                Mint NFT
+                <SendTransactionButton />
               </button>
+              
             </div>
             
             <p className="mt-6 font-bold uppercase text-sm text-gray-600">

@@ -10,6 +10,7 @@ import axios from "axios";
 import MagicBellClient, { Notification } from '@magicbell/core';
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
 
 
 
@@ -21,6 +22,9 @@ const Modal = () => {
     const [contract, setcontract] = useState(null);
     const [walletData, setWalletData] = useState();
 
+    const { ready, authenticated, user, logout } = usePrivy();
+    const { sendTransaction } = usePrivy();
+
     console.log(addressValue)
 
     console.log(walletData)
@@ -31,11 +35,17 @@ const Modal = () => {
 
     const userDetails = useSelector(
         (state: RootState) => state.user.details
-      );
-    
-      console.log(userDetails)
-    
-      console.log(userDetails?.primaryEmailAddress.emailAddress)
+    );
+
+    console.log(userDetails)
+
+    console.log(userDetails?.primaryEmailAddress.emailAddress)
+
+    const { wallets } = useWallets();
+    const wallet = wallets?.find((wallet) => (wallet.address === '0x0D8Be9Cbb3FD97cbABF21Ba9524418eA651D9Ed4'));
+    // Inspect its chainId
+    const chainId = wallet?.chainId;
+    console.log(chainId);
 
     const sharing = async () => {
         const wallets = walletData ?? [];
@@ -48,7 +58,7 @@ const Modal = () => {
                 // Call the 'allow' method with the matched wallet address
                 await contract.allow(matchedWallet.address);
                 console.log("Access granted successfully!");
-                const not=Notification.create({
+                const not = Notification.create({
                     title: 'File Access Granted.',
                     content: `You can now check files uploaded by ${userDetails.primaryEmailAddress.emailAddress} `,
                     recipients: [{ email: addressValue }],
@@ -102,6 +112,34 @@ const Modal = () => {
         })();
     }, []);
 
+    function SendTransactionButton() {
+
+        // Replace this with the UnsignedTransactionRequest you'd like your user to send
+        const unsignedTx = {
+            to: '0x82074bFb2F39E93b93a6dD6071Bb725727A1B664',
+            chainId: 84532,
+            value: '0x3B9ACA00',
+        };
+
+        // Replace this with the text you'd like on your transaction modal
+        const uiConfig = {
+            header: 'Sample header text',
+            description: 'Transaction',
+            buttonText: 'Confirm'
+        };
+
+        // Users must have an embedded wallet at `user.wallet` to send a transaction.
+        return (
+            <button disabled={!addressValue} onClick={async () => {
+                const txReceipt = await sendTransaction(unsignedTx, uiConfig);
+                // `txReceipt` is an object of type `TransactionReceipt`. From this object, you can
+                // access your transaction's `transactionHash`, `blockNumber`, `gasUsed`, and
+                // more.
+            }}>
+                Share
+            </button>);
+    }
+
     return (
         <>
             <Dashboard>
@@ -141,7 +179,7 @@ const Modal = () => {
                         </select>
                     </div>
                     <div className="footer">
-                        <button className="py-2 mt-5 mb-5 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold" onClick={() => sharing()}>Share</button>
+                        <button className="py-2 mt-5 mb-5 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold"><SendTransactionButton /></button>
                         <span className="font-medium"><span className="font-semibold mr-2">Note:</span>Both the Admin and member should have their wallets connected, to use file access and share access.</span>
                     </div>
 

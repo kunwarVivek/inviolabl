@@ -10,6 +10,17 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { ethers } from "ethers";
 import Upload from "../artifacts/contracts/Upload.sol/Upload.json"
+// import { provider } from "@/app/mint/page";
+import { encodeFunctionData } from "viem";
+import {
+  LightSmartContractAccount,
+  getDefaultLightAccountFactoryAddress,
+} from "@alchemy/aa-accounts";
+import { AlchemyProvider } from "@alchemy/aa-alchemy";
+import { WalletClientSigner, type SmartAccountSigner } from "@alchemy/aa-core";
+import { useWallets } from "@privy-io/react-auth";
+import { createWalletClient, custom } from "viem";
+import { baseSepolia, sepolia } from "viem/chains";
 
 
 
@@ -31,6 +42,8 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
   const [fileSize, setFileSize] = useState()
   const lightapi = "609989b0.b85f2616ce1a490eb457e1fd4d7bc994";
   const [loading, setLoading] = useState(false)
+
+  const { wallets } = useWallets();
 
 
   const progressCallback = (progressData) => {
@@ -56,20 +69,48 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       console.log(
         "Visit at https://gateway.lighthouse.storage/ipfs/" + output.data.Hash
       );
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const signer = await provider.getSigner();
-      const address = await signer.getAddress();
-      setAccount(address);
-      let contractAddress = "0x82074bFb2F39E93b93a6dD6071Bb725727A1B664";
+      const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
+      await embeddedWallet.switchChain(baseSepolia.id);
 
-      const contract = new ethers.Contract(
-        contractAddress,
-        Upload.abi,
-        signer
+      // Get a viem client from the embedded wallet
+      const eip1193provider = await embeddedWallet.getEthereumProvider();
+      const privyClient = createWalletClient({
+        account: embeddedWallet.address as any,
+        chain: baseSepolia,
+        transport: custom(eip1193provider),
+      });
+
+      // Create a smart account signer from the embedded wallet's viem client
+      const privySigner: SmartAccountSigner = new WalletClientSigner(
+        privyClient,
+        "json-rpc"
       );
-      contract.uploadFile(`https://gateway.lighthouse.storage/ipfs/${output.data.Hash}`,file[0].name,file[0].size.toString(),user?.primaryEmailAddress.emailAddress );
+
+      // Create an Alchemy Provider with the smart account signer
+      const provider = new AlchemyProvider({
+        apiKey: "JsC7CASSssdGpZ6rOrmEw9tYdn6-oJPd",
+        chain: baseSepolia,
+        
+      }).connect(
+        (rpcClient) =>
+          new LightSmartContractAccount({
+            chain: rpcClient.chain,
+            owner: privySigner,
+            factoryAddress: getDefaultLightAccountFactoryAddress(rpcClient.chain),
+            rpcClient,
+          })
+      );
+      const uoHash = await provider.sendUserOperation({
+        target: '0x82074bFb2F39E93b93a6dD6071Bb725727A1B664',
+        data: encodeFunctionData({
+          abi: Upload.abi,
+          functionName: 'uploadFile',
+          args: [`https://gateway.lighthouse.storage/ipfs/${output.data.Hash}`, file[0].name, file[0].size.toString(), user?.primaryEmailAddress.emailAddress]
+        }),
       
+      });
+      console.log('uoHash', uoHash);
+
       toast.info('File Uploading to blockchain - Processing...', {
         position: toast.POSITION.BOTTOM_RIGHT,
       });
@@ -77,7 +118,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
     } finally {
       setLoading(false);
       setIsModalOpen(false);
-      setFileName("No File selected") // Set loading back to false when uploading is complete
+      setFileName("No File selected") 
       setFileSize(null)
     }
   };

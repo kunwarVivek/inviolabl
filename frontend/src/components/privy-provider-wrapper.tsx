@@ -9,7 +9,7 @@ export default function PrivyProviderWrapper({
 }) {
   return (
     <PrivyProvider
-      appId='clpispdty00ycl80fpueukbhl'
+      appId='clrpwag8h01twla0f9uckte9d'
       config={{
         /* Replace this with your desired login methods */
         loginMethods: ['email', 'wallet'],
@@ -21,10 +21,11 @@ export default function PrivyProviderWrapper({
         },
         embeddedWallets: {
             createOnLogin: 'users-without-wallets',
-            noPromptOnSignature: true
+            noPromptOnSignature: false
         },
         // Import your desired chain from `viem/chains` and pass it to `defaultChain`
-        defaultChain: baseGoerli,
+        defaultChain: sepolia,
+        supportedChains: [baseSepolia, sepolia]
     }}
     >
       {children}
