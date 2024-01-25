@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import Head from "next/head";
 import { useSmartAccount } from "../../hooks/SmartAccountContext";
-import { BASE_GOERLI_SCAN_URL, NFT_ADDRESS } from "../../abiJson/constants";
 import { encodeFunctionData } from "viem";
 import ABI from "../../abiJson/nftABI.json";
 import { ToastContainer, toast } from "react-toastify";
@@ -34,65 +33,7 @@ export default function DashboardPage() {
   const isLoading = !smartAccountAddress || !smartAccountProvider;
   const [isMinting, setIsMinting] = useState(false);
 
-  const onMint = async () => {
-    // The mint button is disabled if either of these are undefined
-    if (!smartAccountProvider || !smartAccountAddress) return;
-
-    // Store a state to disable the mint button while mint is in progress
-    setIsMinting(true);
-    const toastId = toast.loading("Minting...");
-
-    try {
-      // From a viem `RpcTransactionRequest` (e.g. calling an ERC-721's `mint` method),
-      // build and send a user operation. Gas fees will be sponsored by the Base Paymaster.
-      const userOpHash = await sendSponsoredUserOperation({
-        from: smartAccountAddress,
-        to: NFT_ADDRESS,
-        data: encodeFunctionData({
-          abi: ABI,
-          functionName: "mint",
-          args: [smartAccountAddress],
-        }),
-      });
-
-      toast.update(toastId, {
-        render: "Waiting for your transaction to be confirmed...",
-        type: "info",
-        isLoading: true,
-      });
-
-      // Once we have a hash for the user operation, watch it until the transaction has
-      // been confirmed.
-      const transactionHash =
-        await smartAccountProvider.waitForUserOperationTransaction(userOpHash);
-
-      toast.update(toastId, {
-        render: (
-          <Alert href={`${BASE_GOERLI_SCAN_URL}/tx/${transactionHash}`}>
-            Successfully minted! Click here to see your transaction.
-          </Alert>
-        ),
-        type: "success",
-        isLoading: false,
-        autoClose: 5000,
-      });
-    } catch (error) {
-      console.error("Mint failed with error: ", error);
-      toast.update(toastId, {
-        render: (
-          <Alert>
-            There was an error sending your transaction. See the developer
-            console for more info.
-          </Alert>
-        ),
-        type: "error",
-        isLoading: false,
-        autoClose: 3000,
-      });
-    }
-
-    setIsMinting(false);
-  };
+ 
 
 
  function SendTransactionButton() {
