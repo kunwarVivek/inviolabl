@@ -3,9 +3,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import Head from "next/head";
-import { useSmartAccount } from "../../hooks/SmartAccountContext";
 import { encodeFunctionData } from "viem";
-import ABI from "../../abiJson/nftABI.json";
 import { ToastContainer, toast } from "react-toastify";
 import { Alert } from "../../components/AlertWithLink";
 import Header from "@/components/Header";
@@ -16,13 +14,6 @@ export default function DashboardPage() {
   const { ready, authenticated, user, logout } = usePrivy();
   const { sendTransaction } = usePrivy();
 
-  const {
-    smartAccountAddress,
-    smartAccountProvider,
-    sendSponsoredUserOperation,
-    eoa,
-  } = useSmartAccount();
-
   // If the user is not authenticated, redirect them back to the landing page
   useEffect(() => {
     if (ready && !authenticated) {
@@ -30,7 +21,6 @@ export default function DashboardPage() {
     }
   }, [ready, authenticated, router]);
 
-  const isLoading = !smartAccountAddress || !smartAccountProvider;
   const [isMinting, setIsMinting] = useState(false);
 
  
