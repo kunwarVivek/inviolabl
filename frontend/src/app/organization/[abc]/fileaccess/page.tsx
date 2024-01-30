@@ -76,41 +76,42 @@ const Modal = () => {
 
     console.log(contract)
 
-    useEffect(() => {
-        (async () => {
-            const provider = new ethers.BrowserProvider(window.ethereum);
-            await provider.send("eth_requestAccounts", []);
-            const signer = await provider.getSigner();
-            let contractAddress = "0x82074bFb2F39E93b93a6dD6071Bb725727A1B664";
+    // useEffect(() => {
+    //     (async () => {
+    //         const provider = new ethers.BrowserProvider(window.ethereum);
+    //         await provider.send("eth_requestAccounts", []);
+    //         const signer = await provider.getSigner();
+    //         let contractAddress = "0x82074bFb2F39E93b93a6dD6071Bb725727A1B664";
 
-            const newContract = new ethers.Contract(
-                contractAddress,
-                Upload.abi,
-                signer
-            );
+    //         const newContract = new ethers.Contract(
+    //             contractAddress,
+    //             Upload.abi,
+    //             signer
+    //         );
 
-            const wallRes = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/wallet/all-wallets`)
+    //         const wallRes = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/wallet/all-wallets`)
 
-            setWalletData(wallRes.data.wallets)
+    //         setWalletData(wallRes.data.wallets)
 
-            setcontract(newContract);
+    //         setcontract(newContract);
 
-            const addressList = await newContract.shareAccess();
-            console.log(addressList)
-            let select = document.querySelector("#selectNumber");
-            const options = addressList;
+    //         const addressList = await newContract.shareAccess();
+    //         console.log(addressList)
+    //         let select = document.querySelector("#selectNumber");
+    //         const options = addressList;
 
-            for (let i = 0; i < options.length; i++) {
-                let opt = options[i];
-                let e1 = document.createElement("option");
-                e1.textContent = opt;
-                e1.value = opt;
-                e1.disabled = true
-                e1.className = "address";
-                select.appendChild(e1);
-            }
-        })();
-    }, []);
+    //         for (let i = 0; i < options.length; i++) {
+    //             let opt = options[i];
+    //             let e1 = document.createElement("option");
+    //             e1.textContent = opt;
+    //             e1.value = opt;
+    //             e1.disabled = true
+    //             e1.className = "address";
+    //             select.appendChild(e1);
+    //         }
+    //     })();
+    // }, []);
+
 
     function SendTransactionButton() {
 

@@ -1,11 +1,8 @@
 "use client";
 import Dashboard from "@/components/Dashboard";
 import React, { useState, useEffect } from "react";
-import { ShareIcon } from "@heroicons/react/24/solid";
 import DropdownMenu from "@/components/DropdownMenu";
-// import { useValidation } from "@/components/Validation";
-import loading from "@/app/loading";
-import { OrganizationList, useAuth, useOrganization, useOrganizationList, useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import axios from "axios";
@@ -13,7 +10,15 @@ import { ethers } from "ethers";
 import Upload from "../../../../artifacts/contracts/Upload.sol/Upload.json";
 import lighthouse from "@lighthouse-web3/sdk";
 import { toast } from "react-toastify";
-import { fileInfoType } from "@lighthouse-web3/sdk/dist/Lighthouse/getFileInfo";
+import {
+  LightSmartContractAccount,
+  getDefaultLightAccountFactoryAddress,
+} from "@alchemy/aa-accounts";
+import { AlchemyProvider } from "@alchemy/aa-alchemy";
+import { WalletClientSigner, type SmartAccountSigner } from "@alchemy/aa-core";
+import { useWallets } from "@privy-io/react-auth";
+import { createWalletClient, custom } from "viem";
+import { baseSepolia, sepolia } from "viem/chains";
 
 
 interface FileInfoType {
@@ -36,7 +41,40 @@ const page = ({ params }) => {
 
   console.log(data)
 
+  const { wallets } = useWallets();
 
+  const Provider = async (file) => {
+
+    const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
+    await embeddedWallet.switchChain(baseSepolia.id);
+
+    const eip1193provider = await embeddedWallet.getEthereumProvider();
+    const privyClient = createWalletClient({
+      account: embeddedWallet.address as any,
+      chain: baseSepolia,
+      transport: custom(eip1193provider),
+    });
+
+    const privySigner: SmartAccountSigner = new WalletClientSigner(
+      privyClient,
+      "json-rpc"
+    );
+
+    const provider = new AlchemyProvider({
+      apiKey: "JsC7CASSssdGpZ6rOrmEw9tYdn6-oJPd",
+      chain: baseSepolia,
+
+    }).connect(
+      (rpcClient) =>
+        new LightSmartContractAccount({
+          chain: rpcClient.chain,
+          owner: privySigner,
+          factoryAddress: getDefaultLightAccountFactoryAddress(rpcClient.chain),
+          rpcClient,
+        })
+    );
+
+  };
 
   const userDetails = useSelector(
     (state: RootState) => state.user.details
@@ -45,64 +83,64 @@ const page = ({ params }) => {
   console.log(userDetails?.primaryEmailAddress?.emailAddress)
 
 
-  useEffect(() => {
-    const fetchFileDetails = async () => {
-      try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        await provider.send("eth_requestAccounts", []);
-        const signer = await provider.getSigner();
-        const address = await signer.getAddress();
-        setAccount(address);
-        console.log(signer)
+  // useEffect(() => {
+  //   const fetchFileDetails = async () => {
+  //     try {
+  //       const provider = new ethers.BrowserProvider(window.ethereum);
+  //       await provider.send("eth_requestAccounts", []);
+  //       const signer = await provider.getSigner();
+  //       const address = await signer.getAddress();
+  //       setAccount(address);
+  //       console.log(signer)
 
-        const contractAddress = "0x82074bFb2F39E93b93a6dD6071Bb725727A1B664";
-        const wallRes = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/wallet/all-wallets`);
-        setData(wallRes.data.wallets);
+  //       const contractAddress = "0x82074bFb2F39E93b93a6dD6071Bb725727A1B664";
+  //       const wallRes = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/wallet/all-wallets`);
+  //       setData(wallRes.data.wallets);
 
-        const contract = new ethers.Contract(contractAddress, Upload.abi, signer);
-        setContract(contract)
+  //       const contract = new ethers.Contract(contractAddress, Upload.abi, signer);
+  //       setContract(contract)
 
-        const matchingObject = wallRes.data.wallets.find(obj => obj.email === userDetails?.primaryEmailAddress?.emailAddress);
+  //       const matchingObject = wallRes.data.wallets.find(obj => obj.email === userDetails?.primaryEmailAddress?.emailAddress);
 
-        const dataArray = await contract.display(matchingObject.address);
-        const str = dataArray.toString();
-        const str_array = str.split(",");
-        console.log(dataArray);
+  //       const dataArray = await contract.display(matchingObject.address);
+  //       const str = dataArray.toString();
+  //       const str_array = str.split(",");
+  //       console.log(dataArray);
 
-        const getCIDFromUrl = (url) => {
-          const parts = url.split('/');
-          return parts[parts.length - 1];
-        };
+  //       const getCIDFromUrl = (url) => {
+  //         const parts = url.split('/');
+  //         return parts[parts.length - 1];
+  //       };
 
-        const lighthouseUrls = str_array.filter(url => url.includes('lighthouse.storage'));
-        const cids = lighthouseUrls.map(getCIDFromUrl);
+  //       const lighthouseUrls = str_array.filter(url => url.includes('lighthouse.storage'));
+  //       const cids = lighthouseUrls.map(getCIDFromUrl);
 
-        const retrieveFileInfoForCids = async () => {
-          const fileInfoArray = [];
+  //       const retrieveFileInfoForCids = async () => {
+  //         const fileInfoArray = [];
 
-          for (const cid of cids) {
-            try {
-              const fileInfoResult = await lighthouse.getFileInfo(cid);
-              fileInfoArray.push(fileInfoResult.data);
-            } catch (error) {
-              console.error(`Error retrieving file info for CID ${cid}: ${error.message}`);
-            }
-          }
+  //         for (const cid of cids) {
+  //           try {
+  //             const fileInfoResult = await lighthouse.getFileInfo(cid);
+  //             fileInfoArray.push(fileInfoResult.data);
+  //           } catch (error) {
+  //             console.error(`Error retrieving file info for CID ${cid}: ${error.message}`);
+  //           }
+  //         }
 
-          console.log(fileInfoArray);
-          setFileDetails(dataArray);
-        };
+  //         console.log(fileInfoArray);
+  //         setFileDetails(dataArray);
+  //       };
 
-        retrieveFileInfoForCids();
-        setTriggerEffect(false);
-        setTriggerDownload(false)
-      } catch (error) {
-        console.error(`Error retrieving file details: ${error.message}`);
-      }
-    };
+  //       retrieveFileInfoForCids();
+  //       setTriggerEffect(false);
+  //       setTriggerDownload(false)
+  //     } catch (error) {
+  //       console.error(`Error retrieving file details: ${error.message}`);
+  //     }
+  //   };
 
-    fetchFileDetails();
-  }, [triggerEffect, triggerDownload]);
+  //   fetchFileDetails();
+  // }, [triggerEffect, triggerDownload]);
 
 
   console.log(fileDetails)
@@ -113,7 +151,7 @@ const page = ({ params }) => {
 
     try {
 
-      
+
 
       setLoading(true);
 
@@ -150,7 +188,7 @@ const page = ({ params }) => {
   const handleFileDownload = async (file, index, account) => {
 
     try {
-      
+
       const transaction = await contract.addDownload(account, index);
       toast.info('Processing transaction...', {
         position: toast.POSITION.BOTTOM_RIGHT,
