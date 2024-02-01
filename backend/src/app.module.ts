@@ -18,6 +18,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { HealthCheckerModule } from './modules/health-checker/health-checker.module';
 import { PostModule } from './modules/post/post.module';
 import { TenantModule } from './modules/tenant/tenant.module';
+import { ClerkModule } from './modules/clerkUsers/clerk.module';
 import { UserModule } from './modules/user/user.module';
 import { WalletModule } from './modules/wallet/wallet.module';
 import { ApiConfigService } from './shared/services/api-config.service';
@@ -30,6 +31,7 @@ import { SharedModule } from './shared/shared.module';
     PostModule,
     WalletModule,
     TenantModule,
+    ClerkModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
