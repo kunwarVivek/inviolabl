@@ -10,6 +10,8 @@ export default function CreateOrganization() {
     const { isLoaded, isSignedIn, user } = useUser();
     const {  userId, sessionId, getToken } = useAuth();
 
+    console.log(sessionId)
+
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');

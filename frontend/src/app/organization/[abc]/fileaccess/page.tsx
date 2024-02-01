@@ -5,7 +5,7 @@ import { ethers } from "ethers";
 import React, { useState, useEffect } from "react";
 import Upload from "../../../../artifacts/contracts/Upload.sol/Upload.json";
 import MemberList from "@/components/MemberList";
-import { useOrganization } from "@clerk/nextjs";
+import { useOrganization, useOrganizationList } from "@clerk/nextjs";
 import axios from "axios";
 import MagicBellClient, { Notification } from '@magicbell/core';
 import { useSelector } from "react-redux";
@@ -21,6 +21,7 @@ const Modal = () => {
     const [addressValue, setAddressValue] = useState("");
     const [contract, setcontract] = useState(null);
     const [walletData, setWalletData] = useState();
+    const [clerkUsers, setClerkUsers] = useState([]);
 
     const { ready, authenticated, user, logout } = usePrivy();
     const { sendTransaction } = usePrivy();
@@ -112,30 +113,48 @@ const Modal = () => {
     //     })();
     // }, []);
 
+    useEffect(() => {
+        
+        axios.get('http://localhost:3001/clerk/users')
+            .then(response => {
+                
+                const emailAddresses = response.data.clerkUsers.map(user =>
+                    user.emailAddresses[0]?.emailAddress || ''
+                );
+
+                
+                setClerkUsers(emailAddresses);
+            })
+            .catch(error => {
+                console.error('Error fetching Clerk users:', error);
+            });
+    }, []);
+
+    const filteredEmails = clerkUsers.filter(
+        email => email.toLowerCase().includes(addressValue.toLowerCase())
+    );
+
 
     function SendTransactionButton() {
 
-        // Replace this with the UnsignedTransactionRequest you'd like your user to send
+        
         const unsignedTx = {
             to: '0x82074bFb2F39E93b93a6dD6071Bb725727A1B664',
             chainId: 84532,
             value: '0x3B9ACA00',
         };
 
-        // Replace this with the text you'd like on your transaction modal
+        
         const uiConfig = {
             header: 'Sample header text',
             description: 'Transaction',
             buttonText: 'Confirm'
         };
 
-        // Users must have an embedded wallet at `user.wallet` to send a transaction.
+        
         return (
             <button disabled={!addressValue} onClick={async () => {
                 const txReceipt = await sendTransaction(unsignedTx, uiConfig);
-                // `txReceipt` is an object of type `TransactionReceipt`. From this object, you can
-                // access your transaction's `transactionHash`, `blockNumber`, `gasUsed`, and
-                // more.
             }}>
                 Share
             </button>);
@@ -147,31 +166,22 @@ const Modal = () => {
 
                 <div className="mt-20 mx-10">
                     <div className="title font-semibold">Share with</div>
-                    {/* <div className='flex items-center border-b border-gray-500 py-2 mb-5 mt-5 px-2'>
-                        <input
-                            className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 leading-tight focus:outline-none"
-                            type="text"
-                            placeholder="Email address"
-                            value={addressValue}
-                            onChange={(e) => setAddressValue(e.target.value)}
-                        />
-                    </div> */}
                     <div className='flex items-center border-b border-gray-500  mb-5 mt-5 '>
-                        <select
+                        <input
+                            type="text"
                             className="appearance-none bg-transparent p-2 border-none w-full text-gray-700 mr-3 leading-tight focus:outline-none"
                             value={addressValue}
                             onChange={(e) => setAddressValue(e.target.value)}
-                        >
-                            <option value="" disabled className="p-3">Select an option</option>
-
-                            {membershipList
-                                ?.filter(mem => mem.role !== "admin")
-                                .map((mem, index) => (
-                                    <option key={index} value={mem.publicUserData.identifier}>
-                                        {mem.publicUserData.identifier}
-                                    </option>
+                            list="emailList"
+                            placeholder="Enter email address"
+                        />
+                        {addressValue.length > 0 && (
+                            <datalist id="emailList">
+                                {filteredEmails.map((email, index) => (
+                                    <option key={index} value={email} />
                                 ))}
-                        </select>
+                            </datalist>
+                        )}
                     </div>
 
                     <div className="p-0 mt-2">
