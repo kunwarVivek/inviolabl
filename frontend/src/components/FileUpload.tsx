@@ -21,6 +21,7 @@ import { WalletClientSigner, type SmartAccountSigner } from "@alchemy/aa-core";
 import { useWallets } from "@privy-io/react-auth";
 import { createWalletClient, custom } from "viem";
 import { baseSepolia, sepolia } from "viem/chains";
+import { useWalletClient } from "wagmi";
 
 
 
