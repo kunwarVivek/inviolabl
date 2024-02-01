@@ -115,7 +115,7 @@ const Modal = () => {
 
     useEffect(() => {
         
-        axios.get('http://localhost:3001/clerk/users')
+        axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/clerk/users`)
             .then(response => {
                 
                 const emailAddresses = response.data.clerkUsers.map(user =>
