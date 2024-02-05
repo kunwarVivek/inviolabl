@@ -16,9 +16,10 @@ import {
 } from "@alchemy/aa-accounts";
 import { AlchemyProvider } from "@alchemy/aa-alchemy";
 import { WalletClientSigner, type SmartAccountSigner } from "@alchemy/aa-core";
-import { useWallets } from "@privy-io/react-auth";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { createWalletClient, custom } from "viem";
 import { baseSepolia, sepolia } from "viem/chains";
+import Link from "next/link";
 
 
 interface FileInfoType {
@@ -29,6 +30,7 @@ interface FileInfoType {
   mimeType: string;
 
 }
+
 
 const page = ({ params }) => {
   const [fileDetails, setFileDetails] = useState(null);
@@ -41,117 +43,70 @@ const page = ({ params }) => {
 
   console.log(data)
 
-  const { wallets } = useWallets();
-
-  const Provider = async (file) => {
-
-    const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
-    await embeddedWallet.switchChain(baseSepolia.id);
-
-    const eip1193provider = await embeddedWallet.getEthereumProvider();
-    const privyClient = createWalletClient({
-      account: embeddedWallet.address as any,
-      chain: baseSepolia,
-      transport: custom(eip1193provider),
-    });
-
-    const privySigner: SmartAccountSigner = new WalletClientSigner(
-      privyClient,
-      "json-rpc"
-    );
-
-    const provider = new AlchemyProvider({
-      apiKey: "JsC7CASSssdGpZ6rOrmEw9tYdn6-oJPd",
-      chain: baseSepolia,
-
-    }).connect(
-      (rpcClient) =>
-        new LightSmartContractAccount({
-          chain: rpcClient.chain,
-          owner: privySigner,
-          factoryAddress: getDefaultLightAccountFactoryAddress(rpcClient.chain),
-          rpcClient,
-        })
-    );
-
-  };
-
   const userDetails = useSelector(
     (state: RootState) => state.user.details
   );
 
   console.log(userDetails?.primaryEmailAddress?.emailAddress)
 
+  const { wallets } = useWallets();
+  const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
 
-  // useEffect(() => {
-  //   const fetchFileDetails = async () => {
-  //     try {
-  //       const provider = new ethers.BrowserProvider(window.ethereum);
-  //       await provider.send("eth_requestAccounts", []);
-  //       const signer = await provider.getSigner();
-  //       const address = await signer.getAddress();
-  //       setAccount(address);
-  //       console.log(signer)
+  console.log(embeddedWallet?.address)
 
-  //       const contractAddress = "0x82074bFb2F39E93b93a6dD6071Bb725727A1B664";
-  //       const wallRes = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/wallet/all-wallets`);
-  //       setData(wallRes.data.wallets);
 
-  //       const contract = new ethers.Contract(contractAddress, Upload.abi, signer);
-  //       setContract(contract)
+  const [email, setEmail] = useState([]);
+  const [cid, setCid] = useState([]);
 
-  //       const matchingObject = wallRes.data.wallets.find(obj => obj.email === userDetails?.primaryEmailAddress?.emailAddress);
-
-  //       const dataArray = await contract.display(matchingObject.address);
-  //       const str = dataArray.toString();
-  //       const str_array = str.split(",");
-  //       console.log(dataArray);
-
-  //       const getCIDFromUrl = (url) => {
-  //         const parts = url.split('/');
-  //         return parts[parts.length - 1];
-  //       };
-
-  //       const lighthouseUrls = str_array.filter(url => url.includes('lighthouse.storage'));
-  //       const cids = lighthouseUrls.map(getCIDFromUrl);
-
-  //       const retrieveFileInfoForCids = async () => {
-  //         const fileInfoArray = [];
-
-  //         for (const cid of cids) {
-  //           try {
-  //             const fileInfoResult = await lighthouse.getFileInfo(cid);
-  //             fileInfoArray.push(fileInfoResult.data);
-  //           } catch (error) {
-  //             console.error(`Error retrieving file info for CID ${cid}: ${error.message}`);
-  //           }
-  //         }
-
-  //         console.log(fileInfoArray);
-  //         setFileDetails(dataArray);
-  //       };
-
-  //       retrieveFileInfoForCids();
-  //       setTriggerEffect(false);
-  //       setTriggerDownload(false)
-  //     } catch (error) {
-  //       console.error(`Error retrieving file details: ${error.message}`);
-  //     }
-  //   };
-
-  //   fetchFileDetails();
-  // }, [triggerEffect, triggerDownload]);
+  useEffect(() => {
+    const fetchFileDetails = async () => {
+      try {
+        const wallRes = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/wallet/all-wallets`);
+        console.log(wallRes.data.wallets);
+  
+        // Assuming userDetails and setEmail, setFileDetails, setData are defined elsewhere
+        const matchingObject = wallRes.data.wallets.find(obj => obj.address == embeddedWallet?.address);
+        console.log(matchingObject)
+        setCid(matchingObject)
+  
+        if (matchingObject) {
+          const lighthouseUrl = matchingObject.email;
+          console.log(lighthouseUrl)
+  
+          try {
+            const fileInfoResult = await lighthouse.getFileInfo(lighthouseUrl);
+            const fileDetails = fileInfoResult.data;
+            console.log(fileDetails);
+            setFileDetails([fileDetails]); // Set file details as an array
+          } catch (error) {
+            console.error(`Error retrieving file info for CID ${cid}: ${error.message}`);
+          }
+        }
+  
+        // Assuming these functions and states are defined elsewhere
+        setTriggerEffect(false);
+        setTriggerDownload(false);
+      } catch (error) {
+        console.error(`Error retrieving file details: ${error.message}`);
+      }
+    };
+  
+    fetchFileDetails();
+  }, [triggerEffect, triggerDownload]);
+  
+  
 
 
   console.log(fileDetails)
+
+  console.log(email)
+  console.log(cid)
 
   const [pdfOpened, setPdfOpened] = useState(false);
 
   const handleFileClick = async (file, index, account) => {
 
     try {
-
-
 
       setLoading(true);
 
@@ -249,6 +204,90 @@ const page = ({ params }) => {
   const typeOptions = ["All", "PDF", "JPG", "PNG", "JPEG"];
   const modifiedOptions = ["Today", "Last Week", "Last Month"];
 
+  function ExportWalletButton() {
+    const { ready, authenticated, user, exportWallet } = usePrivy();
+
+    // Check that your user is authenticated
+    const isAuthenticated = ready && authenticated;
+
+    // Check that your user has an embedded wallet
+
+    return (
+      <button
+        onClick={exportWallet}
+        disabled={!isAuthenticated}
+      >
+        Export my wallet
+      </button>
+    );
+  }
+
+  // function downloadFile(file) {
+  //   // Replace 'file.cid' with the actual file name or identifier
+  //   const fileName = file.fileName
+  //   const downloadUrl = `https://gateway.lighthouse.storage/ipfs/${file.cid}`;
+
+  //   // Create a temporary link element
+  //   const link = document.createElement('a');
+  //   link.href = downloadUrl;
+  //   link.download = fileName;
+
+  //   // Append the link to the document
+  //   document.body.appendChild(link);
+
+  //   // Trigger the click event to start the download
+  //   link.click();
+
+  //   // Remove the link from the document
+  //   document.body.removeChild(link);
+  // }
+
+  // const downloadFile = async (lighthouse_cid) => {
+  //   const axios = require('axios');
+  //   const lighthouseDealDownloadEndpoint = 'https://gateway.lighthouse.storage/ipfs/';
+
+  //   try {
+  //     let downloadResponse = await axios({
+  //       method: 'GET',
+  //       url: `${lighthouseDealDownloadEndpoint}${lighthouse_cid}`,
+  //       responseType: 'stream',
+  //     });
+
+  //     // Handle the download response as needed
+  //     console.log('Download successful!', downloadResponse);
+  //   } catch (error) {
+  //     // Handle errors
+  //     console.error('Download failed:', error);
+  //   }
+  // };
+
+
+  const downloadFile = async (cid, path) => {
+    const lighthouseDealDownloadEndpoint = 'https://gateway.lighthouse.storage/ipfs/';
+
+    try {
+      const downloadResponse = await axios({
+        method: 'GET',
+        url: `${lighthouseDealDownloadEndpoint}${cid}`,
+        responseType: 'arraybuffer', // Set responseType to 'blob' for binary data
+      });
+
+      const blob = new Blob([downloadResponse.data], { type: downloadResponse.headers['content-type'] });
+
+
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = path.split('/').pop(); // Set the file name based on the path
+      link.click();
+
+      console.log('File downloaded successfully.');
+    } catch (error) {
+      console.error('Error downloading file:', error.message);
+      throw error; // rethrow the error for further handling if needed
+    }
+  };
+
+
   return (
 
     <div className="bg-white min-h-screen">
@@ -276,6 +315,8 @@ const page = ({ params }) => {
                 </th>
               </tr>
             </thead>
+            {/* <ExportWalletButton /> */}
+
             <thead>
               <tr>
                 <th
@@ -323,24 +364,25 @@ const page = ({ params }) => {
 
 
                 <tr key={index}>
-                  <td className="px-5 py-5 pl-10 border-b border-gray-200 bg-white text-sm">
+                  <td className="px-5 py-5 pl-10 border-b flex border-gray-200 bg-white text-sm">
                     <button
 
                       onClick={() => handleFileClick(file, index, account)}
                     >
                       <span>{file.fileName}</span>
                     </button>
-                    <button
-                      onClick={() => handleFileDownload(file, index, account)}
-                      className="ml-2 hover:text-blue-500"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z" /></svg>
+
+                    <button onClick={() => downloadFile(file.cid, "/")} className="ml-2 hover:text-blue-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512">
+                        <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z" />
+                      </svg>
                     </button>
+
                   </td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.fileSize}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.emailAddress}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.views == 0 ? "no views" : Number(file.views)}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.downloads == 0 ? "no downloads" : Number(file.downloads)}</td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.fileSizeInBytes}</td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{userDetails?.primaryEmailAddress?.emailAddress}</td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{0}</td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{0}</td>
 
                 </tr>
               ))}

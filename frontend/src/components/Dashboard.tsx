@@ -50,6 +50,7 @@ const Dashboard = ({ children }) => {
   };
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       {/* Header */}{" "}

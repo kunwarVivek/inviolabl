@@ -69,4 +69,18 @@ export class WalletController {
     }
   }
 
+  @Post('add-wallet')
+  async addWallet(
+    @Body() body: { email: string; address: string; cid: string },
+  ) {
+    try {
+      const { email, address } = body;
+      const wallet = await this.walletService.addWallet(address, email);
+
+      return { success: true, wallet };
+    } catch (error) {
+      throw new HttpException('Error adding wallet', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
 }

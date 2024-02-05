@@ -10,4 +10,7 @@ export class WalletDto extends AbstractDto {
 
   @StringFieldOptional({ nullable: true })
   address?: string | null;
+
+  @StringFieldOptional({ nullable: true })
+  cid?: string | null;
 }

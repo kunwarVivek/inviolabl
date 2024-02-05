@@ -16,6 +16,9 @@ export class UpdateWalletDto {
   address!: string;
 
   
-
+  @IsString()
+  @MinLength(2, { message: 'Name must have atleast 2 characters.' })
+  @IsNotEmpty()
+  cid!: string;
   
 }

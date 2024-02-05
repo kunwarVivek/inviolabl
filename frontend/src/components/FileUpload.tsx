@@ -3,7 +3,7 @@ import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
 import { Dialog, Transition } from "@headlessui/react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import React, { Fragment, useCallback, useRef, useState } from "react";
+import React, { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import lighthouse from "@lighthouse-web3/sdk";
 import { useSelector } from "react-redux";
@@ -18,12 +18,13 @@ import {
 } from "@alchemy/aa-accounts";
 import { AlchemyProvider } from "@alchemy/aa-alchemy";
 import { WalletClientSigner, type SmartAccountSigner } from "@alchemy/aa-core";
-import { useWallets } from "@privy-io/react-auth";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { createWalletClient, custom } from "viem";
 import { baseSepolia, sepolia } from "viem/chains";
 import { useWalletClient } from "wagmi";
-
-
+import NftHome from "./Minting";
+import { WalletContextProvider, useWalletContext } from "@/context/wallet";
+import Provider from "@/app/context/client-provider";
 
 
 const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
@@ -41,11 +42,12 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
 
   const [fileName, setFileName] = useState("No File selected");
   const [fileSize, setFileSize] = useState()
-  const lightapi = "609989b0.b85f2616ce1a490eb457e1fd4d7bc994";
+  const lightapi = "d257291d.f1c891385d364961a1be2577212e7eed";
   const [loading, setLoading] = useState(false)
 
-  const { wallets } = useWallets();
+  const { sendTransaction } = usePrivy();
 
+  const { wallets } = useWallets();
 
   const progressCallback = (progressData) => {
     let percentageDone =
@@ -53,12 +55,52 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
     console.log(percentageDone);
   };
 
-
   const uploadFile = async (file) => {
     setFileName(file[0].name)
     setFileSize(file[0].size)
     setLoading(true);
     try {
+
+
+      const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
+      await embeddedWallet.switchChain(84532);
+
+      const alchemyKey = "wss://base-sepolia.g.alchemy.com/v2/JsC7CASSssdGpZ6rOrmEw9tYdn6-oJPd"
+      const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
+      const web3 = createAlchemyWeb3(alchemyKey);
+
+      const contractAddress = '0x0ae88c1852E683b9907E69b7a4F96d09B3A35b84';
+
+      const helloWorldContract = new web3.eth.Contract(
+        Upload.abi,
+        contractAddress,
+      );
+
+      const unsignedTx = {
+        to: '0x0ae88c1852E683b9907E69b7a4F96d09B3A35b84',
+        chainId: 84532,
+        data: encodeFunctionData({
+          abi: Upload.abi,
+          functionName: 'uploadFile',
+          args: [`https://gateway.lighthouse.storage/ipfs/`, "sm", "12", "test"]
+        })
+      }
+
+      const uiConfig = {
+        header: 'Sample header text',
+        description: 'Transaction',
+        buttonText: 'Confirm'
+      };
+
+      const txReceipt = await sendTransaction(unsignedTx, uiConfig);
+
+      console.log(txReceipt)
+
+
+
+      toast.info('File Uploading to blockchain - Processing...', {
+        position: toast.POSITION.BOTTOM_RIGHT,
+      });
       const output = await lighthouse.upload(
         file,
         lightapi,
@@ -67,60 +109,22 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
         progressCallback
       );
       console.log("File Status:", output);
+      const walletData = {
+        email: output.data.Hash,
+        address: embeddedWallet.address,
+      };
+      const wallRes = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/wallet/add-wallet`, walletData);
+      console.log(wallRes)
       console.log(
         "Visit at https://gateway.lighthouse.storage/ipfs/" + output.data.Hash
       );
-      const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
-      await embeddedWallet.switchChain(baseSepolia.id);
-
-      // Get a viem client from the embedded wallet
-      const eip1193provider = await embeddedWallet.getEthereumProvider();
-      const privyClient = createWalletClient({
-        account: embeddedWallet.address as any,
-        chain: baseSepolia,
-        transport: custom(eip1193provider),
-      });
-
-      // Create a smart account signer from the embedded wallet's viem client
-      const privySigner: SmartAccountSigner = new WalletClientSigner(
-        privyClient,
-        "json-rpc"
-      );
-
-      // Create an Alchemy Provider with the smart account signer
-      const provider = new AlchemyProvider({
-        apiKey: "JsC7CASSssdGpZ6rOrmEw9tYdn6-oJPd",
-        chain: baseSepolia,
-        
-      }).connect(
-        (rpcClient) =>
-          new LightSmartContractAccount({
-            chain: rpcClient.chain,
-            owner: privySigner,
-            factoryAddress: getDefaultLightAccountFactoryAddress(rpcClient.chain),
-            rpcClient,
-          })
-      );
-      const uoHash = await provider.sendUserOperation({
-        target: '0x82074bFb2F39E93b93a6dD6071Bb725727A1B664',
-        data: encodeFunctionData({
-          abi: Upload.abi,
-          functionName: 'uploadFile',
-          args: [`https://gateway.lighthouse.storage/ipfs/${output.data.Hash}`, file[0].name, file[0].size.toString(), user?.primaryEmailAddress.emailAddress]
-        }),
-      
-      });
-      console.log('uoHash', uoHash);
-
-      toast.info('File Uploading to blockchain - Processing...', {
-        position: toast.POSITION.BOTTOM_RIGHT,
-      });
       return output.data.Hash;
     } finally {
       setLoading(false);
       setIsModalOpen(false);
-      setFileName("No File selected") 
+      setFileName("No File selected")
       setFileSize(null)
+
     }
   };
 
@@ -239,7 +243,9 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
     setIsModalOpen(false);
   };
 
+
   return (
+
     <Transition appear show={isModalOpen} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={closeModal}>
         <Transition.Child
@@ -293,6 +299,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
                       <span className="flex justify-center items-center font-semibold text-black">
                         File: {fileName}
                       </span>
+
                       {/* <button
           type="submit"
           className="cursor-pointer mt-5 w-full py-2 flex justify-center text-white items-center bg-green-500 hover:shadow-xl hover:bg-green-600 rounded-md px-4 text-sm font-semibold"
@@ -310,6 +317,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
         </div>
       </Dialog>
     </Transition >
+
   );
 };
 

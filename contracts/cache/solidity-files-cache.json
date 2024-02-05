@@ -35,6 +35,41 @@
       "artifacts": [
         "Upload"
       ]
+    },
+    "S:\\inviolabl\\contracts\\contracts\\Upload.sol": {
+      "lastModificationDate": 1704537075851,
+      "contentHash": "87d0c3c634f48699e7b357cead041ddf",
+      "sourceName": "contracts/Upload.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.7.0 <0.9.0"
+      ],
+      "artifacts": [
+        "Upload"
+      ]
     }
   }
 }

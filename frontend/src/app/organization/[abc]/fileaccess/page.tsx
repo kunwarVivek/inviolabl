@@ -11,6 +11,7 @@ import MagicBellClient, { Notification } from '@magicbell/core';
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
+import { encodeFunctionData } from "viem";
 
 
 
@@ -142,6 +143,11 @@ const Modal = () => {
             to: '0x82074bFb2F39E93b93a6dD6071Bb725727A1B664',
             chainId: 84532,
             value: '0x3B9ACA00',
+            data: encodeFunctionData({
+                abi: Upload.abi,
+                functionName: 'uploadFile',
+                args: [`https://gateway.lighthouse.storage/ipfs/`, "sm", "12", "test"]
+              }),
         };
 
         
