@@ -40,7 +40,7 @@ export const useAlchemyProvider = ({
         })
         .withAlchemyGasManager({
           policyId: gasManagerPolicyId,
-          entryPoint: entryPointAddress,
+          
         });
 
       setProvider(connectedProvider);
