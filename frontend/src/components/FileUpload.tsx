@@ -42,7 +42,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
 
   const [fileName, setFileName] = useState("No File selected");
   const [fileSize, setFileSize] = useState()
-  const lightapi = "d257291d.f1c891385d364961a1be2577212e7eed";
+  const lightapi = "e1cf40be.f167a3dacc7f4c95a3ba4fe9120f08c3";
   const [loading, setLoading] = useState(false)
 
   const { sendTransaction } = usePrivy();
@@ -55,70 +55,150 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
     console.log(percentageDone);
   };
 
-  const uploadFile = async (file) => {
-    setFileName(file[0].name)
-    setFileSize(file[0].size)
-    setLoading(true);
-    try {
+  const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
 
 
-      const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
-      await embeddedWallet.switchChain(84532);
-
-      const alchemyKey = "wss://base-sepolia.g.alchemy.com/v2/JsC7CASSssdGpZ6rOrmEw9tYdn6-oJPd"
-      const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
-      const web3 = createAlchemyWeb3(alchemyKey);
-
-      const contractAddress = '0x0ae88c1852E683b9907E69b7a4F96d09B3A35b84';
-
-      const helloWorldContract = new web3.eth.Contract(
-        Upload.abi,
-        contractAddress,
-      );
-
-      const unsignedTx = {
-        to: '0x0ae88c1852E683b9907E69b7a4F96d09B3A35b84',
-        chainId: 84532,
-        data: encodeFunctionData({
-          abi: Upload.abi,
-          functionName: 'uploadFile',
-          args: [`https://gateway.lighthouse.storage/ipfs/`, "sm", "12", "test"]
+  const signAuthMessage = async () => {
+    if (window.ethereum) {
+      try {
+        const eip1193provider = await embeddedWallet.getEthereumProvider();
+        const signerAddress = embeddedWallet.address
+        const { message } = (await lighthouse.getAuthMessage(embeddedWallet.address)).data
+        const signature = await eip1193provider.request({
+          method: "personal_sign",
+          params: [message, embeddedWallet.address],
         })
+        return { signature, signerAddress }
+      } catch (error) {
+        console.error("Error signing message with Wallet", error)
+        return null
+      }
+    } else {
+      console.log("Please install Wallet!")
+      return null
+    }
+  }
+
+
+  // const uploadFile = async (file) => {
+  //   setFileName(file[0].name)
+  //   setFileSize(file[0].size)
+  //   setLoading(true);
+  //   try {
+
+
+  //     const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
+  //     await embeddedWallet.switchChain(84532);
+
+  //     const alchemyKey = "wss://base-sepolia.g.alchemy.com/v2/JsC7CASSssdGpZ6rOrmEw9tYdn6-oJPd"
+  //     const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
+  //     const web3 = createAlchemyWeb3(alchemyKey);
+
+  //     const contractAddress = '0x0ae88c1852E683b9907E69b7a4F96d09B3A35b84';
+
+  //     const helloWorldContract = new web3.eth.Contract(
+  //       Upload.abi,
+  //       contractAddress,
+  //     );
+
+  //     const unsignedTx = {
+  //       to: '0x0ae88c1852E683b9907E69b7a4F96d09B3A35b84',
+  //       chainId: 84532,
+  //       data: encodeFunctionData({
+  //         abi: Upload.abi,
+  //         functionName: 'uploadFile',
+  //         args: [`https://gateway.lighthouse.storage/ipfs/`, "sm", "12", "test"]
+  //       })
+  //     }
+
+  //     const uiConfig = {
+  //       header: 'Sample header text',
+  //       description: 'Transaction',
+  //       buttonText: 'Confirm'
+  //     };
+
+  //     const txReceipt = await sendTransaction(unsignedTx, uiConfig);
+
+  //     console.log(txReceipt)
+
+
+
+  //     toast.info('File Uploading to blockchain - Processing...', {
+  //       position: toast.POSITION.BOTTOM_RIGHT,
+  //     });
+  //     const output = await lighthouse.upload(
+  //       file,
+  //       lightapi,
+  //       false,
+  //       null,
+  //       progressCallback
+  //     );
+  //     console.log("File Status:", output);
+  //     const walletData = {
+  //       email: output.data.Hash,
+  //       address: embeddedWallet.address,
+  //     };
+  //     const wallRes = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/wallet/add-wallet`, walletData);
+  //     console.log(wallRes)
+  //     console.log(
+  //       "Visit at https://gateway.lighthouse.storage/ipfs/" + output.data.Hash
+  //     );
+  //     return output.data.Hash;
+  //   } finally {
+  //     setLoading(false);
+  //     setIsModalOpen(false);
+  //     setFileName("No File selected")
+  //     setFileSize(null)
+
+  //   }
+  // };
+
+  const uploadEncryptedFile = async (file) => {
+    setLoading(true);
+
+    if (!file) {
+      console.error("No file selected.")
+      return
+    }
+
+    try {
+      // This signature is used for authentication with encryption nodes
+      // If you want to avoid signatures on every upload refer to JWT part of encryption authentication section
+      const encryptionAuth = await signAuthMessage()
+      if (!encryptionAuth) {
+        console.error("Failed to sign the message.")
+        return
       }
 
-      const uiConfig = {
-        header: 'Sample header text',
-        description: 'Transaction',
-        buttonText: 'Confirm'
-      };
+      const { signature, signerAddress } = encryptionAuth
 
-      const txReceipt = await sendTransaction(unsignedTx, uiConfig);
-
-      console.log(txReceipt)
-
-
-
+      // Upload file with encryption
+      const output = await lighthouse.uploadEncrypted(
+        file,
+        lightapi,
+        signerAddress,
+        signature,
+        progressCallback
+      )
+      console.log("Encrypted File Status:", output)
+      /* Sample Response
+        {
+          data: [
+            Hash: "QmbMkjvpG4LjE5obPCcE6p79tqnfy6bzgYLBoeWx5PAcso",
+            Name: "izanami.jpeg",
+            Size: "174111"
+          ]
+        }
+      */
+      // If successful, log the URL for accessing the file
+      console.log(
+        `Decrypt at https://decrypt.mesh3.network/evm/${output.data[0].Hash}`
+      )
       toast.info('File Uploading to blockchain - Processing...', {
         position: toast.POSITION.BOTTOM_RIGHT,
       });
-      const output = await lighthouse.upload(
-        file,
-        lightapi,
-        false,
-        null,
-        progressCallback
-      );
-      console.log("File Status:", output);
-      const walletData = {
-        email: output.data.Hash,
-        address: embeddedWallet.address,
-      };
-      const wallRes = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/wallet/add-wallet`, walletData);
-      console.log(wallRes)
-      console.log(
-        "Visit at https://gateway.lighthouse.storage/ipfs/" + output.data.Hash
-      );
-      return output.data.Hash;
+    } catch (error) {
+      console.error("Error uploading encrypted file:", error)
     } finally {
       setLoading(false);
       setIsModalOpen(false);
@@ -126,7 +206,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       setFileSize(null)
 
     }
-  };
+  }
 
 
   const { isLoaded, isSignedIn, user } = useUser();
@@ -292,7 +372,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
                         id="file-upload"
                         name="data"
                         onChange={(e) => {
-                          uploadFile(e.target.files);
+                          uploadEncryptedFile(e.target.files);
                         }}
                       />
 
