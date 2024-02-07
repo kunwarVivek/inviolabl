@@ -14,6 +14,8 @@ import { clearUser, setUser } from "@/features/LoginSlice";
 import { SignInButton, SignedIn, SignedOut, UserButton, useAuth, useClerk, useUser } from "@clerk/nextjs";
 import MagicBell, { FloatingNotificationInbox } from '@magicbell/magicbell-react';
 import { ethers } from "ethers";
+import { setAccount } from "@/features/PrivySlice";
+import { useWallets } from "@privy-io/react-auth";
 
 
 const Header = ({ className }: any) => {
@@ -28,16 +30,22 @@ const Header = ({ className }: any) => {
   console.log(signOut)
 
   const { user } = useUser();
+  
   console.log(user)
   console.log(user?.primaryEmailAddress.emailAddress)
 
+  const { wallets } = useWallets();
+  const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
 
   useEffect(() => {
     // Check if user exists before dispatching
     if (user) {
       dispatch(setUser(user));
     }
-  }, [dispatch, user]);
+    if (embeddedWallet) {
+      dispatch(setAccount(embeddedWallet.address))
+    }
+  }, [dispatch, user, embeddedWallet]);
 
 
   const MetaMaskAccount = useSelector(

@@ -24,6 +24,7 @@ import { WalletModule } from './modules/wallet/wallet.module';
 import { ApiConfigService } from './shared/services/api-config.service';
 import { SharedModule } from './shared/shared.module';
 import { PrivyModule } from './modules/privyUsers/privy.module';
+import { FilesModule } from './modules/files/files.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { PrivyModule } from './modules/privyUsers/privy.module';
     TenantModule,
     ClerkModule,
     PrivyModule,
+    FilesModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',

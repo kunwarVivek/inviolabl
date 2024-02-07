@@ -1,9 +1,9 @@
 "use client";
 import Dashboard from "@/components/Dashboard";
-import React, { useState, useEffect, Fragment } from "react";
+import React, { useState, useEffect, Fragment, use } from "react";
 import DropdownMenu from "@/components/DropdownMenu";
 import { useUser } from "@clerk/nextjs";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import axios from "axios";
 import { ethers } from "ethers";
@@ -18,19 +18,13 @@ import { AlchemyProvider } from "@alchemy/aa-alchemy";
 import { WalletClientSigner, type SmartAccountSigner } from "@alchemy/aa-core";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { createWalletClient, custom } from "viem";
-import { baseSepolia, sepolia } from "viem/chains";
+import { baseSepolia, hardhat, sepolia } from "viem/chains";
 import Link from "next/link";
 import { Dialog, Transition } from "@headlessui/react";
+import { usePrivyWagmi } from "@privy-io/wagmi-connector";
 
 
-interface FileInfoType {
-  fileSizeInBytes: string;
-  cid: string;
-  encryption: boolean;
-  fileName: string;
-  mimeType: string;
 
-}
 
 
 const page = ({ params }) => {
@@ -42,11 +36,17 @@ const page = ({ params }) => {
   const [triggerEffect, setTriggerEffect] = useState(false);
   const [triggerDownload, setTriggerDownload] = useState(false)
 
+
   console.log(data)
 
   const { signMessage } = usePrivy();
 
 
+  const PrivyAccount = useSelector(
+    (state: RootState) => state.privy.account
+  );
+
+  console.log(PrivyAccount)
 
 
   const userDetails = useSelector(
@@ -60,11 +60,25 @@ const page = ({ params }) => {
 
   console.log(embeddedWallet?.address)
 
+
   const [email, setEmail] = useState([]);
   const [cid, setCid] = useState([]);
 
   const [privyUsers, setPrivyUsers] = useState([])
   const [selectedEmail, setSelectedEmail] = useState(null);
+  const [accessData, setAccessData] = useState([]);
+  const [matchedAccessData, setMatchedAccessData] = useState([])
+  const [address, setAddress] = useState("")
+  const [fileInfo, setFileInfo] = useState([])
+
+  const accessConditions = async () => {
+    const cid = "YOUR_FILE_CID_HERE";
+    const response = await lighthouse.getAccessConditions(cid);
+
+    // Print the access conditions
+    console.log(response);
+  }
+
 
   useEffect(() => {
     const fetchFileDetails = async () => {
@@ -74,35 +88,28 @@ const page = ({ params }) => {
         console.log(response)
         setFileDetails(response.data.fileList)
 
+        const cids = response.data.fileList.map(file => file.cid);
+        const accessPromises = cids.map(cid => lighthouse.getAccessConditions(cid));
+        const accessResponses = await Promise.all(accessPromises);
+        const accessData = accessResponses.map(response => response.data);
+        setAccessData(accessData);
+
+        const matchedAccess = accessData.filter(access => {
+          return access.owner == Number(PrivyAccount) || access.sharedTo.some(account => account == Number(PrivyAccount));
+        });
+        console.log("Matched Access Data:", matchedAccess);
+        setMatchedAccessData(matchedAccess);
+
+        const fileInfos = await Promise.all(matchedAccess.map(access => lighthouse.getFileInfo(access.cid)));
+        const fileInfoList = fileInfos.map(response => response.data);
+        console.log("File Info:", fileInfoList);
+        setFileInfo(fileInfoList);
+
+
         const privyUsersList = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/privy/users`);
         setPrivyUsers(privyUsersList.data.privyUsers)
 
 
-        // const wallRes = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/wallet/all-wallets`);
-        // console.log(wallRes.data.wallets);
-
-        // // Assuming userDetails and setEmail, setFileDetails, setData are defined elsewhere
-        // const matchingObject = wallRes.data.wallets.find(obj => obj.address == embeddedWallet?.address);
-        // console.log(matchingObject)
-        // setCid(matchingObject)
-
-        // if (matchingObject) {
-        //   const lighthouseUrl = matchingObject.email;
-        //   console.log(lighthouseUrl)
-
-        //   try {
-        //     const fileInfoResult = await lighthouse.getFileInfo(lighthouseUrl);
-        //     const fileDetails = fileInfoResult.data;
-        //     console.log(fileDetails);
-        //     setFileDetails([fileDetails]); // Set file details as an array
-        //   } catch (error) {
-        //     console.error(`Error retrieving file info for CID ${cid}: ${error.message}`);
-        //   }
-        // }
-
-        // // Assuming these functions and states are defined elsewhere
-        // setTriggerEffect(false);
-        // setTriggerDownload(false);
       } catch (error) {
         console.error(`Error retrieving file details: ${error.message}`);
       }
@@ -113,11 +120,12 @@ const page = ({ params }) => {
 
 
 
-
-  console.log(fileDetails)
-
   console.log(email)
   console.log(cid)
+  console.log(accessData)
+
+  console.log(matchedAccessData)
+  console.log(fileInfo)
 
   const [pdfOpened, setPdfOpened] = useState(false);
 
@@ -198,7 +206,7 @@ const page = ({ params }) => {
 
   console.log(userDetails)
 
-  const { user } = useUser();
+  // const { user } = useUser();
 
   const [userFiles, setUserFiles] = useState([]);
   console.log(userFiles)
@@ -355,6 +363,8 @@ const page = ({ params }) => {
 
   const [cidHash, setCidHash] = useState("")
 
+
+
   return (
 
     <div className="bg-white min-h-screen">
@@ -427,7 +437,7 @@ const page = ({ params }) => {
             </thead>
 
             <tbody className="text-gray-700">
-              {fileDetails?.map((file, index) => (
+              {fileInfo?.map((file, index) => (
 
 
                 <tr key={index}>
