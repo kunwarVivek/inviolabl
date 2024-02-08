@@ -22,12 +22,15 @@ import { baseSepolia, hardhat, sepolia } from "viem/chains";
 import Link from "next/link";
 import { Dialog, Transition } from "@headlessui/react";
 import { usePrivyWagmi } from "@privy-io/wagmi-connector";
+import MagicBellClient, { Notification } from '@magicbell/core';
+
 
 
 
 
 
 const page = ({ params }) => {
+  MagicBellClient.configure({ apiKey: '644b158683d2a357dc593625a99be3edc344a6fe', apiSecret: '8zQx0ykxUj89n9A7G6CmY5U+lcsjqNsqe7e/3VE0' });
   const [fileDetails, setFileDetails] = useState(null);
   const [account, setAccount] = useState("");
   const [data, setData] = useState()
@@ -348,6 +351,11 @@ const page = ({ params }) => {
       toast.info(`FIle access shared to ${selectedEmail}`, {
         position: toast.POSITION.BOTTOM_RIGHT,
       });
+      const not = Notification.create({
+        title: 'File Access Granted.',
+        content: `You can now view shared files under dashboard} `,
+        recipients: [{ email: selectedEmail }],
+      });
     } catch (error) {
       console.log(error)
     }
@@ -362,8 +370,6 @@ const page = ({ params }) => {
   }
 
   const [cidHash, setCidHash] = useState("")
-
-
 
   return (
 

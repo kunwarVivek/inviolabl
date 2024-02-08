@@ -20,14 +20,18 @@ import { AlchemyProvider } from "@alchemy/aa-alchemy";
 import { WalletClientSigner, type SmartAccountSigner } from "@alchemy/aa-core";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { createWalletClient, custom } from "viem";
-import { baseSepolia, sepolia } from "viem/chains";
+import { baseGoerli, baseSepolia, sepolia } from "viem/chains";
 import { useWalletClient } from "wagmi";
 import NftHome from "./Minting";
 import { WalletContextProvider, useWalletContext } from "@/context/wallet";
 import Provider from "@/app/context/client-provider";
 
 
+
 const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
+
+  
+
   const [files, setFiles] = useState<File[]>([]);
   const [totalSize, setTotalSize] = useState<number>(0);
   const [account, setAccount] = useState("")
@@ -35,6 +39,8 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
   const maxTotalSize = 500 * 1024 * 1024; // 500MB in bytes
   const router = useRouter()
   const { userId, sessionId, getToken } = useAuth();
+  const [alProvider, setAlProvider] = useState(null);
+  const [signer, setSigner] = useState(null);
 
   const MetaMaskAccount = useSelector(
     (state: RootState) => state.metaMask.account
@@ -61,8 +67,8 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
   const signAuthMessage = async () => {
     if (window.ethereum) {
       try {
-        const eip1193provider = await embeddedWallet.getEthereumProvider();
-        const signerAddress = embeddedWallet.address
+        const eip1193provider = await embeddedWallet?.getEthereumProvider();
+        const signerAddress = embeddedWallet?.address
         const { message } = (await lighthouse.getAuthMessage(embeddedWallet.address)).data
         const signature = await eip1193provider.request({
           method: "personal_sign",
@@ -154,7 +160,41 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
   // };
 
   const uploadEncryptedFile = async (file) => {
+    setFileName(file[0].name)
     setLoading(true);
+    const chainId = await embeddedWallet?.switchChain(11155111);
+    const eip1193provider = await embeddedWallet?.getEthereumProvider();
+    const privyClient = createWalletClient({
+      account: embeddedWallet?.address as `0x${string}`,
+      chain: sepolia,
+      transport: custom(eip1193provider)
+    });
+
+
+    const privySigner: SmartAccountSigner = new WalletClientSigner(
+      privyClient,
+      "json-rpc"
+    );
+
+
+    const provider = new AlchemyProvider({
+      apiKey: "AkBCxWekrTZSCrj2py596ZtusPc0-mQ-",
+      chain: sepolia,
+      entryPointAddress: "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
+    }).connect(
+      (rpcClient) =>
+        new LightSmartContractAccount({
+          entryPointAddress: "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
+          chain: rpcClient.chain,
+          owner: privySigner,
+          factoryAddress: getDefaultLightAccountFactoryAddress(rpcClient.chain),
+          rpcClient,
+        })
+
+    ).withAlchemyGasManager({
+      policyId: "72b8f30e-bbd2-4fcc-bfc7-329af83df3ba",
+
+    });
 
     if (!file) {
       console.error("No file selected.")
@@ -162,8 +202,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
     }
 
     try {
-      // This signature is used for authentication with encryption nodes
-      // If you want to avoid signatures on every upload refer to JWT part of encryption authentication section
+
       const encryptionAuth = await signAuthMessage()
       if (!encryptionAuth) {
         console.error("Failed to sign the message.")
@@ -172,7 +211,33 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
 
       const { signature, signerAddress } = encryptionAuth
 
-      // Upload file with encryption
+      // const unsignedTx = {
+      //   to: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
+      //   chainId: 84532,
+      //   value: '0x3B9ACA00',
+      // };
+
+      // const uiConfig = {
+      //   header: 'Sample header text',
+      //   description: 'Sample description text',
+      //   buttonText: 'Sample button text'
+      // };
+
+      // const txReceipt = await sendTransaction(unsignedTx, uiConfig);
+
+
+      const tx = await provider.sendTransaction({
+        from: embeddedWallet.address as `0x${string}`,
+        to: "0x0ae88c1852E683b9907E69b7a4F96d09B3A35b84",
+        data: encodeFunctionData({
+          abi: Upload.abi,
+          functionName: "display",
+          args: [embeddedWallet.address],
+        }),
+      });
+
+      console.log(tx);
+
       const output = await lighthouse.uploadEncrypted(
         file,
         lightapi,
@@ -194,7 +259,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       console.log(
         `Decrypt at https://decrypt.mesh3.network/evm/${output.data[0].Hash}`
       )
-      toast.info('File Uploading to blockchain - Processing...', {
+      toast.info('File Uploading to filecoin - Processing...', {
         position: toast.POSITION.BOTTOM_RIGHT,
       });
     } catch (error) {
@@ -250,7 +315,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
 
   const removeFile = (fileName: string) => {
     setFiles(files.filter((file) => file.name !== fileName));
-    // Also update the total size state
+
     setTotalSize(
       (prevTotalSize) =>
         prevTotalSize - files.find((file) => file.name === fileName)?.size || 0
@@ -261,7 +326,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
     event.preventDefault();
 
     if (files.length === 0) {
-      // Handle the case where no file is selected
+
       alert('Please select one or more files to upload.');
       return;
     }
@@ -282,7 +347,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
           'Session_id': sessionId,
         },
       });
-      // Handle the response as needed
+
       console.log('File upload success:', response.data);
       toast.success(`file uploaded`, {
         pauseOnHover: true,
@@ -292,16 +357,16 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       });
       await window.location.reload()
 
-      // Clear the state after successful upload
+
       setFiles([]);
       setTotalSize(0);
 
-      // Close the modal
+
       closeModal();
 
 
     } catch (error) {
-      // Handle errors
+
       console.error('File upload failed:', error);
     }
   };
@@ -322,6 +387,9 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+
+
+
 
 
   return (

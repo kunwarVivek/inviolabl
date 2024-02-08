@@ -158,6 +158,7 @@ export default function WalletDisplay({
     return description;
   }
 
+
   if (isTransferring) {
     return (
       <Loader
