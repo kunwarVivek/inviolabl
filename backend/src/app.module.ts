@@ -25,6 +25,7 @@ import { ApiConfigService } from './shared/services/api-config.service';
 import { SharedModule } from './shared/shared.module';
 import { PrivyModule } from './modules/privyUsers/privy.module';
 import { FilesModule } from './modules/files/files.module';
+import { CountsModule } from './modules/count/counts.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { FilesModule } from './modules/files/files.module';
     ClerkModule,
     PrivyModule,
     FilesModule,
+    CountsModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',

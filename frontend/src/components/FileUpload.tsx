@@ -48,7 +48,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
 
   const [fileName, setFileName] = useState("No File selected");
   const [fileSize, setFileSize] = useState()
-  const lightapi = "e1cf40be.f167a3dacc7f4c95a3ba4fe9120f08c3";
+  const lightapi = "87ea616b.7316eb2b3fad435f9e5618aca682acb8";
   const [loading, setLoading] = useState(false)
 
   const { sendTransaction } = usePrivy();
@@ -259,6 +259,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       console.log(
         `Decrypt at https://decrypt.mesh3.network/evm/${output.data[0].Hash}`
       )
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/counts/${output.data[0].Hash}`)
       toast.info('File Uploading to filecoin - Processing...', {
         position: toast.POSITION.BOTTOM_RIGHT,
       });

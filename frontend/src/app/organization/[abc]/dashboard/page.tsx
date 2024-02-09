@@ -74,22 +74,26 @@ const page = ({ params }) => {
   const [address, setAddress] = useState("")
   const [fileInfo, setFileInfo] = useState([])
 
-  const accessConditions = async () => {
-    const cid = "YOUR_FILE_CID_HERE";
-    const response = await lighthouse.getAccessConditions(cid);
 
-    // Print the access conditions
-    console.log(response);
-  }
+
+  const [countDetails, setCountDetails] = useState([])
+  const [downloading, setDownloading] = useState(false)
+  const [viewing, setViewing] = useState(false)
+
 
 
   useEffect(() => {
     const fetchFileDetails = async () => {
+      setDownloading(false)
+      setViewing(false)
       try {
 
-        const response = await lighthouse.getUploads("e1cf40be.f167a3dacc7f4c95a3ba4fe9120f08c3")
+        const response = await lighthouse.getUploads("87ea616b.7316eb2b3fad435f9e5618aca682acb8")
         console.log(response)
         setFileDetails(response.data.fileList)
+
+        const countDet = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/counts`)
+        setCountDetails(countDet.data)
 
         const cids = response.data.fileList.map(file => file.cid);
         const accessPromises = cids.map(cid => lighthouse.getAccessConditions(cid));
@@ -119,54 +123,52 @@ const page = ({ params }) => {
     };
 
     fetchFileDetails();
-  }, [triggerEffect, triggerDownload]);
+  }, [downloading, viewing]);
 
 
 
   console.log(email)
   console.log(cid)
   console.log(accessData)
+  console.log(countDetails)
 
   console.log(matchedAccessData)
   console.log(fileInfo)
 
   const [pdfOpened, setPdfOpened] = useState(false);
 
-  const handleFileClick = async (file, index, account) => {
-
+  const handleFileClick = async (cid, type) => {
     try {
+      const { publicKey, signedMessage } = await encryptionSignature();
 
-      setLoading(true);
+      const keyObject = await lighthouse.fetchEncryptionKey(
+        cid,
+        publicKey,
+        signedMessage
+      );
 
-      const transaction = await contract.addView(account, index);
+      const decrypted = await lighthouse.decryptFile(cid, keyObject.data.key, type);
+      console.log(decrypted);
 
-      toast.info('Processing transaction...', {
-        position: toast.POSITION.BOTTOM_RIGHT,
-        autoClose: false,
-      });
+      const url = URL.createObjectURL(decrypted);
+      console.log(url);
+      setFileURL(url);
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/counts/${cid}/views/increment`);
 
-      await transaction.wait();
+      // Open the URL in a new window
+      window.open(url);
 
-      console.log('addview function called successfully');
-      toast.dismiss();
-
-      toast.success('transaction successfull', {
-        position: toast.POSITION.BOTTOM_RIGHT,
-        autoClose: 1000,
-      });
+      // Set viewing to true after opening the window
+      setViewing(true);
     } catch (error) {
       console.error('Error calling addview function:', error);
       return;
     } finally {
-
       setLoading(false);
       setTriggerEffect(true);
     }
-
-
-    window.open(file.url, '_blank');
-    setPdfOpened(true);
   };
+
 
   const handleFileDownload = async (file, index, account) => {
 
@@ -212,7 +214,6 @@ const page = ({ params }) => {
   // const { user } = useUser();
 
   const [userFiles, setUserFiles] = useState([]);
-  const [downloading, setDownloading] = useState(false)
   console.log(userFiles)
 
 
@@ -412,6 +413,9 @@ const page = ({ params }) => {
 
       console.log(tx);
 
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/counts/${cid}/downloads/increment`)
+
+
       toast.dismiss(toastId);
 
       try {
@@ -429,6 +433,7 @@ const page = ({ params }) => {
         link.click();
 
         console.log('File downloaded successfully.');
+        setDownloading(true)
       } catch (error) {
         console.error('Error downloading file:', error.message);
         throw error;
@@ -488,6 +493,17 @@ const page = ({ params }) => {
   }
 
   const [cidHash, setCidHash] = useState("")
+
+  const getDownloadCount = (cid) => {
+    const detail = countDetails.find(detail => detail.cid === cid);
+    return detail ? detail.downloads : 0;
+  };
+
+  const getViewCount = (cid) => {
+    const detail = countDetails.find(detail => detail.cid === cid);
+    return detail ? detail.views : 0;
+  };
+
 
   return (
 
@@ -568,7 +584,7 @@ const page = ({ params }) => {
                   <td className="px-5 py-5 pl-10 border-b flex border-gray-200 bg-white text-sm">
                     <button
 
-                      onClick={() => handleFileClick(file, index, account)}
+                      onClick={() => handleFileClick(file.cid, file.mimeType)}
                     >
                       <span>{file.fileName}</span>
                     </button>
@@ -587,8 +603,8 @@ const page = ({ params }) => {
                   </td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.fileSizeInBytes}</td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{userDetails?.primaryEmailAddress?.emailAddress}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{0}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{0}</td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getViewCount(file.cid)}</td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getDownloadCount(file.cid)}</td>
 
                 </tr>
               ))}
