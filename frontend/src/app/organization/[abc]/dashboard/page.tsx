@@ -25,10 +25,6 @@ import { usePrivyWagmi } from "@privy-io/wagmi-connector";
 import MagicBellClient, { Notification } from '@magicbell/core';
 
 
-
-
-
-
 const page = ({ params }) => {
   MagicBellClient.configure({ apiKey: '644b158683d2a357dc593625a99be3edc344a6fe', apiSecret: '8zQx0ykxUj89n9A7G6CmY5U+lcsjqNsqe7e/3VE0' });
   const [fileDetails, setFileDetails] = useState(null);
@@ -417,6 +413,11 @@ const page = ({ params }) => {
 
 
       toast.dismiss(toastId);
+      const not = Notification.create({
+        title: 'File downloaded.',
+        content: `File download success.`,
+        recipients: [{ email: userDetails?.primaryEmailAddress?.emailAddress }],
+      });
 
       try {
         const downloadResponse = await axios({
@@ -476,7 +477,7 @@ const page = ({ params }) => {
       });
       const not = Notification.create({
         title: 'File Access Granted.',
-        content: `You can now view shared files under dashboard} `,
+        content: `You can now view shared files under dashboard `,
         recipients: [{ email: selectedEmail }],
       });
     } catch (error) {
