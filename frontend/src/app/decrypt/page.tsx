@@ -21,10 +21,10 @@ function App() {
         buttonText: 'Sample button text'
     };
 
-    const address = embeddedWallet.address
+    const address = embeddedWallet?.address
 
     const encryptionSignature = async () => {
-        const eip1193provider = await embeddedWallet.getEthereumProvider();
+        const eip1193provider = await embeddedWallet?.getEthereumProvider();
         const messageRequested = (await lighthouse.getAuthMessage(address)).data.message
         const signedMessage = await signMessage(messageRequested, uiConfig);
         return ({

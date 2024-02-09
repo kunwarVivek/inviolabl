@@ -17,7 +17,7 @@ import {
 import { AlchemyProvider } from "@alchemy/aa-alchemy";
 import { WalletClientSigner, type SmartAccountSigner } from "@alchemy/aa-core";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { createWalletClient, custom } from "viem";
+import { createWalletClient, custom, encodeFunctionData } from "viem";
 import { baseSepolia, hardhat, sepolia } from "viem/chains";
 import Link from "next/link";
 import { Dialog, Transition } from "@headlessui/react";
@@ -212,6 +212,7 @@ const page = ({ params }) => {
   // const { user } = useUser();
 
   const [userFiles, setUserFiles] = useState([]);
+  const [downloading, setDownloading] = useState(false)
   console.log(userFiles)
 
 
@@ -289,54 +290,171 @@ const page = ({ params }) => {
   //   }
   // };
 
-  const [isModalOpen, setIsModalOpen] = useState(false)
-
-  const downloadFile = async (cid, path) => {
-    const lighthouseDealDownloadEndpoint = 'https://gateway.lighthouse.storage/ipfs/';
-
-    try {
-      const downloadResponse = await axios({
-        method: 'GET',
-        url: `${lighthouseDealDownloadEndpoint}${cid}`,
-        responseType: 'arraybuffer', // Set responseType to 'blob' for binary data
-      });
-
-      const blob = new Blob([downloadResponse.data], { type: downloadResponse.headers['content-type'] });
-
-
-      const link = document.createElement('a');
-      link.href = window.URL.createObjectURL(blob);
-      link.download = path.split('/').pop(); // Set the file name based on the path
-      link.click();
-
-      console.log('File downloaded successfully.');
-    } catch (error) {
-      console.error('Error downloading file:', error.message);
-      throw error; // rethrow the error for further handling if needed
-    }
-  };
-
   const uiConfig = {
     title: 'Sign',
     description: 'Signature',
     buttonText: 'Confirm'
   };
 
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [fileUrl, setFileURL] = useState("")
+
+  const addresses = embeddedWallet?.address
+
+  const encryptionSignature = async () => {
+    const eip1193provider = await embeddedWallet?.getEthereumProvider();
+    const messageRequested = (await lighthouse.getAuthMessage(addresses)).data.message
+    const signedMessage = await signMessage(messageRequested, uiConfig);
+    return ({
+      signedMessage: signedMessage,
+      publicKey: addresses
+    })
+  }
+
+  const decrypt = async () => {
+    // Fetch file encryption key
+    const cid = "QmRJS5VC6qTvuvu47VNuQjKuEZnnPyT3NFRpj9NU6GR7Wf" //replace with your IPFS CID
+    const { publicKey, signedMessage } = await encryptionSignature()
+    /*
+      fetchEncryptionKey(cid, publicKey, signedMessage)
+        Parameters:
+          CID: CID of the file to decrypt
+          publicKey: public key of the user who has access to file or owner
+          signedMessage: message signed by the owner of publicKey
+    */
+    const keyObject = await lighthouse.fetchEncryptionKey(
+      cid,
+      publicKey,
+      signedMessage
+    )
+
+    // Decrypt file
+    /*
+      decryptFile(cid, key, mimeType)
+        Parameters:
+          CID: CID of the file to decrypt
+          key: the key to decrypt the file
+          mimeType: default null, mime type of file
+    */
+    const fileType = "application/pdf"
+    const decrypted = await lighthouse.decryptFile(cid, keyObject.data.key, fileType)
+    console.log(decrypted)
+    /*
+      Response: blob
+    */
+
+    // View File
+    const url = URL.createObjectURL(decrypted)
+    console.log(url)
+    setFileURL(url)
+  }
+
+  const downloadFile = async (cid, path, type) => {
+    const eip1193provider = await embeddedWallet?.getEthereumProvider();
+    const privyClient = createWalletClient({
+      account: embeddedWallet?.address as `0x${string}`,
+      chain: sepolia,
+      transport: custom(eip1193provider)
+    });
+
+    const privySigner = new WalletClientSigner(
+      privyClient,
+      "json-rpc"
+    );
+
+    const provider = new AlchemyProvider({
+      apiKey: "AkBCxWekrTZSCrj2py596ZtusPc0-mQ-",
+      chain: sepolia,
+      entryPointAddress: "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
+    }).connect(
+      (rpcClient) => new LightSmartContractAccount({
+        entryPointAddress: "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
+        chain: rpcClient.chain,
+        owner: privySigner,
+        factoryAddress: getDefaultLightAccountFactoryAddress(rpcClient.chain),
+        rpcClient,
+      })
+    ).withAlchemyGasManager({
+      policyId: "72b8f30e-bbd2-4fcc-bfc7-329af83df3ba",
+    });
+
+
+
+    try {
+
+      const lighthouseDealDownloadEndpoint = 'https://gateway.lighthouse.storage/ipfs/';
+      const { publicKey, signedMessage } = await encryptionSignature();
+
+      const keyObject = await lighthouse.fetchEncryptionKey(
+        cid,
+        publicKey,
+        signedMessage
+      );
+
+      const decrypted = await lighthouse.decryptFile(cid, keyObject.data.key, type);
+      console.log(decrypted);
+
+      const url = URL.createObjectURL(decrypted);
+      console.log(url);
+      setFileURL(url);
+
+      const toastId = toast.info('Preparing to download... Transaction is in process', { autoClose: false });
+
+      const tx = await provider.sendTransaction({
+        from: embeddedWallet.address as `0x${string}`,
+        to: "0x0ae88c1852E683b9907E69b7a4F96d09B3A35b84",
+        data: encodeFunctionData({
+          abi: Upload.abi,
+          functionName: "display",
+          args: [embeddedWallet.address],
+        }),
+      });
+
+      console.log(tx);
+
+      toast.dismiss(toastId);
+
+      try {
+        const downloadResponse = await axios({
+          method: 'GET',
+          url: `${lighthouseDealDownloadEndpoint}${cid}`,
+          responseType: 'arraybuffer',
+        });
+
+        const blob = new Blob([downloadResponse.data], { type: downloadResponse.headers['content-type'] });
+
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(decrypted);
+        link.download = path.split('/').pop();
+        link.click();
+
+        console.log('File downloaded successfully.');
+      } catch (error) {
+        console.error('Error downloading file:', error.message);
+        throw error;
+      }
+    } catch (error) {
+      console.error('Error:', error.message);
+      throw error;
+    }
+  };
+
+
+
+
   console.log(selectedEmail)
 
   const shareFile = async (cidHash: any) => {
     try {
-      // CID of the encrypted file that you want to share
-      // CID is generated by uploading a file with encryption
-      // Only the owner of the file can share it with another wallet address
-      const cid = cidHash // Example: "Qma7Na9sEdeM6aQeu6bUFW54HktNnW2k8g226VunXBhrn7";
-      const publicKey = embeddedWallet.address // Example: "0xa3c960b3ba29367ecbcaf1430452c6cd7516f588";
+
+      const cid = cidHash
+      const publicKey = embeddedWallet.address
       const messageRequested = (await lighthouse.getAuthMessage(embeddedWallet.address)).data.message
       const signedMessage = await signMessage(messageRequested, uiConfig);
       const user = privyUsers.find(user => user.email.address == selectedEmail);
       console.log(user)
 
-      const publicKeyUserB = [user.wallet.address] //Example: 0x487fc2fE07c593EAb555729c3DD6dF85020B5160
+      const publicKeyUserB = [user.wallet.address]
       console.log(publicKeyUserB)
 
       const shareResponse = await lighthouse.shareFile(
@@ -455,7 +573,7 @@ const page = ({ params }) => {
                       <span>{file.fileName}</span>
                     </button>
 
-                    <button onClick={() => downloadFile(file.cid, "/")} className="ml-2 hover:text-blue-500">
+                    <button onClick={() => downloadFile(file.cid, "/", file.mimeType)} className="ml-2 hover:text-blue-500">
                       <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512">
                         <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z" />
                       </svg>
@@ -538,7 +656,6 @@ const page = ({ params }) => {
             </div>
           </Dialog>
         </Transition >
-
       </Dashboard>
     </div>
 
