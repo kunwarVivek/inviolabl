@@ -2,7 +2,7 @@
 import Dashboard from "@/components/Dashboard";
 import React, { useState, useEffect, Fragment, use } from "react";
 import DropdownMenu from "@/components/DropdownMenu";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import axios from "axios";
@@ -39,6 +39,9 @@ const page = ({ params }) => {
   console.log(data)
 
   const { signMessage } = usePrivy();
+  const { userId, sessionId, getToken } = useAuth();
+
+
 
 
   const PrivyAccount = useSelector(
@@ -75,6 +78,7 @@ const page = ({ params }) => {
   const [countDetails, setCountDetails] = useState([])
   const [downloading, setDownloading] = useState(false)
   const [viewing, setViewing] = useState(false)
+  const [token, setToken] = useState("")
 
 
 
@@ -83,7 +87,8 @@ const page = ({ params }) => {
       setDownloading(false)
       setViewing(false)
       try {
-
+        const token = await getToken()
+        setToken(token)
         const response = await lighthouse.getUploads("87ea616b.7316eb2b3fad435f9e5618aca682acb8")
         console.log(response)
         setFileDetails(response.data.fileList)
@@ -122,7 +127,7 @@ const page = ({ params }) => {
   }, [downloading, viewing]);
 
 
-
+  console.log(token)
   console.log(email)
   console.log(cid)
   console.log(accessData)
@@ -372,7 +377,7 @@ const page = ({ params }) => {
         rpcClient,
       })
     ).withAlchemyGasManager({
-      policyId: "72b8f30e-bbd2-4fcc-bfc7-329af83df3ba",
+      policyId: "203dcfc0-f897-4f66-9b71-960baccecc9e",
     });
 
 
