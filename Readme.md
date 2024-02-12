@@ -5,6 +5,7 @@ Technologies: NextJS, Clerk, NestJS, Alchemy, Filecoin and Privy.
 **Roles**
 
 **Admin**
+- sign ups
 - creates org
 - completes profile
 - creates wallet, attach wallet & maintains wallet
@@ -13,6 +14,7 @@ Technologies: NextJS, Clerk, NestJS, Alchemy, Filecoin and Privy.
 - audits transaction on the wallet
 
 **Non-Admin/Members**
+- sign ups 
 - joins invited org
 - completes profile
 - upload files and shares it with users (within org or outside org (email id)
