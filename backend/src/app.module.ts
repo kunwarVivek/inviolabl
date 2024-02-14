@@ -26,6 +26,8 @@ import { SharedModule } from './shared/shared.module';
 import { PrivyModule } from './modules/privyUsers/privy.module';
 import { FilesModule } from './modules/files/files.module';
 import { CountsModule } from './modules/count/counts.module';
+import { OrganizationModule } from './modules/organization/organization.module';
+import { ProxyModule } from './modules/proxy/proxy.module';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { CountsModule } from './modules/count/counts.module';
     PrivyModule,
     FilesModule,
     CountsModule,
+    OrganizationModule,
+    ProxyModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',

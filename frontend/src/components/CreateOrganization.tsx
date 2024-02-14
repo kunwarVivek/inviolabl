@@ -8,7 +8,7 @@ export default function CreateOrganization() {
     const { createOrganization, setActive } = useOrganizationList();
     const [organizationName, setOrganizationName] = useState("");
     const { isLoaded, isSignedIn, user } = useUser();
-    const {  userId, sessionId, getToken } = useAuth();
+    const { userId, sessionId, getToken } = useAuth();
 
     console.log(sessionId)
 
@@ -24,27 +24,59 @@ export default function CreateOrganization() {
             const organization = await createOrganization({ name: organizationName });
             setOrganizationName("");
             setActive({ organization });
-            const tenantData = {
-                "name": organization.name,
-                "domain": organization.id,
-                "email": user?.primaryEmailAddress.emailAddress,
-                "phone": "12345678"
+            const accessKey = "alcht_k1ujYDxPKzVToJ7AOWjHq2bno55dr3"
+            const gasPolicy = {
+                "policyName": organization.id,
+                "policyType": "SPONSORSHIP",
+                "appId": "7583urdodpg1kcgg",
+                "rules": {
+                    "startTimeUnix": Math.floor(Date.now() / 1000),
+                    "sponsorshipExpiryMs": "86400000"
+                }
             };
 
-            await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tenants`, tenantData, {
-                headers: {
-                  'Session_id': sessionId,
-                },
-            })
-            .then(tenantResponse => {
-                console.log(tenantResponse.data);
-                // toast.success(`Hi ${name}, a tenant with the domain ${organizationName}.inviolabl.com has been created, and a user has been associated. You will receive an email notification.`, {
-                //     pauseOnHover: true,
-                //     theme: 'colored',
-                //     progressStyle: { background: 'rgb(216 180 254)' },
-                //     style: { background: 'rgb(126 34 206)' },
-                // });
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/proxy`, {
+                url: "https://manage.g.alchemy.com/api/gasManager/policy",
+                data: gasPolicy,
+                config: {
+                    headers: {
+                        Authorization: `Bearer ${accessKey}`,
+                        'Content-Type': 'application/json',
+                    },
+                    withCredentials: true,
+                }
             });
+            console.log('Data posted successfully:', response.data.data);
+
+            const status = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/proxy`, {
+                url: `https://manage.g.alchemy.com/api/gasManager/policy/${response.data.data.policy.policyId}/status`,
+                data: {status: "active"},
+                config: {
+                    headers: {
+                        Authorization: `Bearer ${accessKey}`,
+                        'Content-Type': 'application/json',
+                    },
+                    withCredentials: true,
+                }
+            });
+            console.log(status)
+
+            const PolicyData = {
+                "name": organization.id,
+                "gasPolicy": response.data.data.policy.policyId
+            };
+
+
+            await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/organizations`, PolicyData)
+                .then(tenantResponse => {
+                    console.log(tenantResponse.data);
+                    // toast.success(`Hi ${name}, a tenant with the domain ${organizationName}.inviolabl.com has been created, and a user has been associated. You will receive an email notification.`, {
+                    //     pauseOnHover: true,
+                    //     theme: 'colored',
+                    //     progressStyle: { background: 'rgb(216 180 254)' },
+                    //     style: { background: 'rgb(126 34 206)' },
+                    // });
+                });
         } catch (error) {
             console.error('Error:', error);
             toast.error('Error');

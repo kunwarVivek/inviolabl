@@ -19,10 +19,6 @@ export default function Home() {
 
    const dispatch = useDispatch();
 
-
-    
-
-
     const {  userId, sessionId, getToken } = useAuth();
     console.log(sessionId, userId, getToken)
     

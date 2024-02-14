@@ -365,7 +365,7 @@ const page = ({ params }) => {
     );
 
     const provider = new AlchemyProvider({
-      apiKey: "AkBCxWekrTZSCrj2py596ZtusPc0-mQ-",
+      apiKey: "7u3nZd8ofdYF4IYygF_7LzrA3MDw8rIs",
       chain: sepolia,
       entryPointAddress: "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
     }).connect(
@@ -376,11 +376,7 @@ const page = ({ params }) => {
         factoryAddress: getDefaultLightAccountFactoryAddress(rpcClient.chain),
         rpcClient,
       })
-    ).withAlchemyGasManager({
-      policyId: "203dcfc0-f897-4f66-9b71-960baccecc9e",
-    });
-
-
+    )
 
     try {
 

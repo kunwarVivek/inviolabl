@@ -164,12 +164,13 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
     setLoading(true);
     const chainId = await embeddedWallet?.switchChain(11155111);
     const eip1193provider = await embeddedWallet?.getEthereumProvider();
+    const organizationPolicy = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/organizations/name/${currentOrganization.id}`)
+    console.log(organizationPolicy.data.gasPolicy)
     const privyClient = createWalletClient({
       account: embeddedWallet?.address as `0x${string}`,
       chain: sepolia,
       transport: custom(eip1193provider)
     });
-
 
     const privySigner: SmartAccountSigner = new WalletClientSigner(
       privyClient,
@@ -178,7 +179,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
 
 
     const provider = new AlchemyProvider({
-      apiKey: "AkBCxWekrTZSCrj2py596ZtusPc0-mQ-",
+      apiKey: "7u3nZd8ofdYF4IYygF_7LzrA3MDw8rIs",
       chain: sepolia,
       entryPointAddress: "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
     }).connect(
@@ -192,7 +193,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
         })
 
     ).withAlchemyGasManager({
-      policyId: "203dcfc0-f897-4f66-9b71-960baccecc9e",
+      policyId: organizationPolicy.data.gasPolicy
 
     });
 
@@ -281,6 +282,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
   const {
     organization: currentOrganization,
   } = useOrganization();
+
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
