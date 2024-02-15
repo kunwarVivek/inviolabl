@@ -30,7 +30,7 @@ import Provider from "@/app/context/client-provider";
 
 const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
 
-  
+
 
   const [files, setFiles] = useState<File[]>([]);
   const [totalSize, setTotalSize] = useState<number>(0);
@@ -65,25 +65,21 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
 
 
   const signAuthMessage = async () => {
-    if (window.ethereum) {
-      try {
-        const eip1193provider = await embeddedWallet?.getEthereumProvider();
-        const signerAddress = embeddedWallet?.address
-        const { message } = (await lighthouse.getAuthMessage(embeddedWallet.address)).data
-        const signature = await eip1193provider.request({
-          method: "personal_sign",
-          params: [message, embeddedWallet.address],
-        })
-        return { signature, signerAddress }
-      } catch (error) {
-        console.error("Error signing message with Wallet", error)
-        return null
-      }
-    } else {
-      console.log("Please install Wallet!")
+    try {
+      const eip1193provider = await embeddedWallet?.getEthereumProvider();
+      const signerAddress = embeddedWallet?.address
+      const { message } = (await lighthouse.getAuthMessage(embeddedWallet.address)).data
+      const signature = await eip1193provider.request({
+        method: "personal_sign",
+        params: [message, embeddedWallet.address],
+      })
+      return { signature, signerAddress }
+    } catch (error) {
+      console.error("Error signing message with Wallet", error)
       return null
     }
   }
+
 
 
   // const uploadFile = async (file) => {

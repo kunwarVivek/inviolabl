@@ -20,28 +20,25 @@ function App() {
 
 
     const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
-    
+
 
     const signAuthMessage = async () => {
-        if (window.ethereum) {
-            try {
-                const eip1193provider = await embeddedWallet.getEthereumProvider();
-                const signerAddress = embeddedWallet.address
-                const { message } = (await lighthouse.getAuthMessage(embeddedWallet.address)).data
-                const signature = await eip1193provider.request({
-                    method: "personal_sign",
-                    params: [message, embeddedWallet.address],
-                })
-                return { signature, signerAddress }
-            } catch (error) {
-                console.error("Error signing message with Wallet", error)
-                return null
-            }
-        } else {
-            console.log("Please install Wallet!")
+
+        try {
+            const eip1193provider = await embeddedWallet.getEthereumProvider();
+            const signerAddress = embeddedWallet.address
+            const { message } = (await lighthouse.getAuthMessage(embeddedWallet.address)).data
+            const signature = await eip1193provider.request({
+                method: "personal_sign",
+                params: [message, embeddedWallet.address],
+            })
+            return { signature, signerAddress }
+        } catch (error) {
+            console.error("Error signing message with Wallet", error)
             return null
         }
     }
+
 
     // Function to upload the encrypted file
     const uploadEncryptedFile = async () => {
