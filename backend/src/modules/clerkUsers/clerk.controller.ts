@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ClerkService } from './clerk.service';
 
 @Controller('clerk')
@@ -15,4 +15,12 @@ export class ClerkController {
       return { error: 'Internal Server Error' };
     }
   }
+
+  @Post('invite-user')
+  async inviteUserToOrganization(@Body() inviteData: any) {
+    const { emailAddress, organizationId, inviterUserId, role, redirectUrl } = inviteData;
+    await this.clerkService.inviteUserToOrganization(emailAddress, organizationId, inviterUserId, role, redirectUrl);
+    return { message: 'Invitation sent successfully' };
+  }
+
 }

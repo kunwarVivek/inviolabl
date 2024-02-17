@@ -1,14 +1,15 @@
 'use client'
 import { useState } from 'react';
 import AddRoleModal from '@/components/AddRoleModal';
-import RolesTable from '@/components/RolesTable'; 
+import RolesTable from '@/components/RolesTable';
 import Dashboard from '@/components/Dashboard';
 import ShareTable from '@/components/ShareTable';
 import { ShareIcon } from '@heroicons/react/24/solid'
 import { ShareModal } from '@/components/ShareModal';
-import { useOrganization } from '@clerk/nextjs';
+import { currentUser, useOrganization, useUser } from '@clerk/nextjs';
 import InvitationList from '@/components/InvitationList';
 import MemberList from '@/components/MemberList';
+import axios from 'axios';
 
 export default function Page() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,18 +23,42 @@ export default function Page() {
     { id: 2, email: 'rajkumar@gmail.com', status: "Invite Accepted" }
   ]);
 
+  const { user } = useUser();
+
   const sendInvite = (email) => {
     const newShare = { id: shares.length + 1, email, status: "Invite Sent" };
     setShares([...shares, newShare]);
   };
 
-  const onSubmit = async e => {
+  // const onSubmit = async e => {
+  //   e.preventDefault();
+  //   setDisabled(true);
+  //   await organization.inviteMember({ emailAddress, role });
+  //   setEmailAddress('');
+  //   setRole('basic_member');
+  //   setDisabled(false);
+  // };
+
+  const onSubmit = async (e) => {
     e.preventDefault();
     setDisabled(true);
-    await organization.inviteMember({ emailAddress, role });
-    setEmailAddress('');
-    setRole('basic_member');
-    setDisabled(false);
+    try {
+      const inviteData = {
+        emailAddress: emailAddress,
+        organizationId: organization.id,
+        inviterUserId: user.id,
+        role: role,
+        redirectUrl: `https://alpha.inviolabl.io/organization/${organization.name}/dashboard`
+      };
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/clerk/invite-user`, inviteData);
+      console.log(response.data.message);
+      setEmailAddress('');
+      setRole('basic_member');
+    } catch (error) {
+      console.error('Error sending invitation:', error.message);
+    } finally {
+      setDisabled(false);
+    }
   };
 
   console.log(invitationList)
@@ -42,7 +67,7 @@ export default function Page() {
     <Dashboard>
 
       <div className="min-h-screen bg-white">
-        
+
         {/* <ShareModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSend={sendInvite} /> */}
         <div className="flex items-center gap-3 bg-white">
           <h1 className="text-xl font-bold mt-14 pl-10 py-5 w-full bg-slate-100">Invite</h1>
