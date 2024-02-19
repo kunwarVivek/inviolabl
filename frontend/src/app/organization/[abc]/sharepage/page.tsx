@@ -25,6 +25,14 @@ export default function Page() {
 
   const { user } = useUser();
 
+  const {
+    organization: currentOrganization,
+    membership,
+    isLoaded,
+  } = useOrganization();
+
+  const isAdmin = membership?.role === "admin";
+
   const sendInvite = (email) => {
     const newShare = { id: shares.length + 1, email, status: "Invite Sent" };
     setShares([...shares, newShare]);
@@ -78,6 +86,7 @@ export default function Page() {
               <input
                 className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 leading-tight focus:outline-none"
                 type="text"
+                disabled={!isAdmin}
                 placeholder="Email address"
                 value={emailAddress}
                 onChange={e => setEmailAddress(e.target.value)}
@@ -86,6 +95,7 @@ export default function Page() {
             <label className='px-2 cursor-pointer'>
               <input
                 type="radio"
+                disabled={!isAdmin}
                 checked={role === 'admin'}
                 onChange={() => {
                   setRole('admin');
@@ -96,6 +106,7 @@ export default function Page() {
             <label className='px-2 cursor-pointer'>
               <input
                 type="radio"
+                disabled={!isAdmin}
                 checked={role === 'basic_member'}
                 onChange={() => {
                   setRole('basic_member');
@@ -105,7 +116,7 @@ export default function Page() {
             </label>{' '}
             <button
               type="submit"
-              disabled={disabled}
+              disabled={disabled || !isAdmin}
               className="py-2 mt-5 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold">
               <span>Invite</span>
               <svg xmlns="http://www.w3.org/2000/svg" className="ms-2 fill-white" height="1em" viewBox="0 0 320 512"><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z" /></svg>
