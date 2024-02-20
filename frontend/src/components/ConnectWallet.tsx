@@ -1,11 +1,10 @@
 "use client";
 import { usePathname, useRouter } from "next/navigation";
 import { TruncatedWalletAddress } from "./TruncateFunction";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useClerk } from "@clerk/nextjs";
 import { useLogin, usePrivy } from "@privy-io/react-auth";
-import { setAccount } from "@/features/PrivySlice";
 
 const ConnectWallet = () => {
 
@@ -18,7 +17,7 @@ const ConnectWallet = () => {
     (state: RootState) => state.metaMask.account
   );
 
-  const dispatch = useDispatch();
+
 
   const { ready, authenticated, user } = usePrivy()
   
@@ -54,7 +53,7 @@ const ConnectWallet = () => {
             <span className="text-sm font-semibold bg-slate-300 p-1 rounded-md text-black px-4">
               {(user?.wallet?.address)}
             </span>
-            <button onClick={() => { logout(); dispatch(setAccount('')); }} className="p-1 bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold ms-6">Disconnect</button>
+            <button onClick={logout} className="p-1 bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold ms-6">Disconnect</button>
           </p>
         </>
         )}

@@ -25,6 +25,7 @@ module.exports = withSentryConfig(
     silent: true,
     org: "inviolabl",
     project: "inviolabl",
+    authToken: process.env.SENTRY_AUTH_TOKEN,
   },
   {
     // For all available options, see:
