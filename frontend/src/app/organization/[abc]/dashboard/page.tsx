@@ -438,10 +438,12 @@ const page = ({ params }) => {
         setDownloading(true)
       } catch (error) {
         console.error('Error downloading file:', error.message);
+        throw new Error('download Error');
         throw error;
       }
     } catch (error) {
       console.error('Error:', error.message);
+      throw new Error('download Error');
       throw error;
     }
   };
@@ -483,6 +485,7 @@ const page = ({ params }) => {
       });
     } catch (error) {
       console.log(error)
+      throw new Error('Share file');
     }
   }
 

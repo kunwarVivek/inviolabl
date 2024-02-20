@@ -115,15 +115,15 @@ const Modal = () => {
     // }, []);
 
     useEffect(() => {
-        
+
         axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/clerk/users`)
             .then(response => {
-                
+
                 const emailAddresses = response.data.clerkUsers.map(user =>
                     user.emailAddresses[0]?.emailAddress || ''
                 );
 
-                
+
                 setClerkUsers(emailAddresses);
             })
             .catch(error => {
@@ -138,7 +138,7 @@ const Modal = () => {
 
     function SendTransactionButton() {
 
-        
+
         const unsignedTx = {
             to: '0x82074bFb2F39E93b93a6dD6071Bb725727A1B664',
             chainId: 84532,
@@ -147,17 +147,17 @@ const Modal = () => {
                 abi: Upload.abi,
                 functionName: 'uploadFile',
                 args: [`https://gateway.lighthouse.storage/ipfs/`, "sm", "12", "test"]
-              }),
+            }),
         };
 
-        
+
         const uiConfig = {
             header: 'Sample header text',
             description: 'Transaction',
             buttonText: 'Confirm'
         };
 
-        
+
         return (
             <button disabled={!addressValue} onClick={async () => {
                 const txReceipt = await sendTransaction(unsignedTx, uiConfig);

@@ -262,6 +262,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       });
     } catch (error) {
       console.error("Error uploading encrypted file:", error)
+      throw new Error('File upload Error');
     } finally {
       setLoading(false);
       setIsModalOpen(false);

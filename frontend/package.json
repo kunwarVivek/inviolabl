@@ -24,6 +24,7 @@
     "@privy-io/server-auth": "^1.7.0",
     "@privy-io/wagmi-connector": "^0.1.12",
     "@reduxjs/toolkit": "^1.9.7",
+    "@sentry/nextjs": "^7.101.1",
     "@t3-oss/env-nextjs": "^0.8.0",
     "@wagmi/chains": "^1.8.0",
     "alchemy-sdk": "^3.1.2",
