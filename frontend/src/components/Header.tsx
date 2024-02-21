@@ -11,7 +11,7 @@ import { TruncatedWalletAddress } from "./TruncateFunction";
 import { cn } from "@/lib/utils";
 import { usePathname, useSearchParams } from "next/navigation";
 import { clearUser, setUser } from "@/features/LoginSlice";
-import { SignInButton, SignedIn, SignedOut, UserButton, useAuth, useClerk, useUser } from "@clerk/nextjs";
+import { OrganizationSwitcher, SignInButton, SignedIn, SignedOut, UserButton, useAuth, useClerk, useUser } from "@clerk/nextjs";
 import MagicBell, { FloatingNotificationInbox } from '@magicbell/magicbell-react';
 import { ethers } from "ethers";
 import { setAccount } from "@/features/PrivySlice";
@@ -106,6 +106,7 @@ const Header = ({ className }: any) => {
           {sessionId && <Link href={"/organization"}>
             <span className="py-[5.5px] px-4 mb-4 text-white text-sm bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 font-semibold rounded-md">Organization</span>
           </Link>}
+          <OrganizationSwitcher />
           {!sessionId && <Link href={"/organization"}>
             <span className="py-[5.5px] px-4 mb-4 text-white text-sm bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 font-semibold rounded-md">Try it free</span>
           </Link>}

@@ -157,6 +157,7 @@ console.log(add)
 
   console.log(userDetails?.primaryEmailAddress?.emailAddress)
 
+  
 
 
   useEffect(() => {
@@ -206,7 +207,7 @@ console.log(add)
     } catch (error) {
       console.error('Error calling addview function:', error);
       return;
-    } finally {
+    } finally { 
 
       setLoading(false);
       setTriggerEffect(true);
@@ -218,7 +219,7 @@ console.log(add)
   };
 
 
-  console.log(userDetails)
+  console.log(userDetails)  
 
   const { user } = useUser();
 
@@ -228,10 +229,10 @@ console.log(add)
 
 
   const [filter, setFilter] = useState('all');
-  const [fileHistory, setFileHistory] = useState([
+  const [fileHistory, setFileHistory] = useState([  
     // { filename: "resume.pdf", size: "1mb", createdAt: "yesterday", status: "Success" },
   ]);
-  console.log(filter);
+  console.log(filter);  
 
   const filteredFileHistory = filter === 'all'
     ? fileHistory
@@ -239,7 +240,7 @@ console.log(add)
 
   const handleFilterChange = (selectedFilter) => {
     setFilter(selectedFilter.toLowerCase());
-  };
+  };  
   const typeOptions = ["All", "PDF", "JPG", "PNG", "JPEG"];
   const modifiedOptions = ["Today", "Last Week", "Last Month"];
 

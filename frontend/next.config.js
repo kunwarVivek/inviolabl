@@ -1,15 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    eslint: {
-        ignoreDuringBuilds: true,
-    },
-    images: {
-        domains: ["avataaars.io", "static.alchemyapi.io"],
-    },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  images: {
+    domains: ["avataaars.io", "static.alchemyapi.io"],
+  },
 }
 
 module.exports = nextConfig
-
 
 // Injected content via Sentry wizard below
 
@@ -25,7 +24,7 @@ module.exports = withSentryConfig(
     silent: true,
     org: "inviolabl",
     project: "inviolabl",
-    authToken: process.env.SENTRY_AUTH_TOKEN,
+    // authToken: "0b45a936cfba11ee8ce86ac42c6c2610",
   },
   {
     // For all available options, see:

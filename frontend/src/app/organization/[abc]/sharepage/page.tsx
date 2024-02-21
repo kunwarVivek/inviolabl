@@ -25,6 +25,8 @@ export default function Page() {
 
   const { user } = useUser();
 
+
+
   const sendInvite = (email) => {
     const newShare = { id: shares.length + 1, email, status: "Invite Sent" };
     setShares([...shares, newShare]);
@@ -62,6 +64,9 @@ export default function Page() {
   };
 
   console.log(invitationList)
+
+  
+
 
   return (
     <Dashboard>
