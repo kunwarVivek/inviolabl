@@ -25,6 +25,9 @@ import { setupSwagger } from './setup-swagger';
 import { ApiConfigService } from './shared/services/api-config.service';
 import { TranslationService } from './shared/services/translation.service';
 import { SharedModule } from './shared/shared.module';
+import * as Sentry from '@sentry/node';
+
+
 
 export async function bootstrap(): Promise<NestExpressApplication> {
   initializeTransactionalContext();
@@ -33,6 +36,22 @@ export async function bootstrap(): Promise<NestExpressApplication> {
     new ExpressAdapter(),
     { cors: true },
   );
+
+  Sentry.init({
+    dsn: 'https://ffe7bb38bd101dfe8554b41058e440eb@o4506777703415808.ingest.sentry.io/4506784957267968',
+  });
+
+
+  // Sentry.init({
+  //   dsn: "https://ffe7bb38bd101dfe8554b41058e440eb@o4506777703415808.ingest.sentry.io/4506784957267968",
+  //   integrations: [
+  //     new ProfilingIntegration(),
+  //   ],
+  //   // Performance Monitoring
+  //   tracesSampleRate: 1.0, //  Capture 100% of the transactions
+  //   // Set sampling rate for profiling - this is relative to tracesSampleRate
+  //   profilesSampleRate: 1.0,
+  // });
   app.enable('trust proxy'); // only if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
   app.use(helmet());
   // app.setGlobalPrefix('/api'); use api as global prefix if you don't have subdomain
@@ -96,6 +115,7 @@ export async function bootstrap(): Promise<NestExpressApplication> {
   if (!configService.isDevelopment) {
     app.enableShutdownHooks();
   }
+
 
   const port = configService.appConfig.port;
   await app.listen(port);

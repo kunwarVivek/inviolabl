@@ -1,6 +1,8 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseInterceptors } from '@nestjs/common';
 import { ClerkService } from './clerk.service';
+import { SentryInterceptor } from '../../interceptors/sentry-interceptor.service';
 
+@UseInterceptors(SentryInterceptor)
 @Controller('clerk')
 export class ClerkController {
   constructor(private readonly clerkService: ClerkService) {}

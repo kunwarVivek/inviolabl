@@ -1,8 +1,10 @@
 
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseInterceptors } from '@nestjs/common';
 import { Organization } from './organization.entity';
 import { OrganizationService } from './organization.service';
+import { SentryInterceptor } from '../../interceptors/sentry-interceptor.service';
 
+@UseInterceptors(SentryInterceptor)
 @Controller('organizations')
 export class OrganizationController {
   constructor(private readonly organizationService: OrganizationService) {}
