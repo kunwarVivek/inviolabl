@@ -199,7 +199,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
     }
 
     try {
-
+      setIsModalOpen(true)
       const encryptionAuth = await signAuthMessage()
       if (!encryptionAuth) {
         console.error("Failed to sign the message.")
@@ -226,15 +226,10 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       const tx = await provider.sendTransaction({
         from: embeddedWallet.address as `0x${string}`,
         to: "0x0ae88c1852E683b9907E69b7a4F96d09B3A35b84",
-        data: encodeFunctionData({
-          abi: Upload.abi,
-          functionName: "display",
-          args: [embeddedWallet.address],
-        }),
       });
 
       console.log(tx);
-
+    
       const output = await lighthouse.uploadEncrypted(
         file,
         lightapi,
@@ -385,7 +380,11 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
   };
 
   const closeModal = () => {
-    setIsModalOpen(false);
+    if(loading){
+    setIsModalOpen(true);
+    } else {
+      setIsModalOpen(false)
+    }
   };
 
 

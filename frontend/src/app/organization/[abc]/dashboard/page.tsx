@@ -2,7 +2,7 @@
 import Dashboard from "@/components/Dashboard";
 import React, { useState, useEffect, Fragment, use } from "react";
 import DropdownMenu from "@/components/DropdownMenu";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import axios from "axios";
@@ -351,8 +351,13 @@ const page = ({ params }) => {
     setFileURL(url)
   }
 
+  const {
+    organization: currentOrganization,
+  } = useOrganization();
+
   const downloadFile = async (cid, path, type) => {
     const eip1193provider = await embeddedWallet?.getEthereumProvider();
+    const organizationPolicy = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/organizations/name/${currentOrganization.id}`)
     const privyClient = createWalletClient({
       account: embeddedWallet?.address as `0x${string}`,
       chain: sepolia,
@@ -376,7 +381,10 @@ const page = ({ params }) => {
         factoryAddress: getDefaultLightAccountFactoryAddress(rpcClient.chain),
         rpcClient,
       })
-    )
+    ).withAlchemyGasManager({
+      policyId: organizationPolicy.data.gasPolicy
+
+    });
 
     try {
 
@@ -401,11 +409,6 @@ const page = ({ params }) => {
       const tx = await provider.sendTransaction({
         from: embeddedWallet.address as `0x${string}`,
         to: "0x0ae88c1852E683b9907E69b7a4F96d09B3A35b84",
-        data: encodeFunctionData({
-          abi: Upload.abi,
-          functionName: "display",
-          args: [embeddedWallet.address],
-        }),
       });
 
       console.log(tx);
@@ -657,7 +660,7 @@ const page = ({ params }) => {
                           {selectedEmail?.length > 0 && (
                             <datalist id="emailList">
                               {privyUsers.map(user => (
-                                <option key={user.id} value={user.email.address} />
+                                <option key={user?.id} value={user?.email?.address} />
                               ))}
                             </datalist>
                           )}
