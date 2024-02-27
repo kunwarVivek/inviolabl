@@ -5,15 +5,19 @@ import storage from 'redux-persist/lib/storage';
 import MetaMaskReducer from '../features/MetaMaskSlice';
 import OrganisationSettingsReducer from "@/features/OrganisationSettingsSlice";
 import TenantReducer from "@/features/TenantSlice";
-import UserReducer from '../features/LoginSlice'
-import PrivyReducer from '../features/PrivySlice'
+import UserReducer from '../features/LoginSlice';
+import PrivyReducer from '../features/PrivySlice';
+import FileUploadCompleteReducer from '../features/FileUploadCompleteSlice';
+
 
 const reducers = combineReducers({
   metaMask: MetaMaskReducer,
   organisationSettings:OrganisationSettingsReducer,
   tenant: TenantReducer,
   user: UserReducer,
-  privy: PrivyReducer
+  privy: PrivyReducer,
+  FileUploadComplete: FileUploadCompleteReducer
+  
 })
 const persistReducers = persistReducer(
   {

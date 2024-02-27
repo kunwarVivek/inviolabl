@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import React, { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import lighthouse from "@lighthouse-web3/sdk";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { ethers } from "ethers";
 import Upload from "../artifacts/contracts/Upload.sol/Upload.json"
@@ -25,6 +25,7 @@ import { useWalletClient } from "wagmi";
 import NftHome from "./Minting";
 import { WalletContextProvider, useWalletContext } from "@/context/wallet";
 import Provider from "@/app/context/client-provider";
+import { setFileUploadComplete } from "@/features/FileUploadCompleteSlice";
 
 
 
@@ -41,6 +42,9 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
   const { userId, sessionId, getToken } = useAuth();
   const [alProvider, setAlProvider] = useState(null);
   const [signer, setSigner] = useState(null);
+
+  const dispatch = useDispatch()
+
 
   const MetaMaskAccount = useSelector(
     (state: RootState) => state.metaMask.account
@@ -255,6 +259,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       toast.info('File Uploading to filecoin - Processing...', {
         position: toast.POSITION.BOTTOM_RIGHT,
       });
+      dispatch(setFileUploadComplete(true))
     } catch (error) {
       console.error("Error uploading encrypted file:", error)
       throw new Error('File upload Error');

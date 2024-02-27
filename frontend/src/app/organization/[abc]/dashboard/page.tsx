@@ -23,6 +23,7 @@ import Link from "next/link";
 import { Dialog, Transition } from "@headlessui/react";
 import { usePrivyWagmi } from "@privy-io/wagmi-connector";
 import MagicBellClient, { Notification } from '@magicbell/core';
+import { setFileUploadComplete } from "@/features/FileUploadCompleteSlice";
 
 
 const page = ({ params }) => {
@@ -34,6 +35,7 @@ const page = ({ params }) => {
   const [loading, setLoading] = useState(false);
   const [triggerEffect, setTriggerEffect] = useState(false);
   const [triggerDownload, setTriggerDownload] = useState(false)
+  const dispatch = useDispatch()
 
 
   console.log(data)
@@ -53,6 +55,10 @@ const page = ({ params }) => {
 
   const userDetails = useSelector(
     (state: RootState) => state.user.details
+  );
+
+  const fileUploadComplete = useSelector(
+    (state: RootState) => state.FileUploadComplete.account
   );
 
   console.log(userDetails?.primaryEmailAddress?.emailAddress)
@@ -84,6 +90,7 @@ const page = ({ params }) => {
 
   useEffect(() => {
     const fetchFileDetails = async () => {
+      dispatch(setFileUploadComplete(false))
       setDownloading(false)
       setViewing(false)
       try {
@@ -124,7 +131,7 @@ const page = ({ params }) => {
     };
 
     fetchFileDetails();
-  }, [downloading, viewing]);
+  }, [downloading, viewing, fileUploadComplete]);
 
 
   console.log(token)
@@ -511,6 +518,8 @@ const page = ({ params }) => {
     const detail = countDetails.find(detail => detail.cid === cid);
     return detail ? detail.views : 0;
   };
+
+  console.log(fileUploadComplete)
 
 
   return (

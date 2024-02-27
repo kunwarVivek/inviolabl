@@ -11,7 +11,7 @@ import { TruncatedWalletAddress } from "./TruncateFunction";
 import { cn } from "@/lib/utils";
 import { usePathname, useSearchParams } from "next/navigation";
 import { clearUser, setUser } from "@/features/LoginSlice";
-import { OrganizationSwitcher, SignInButton, SignedIn, SignedOut, UserButton, useAuth, useClerk, useUser } from "@clerk/nextjs";
+import { OrganizationSwitcher, SignInButton, SignedIn, SignedOut, UserButton, useAuth, useClerk, useOrganization, useUser } from "@clerk/nextjs";
 import MagicBell, { FloatingNotificationInbox } from '@magicbell/magicbell-react';
 import { ethers } from "ethers";
 import { setAccount } from "@/features/PrivySlice";
@@ -26,6 +26,10 @@ const Header = ({ className }: any) => {
   const pathname = usePathname();
   const { signOut } = useClerk();
   const dispatch = useDispatch();
+  const {
+    organization: currentOrganization,
+  } = useOrganization();
+  
 
   console.log(signOut)
 
