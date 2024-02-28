@@ -10,8 +10,11 @@ import { OrganizationList, OrganizationProfile, currentUser, useOrganization, us
 import InvitationList from '@/components/InvitationList';
 import MemberList from '@/components/MemberList';
 import axios from 'axios';
+import MagicBellClient, { Notification } from '@magicbell/core';
+
 
 export default function Page() {
+  MagicBellClient.configure({ apiKey: '644b158683d2a357dc593625a99be3edc344a6fe', apiSecret: '8zQx0ykxUj89n9A7G6CmY5U+lcsjqNsqe7e/3VE0' });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { organization } = useOrganization();
   const [emailAddress, setEmailAddress] = useState('');
@@ -47,13 +50,18 @@ export default function Page() {
     try {
       const inviteData = {
         emailAddress: emailAddress,
-        organizationId: organization.id,
+        organizationId: organization.id,  
         inviterUserId: user.id,
         role: role,
         redirectUrl: `https://alpha.inviolabl.io/organization/${organization.name}/dashboard`
       };
       const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/clerk/invite-user`, inviteData);
       console.log(response.data.message);
+      const not = Notification.create({
+        title: `Invitation to join ${organization.name}`,
+        content: `You are invited to join the ${organization.name} organization by ${user?.primaryEmailAddress}.`,
+        recipients: [{ email: emailAddress }],
+      });
       setEmailAddress('');
       setRole('basic_member');
     } catch (error) {
@@ -65,7 +73,7 @@ export default function Page() {
 
   console.log(invitationList)
 
-  
+
 
 
   return (
@@ -76,7 +84,7 @@ export default function Page() {
         {/* <ShareModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSend={sendInvite} /> */}
         <div className="flex items-center gap-3 bg-white">
           <h1 className="text-xl font-bold mt-14 pl-10 py-5 w-full bg-slate-100">Invite</h1>
-        </div>
+        </div>  
         <div className='p-10'>
           <form onSubmit={onSubmit}>
             <div className='flex items-center border-b border-gray-500 py-2 mb-5 mt-5 px-2'>

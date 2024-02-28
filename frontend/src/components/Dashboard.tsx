@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Header from "./Header";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FileUpload from "./FileUpload";
 import {
   ArrowUpCircleIcon,
@@ -25,6 +25,16 @@ const Dashboard = ({ children }) => {
     membership,
     isLoaded,
   } = useOrganization();
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      router.replace(`https://alpha.inviolabl.io/organization/${currentOrganization?.name}/dashboard`)
+    };
+    handleScroll()
+  }, [currentOrganization?.name]);
+
 
   const isAdmin = membership?.role === "admin";
 
@@ -113,8 +123,8 @@ const Dashboard = ({ children }) => {
 
             {isSidebarOpen && transitionComplete && (
               <Link
-                href={`/organization/${organization?.name}/dashboard`}
-                className={`block p-2 px-4 text-sm rounded-[100px] transition duration-200 font-semibold  ${isActive(`/organization/${organization?.name}/dashboard`)
+                href={`/organization/${currentOrganization?.name}/dashboard`}
+                className={`block p-2 px-4 text-sm rounded-[100px] transition duration-200 font-semibold  ${isActive(`/organization/${currentOrganization?.name}/dashboard`)
                   ? "bg-[#c1acff] text-black"
                   : "hover:bg-gray-300"
                   }  `}
@@ -131,7 +141,7 @@ const Dashboard = ({ children }) => {
               </Link>
             )}  {!isSidebarOpen && (
               <Link
-                href={organization ? `/organization/${organization?.name}/dashboard` : "/dashboard"}>
+                href={organization ? `/organization/${currentOrganization?.name}/dashboard` : "/dashboard"}>
                 <img
                   src="https://cdn-icons-png.flaticon.com/512/1828/1828765.png"
                   width={20}
@@ -168,7 +178,7 @@ const Dashboard = ({ children }) => {
                   : "hover:bg-gray-300"
                   } `}
               >
-                <div className={`flex items-center `}>
+                <div className={`flex items-center `}>  
                 <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 512 512"><path d="M336 352c97.2 0 176-78.8 176-176S433.2 0 336 0S160 78.8 160 176c0 18.7 2.9 36.8 8.3 53.7L7 391c-4.5 4.5-7 10.6-7 17v80c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V448h40c13.3 0 24-10.7 24-24V384h40c6.4 0 12.5-2.5 17-7l33.3-33.3c16.9 5.4 35 8.3 53.7 8.3zM376 96a40 40 0 1 1 0 80 40 40 0 1 1 0-80z" /></svg>
                   
 
