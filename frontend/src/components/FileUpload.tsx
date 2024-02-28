@@ -256,12 +256,14 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
         `Decrypt at https://decrypt.mesh3.network/evm/${output.data[0].Hash}`
       )
       await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/counts/${output.data[0].Hash}`)
-      toast.info('File Uploading to filecoin - Processing...', {
+      toast.info('File uploaded successfully', {
         position: toast.POSITION.BOTTOM_RIGHT,
       });
       dispatch(setFileUploadComplete(true))
     } catch (error) {
       console.error("Error uploading encrypted file:", error)
+      dispatch(setFileUploadComplete(false))
+      toast.error("Error due to increase network activity at that time. Please try again.")
       throw new Error('File upload Error');
     } finally {
       setLoading(false);

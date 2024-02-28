@@ -6,7 +6,7 @@ import Dashboard from '@/components/Dashboard';
 import ShareTable from '@/components/ShareTable';
 import { ShareIcon } from '@heroicons/react/24/solid'
 import { ShareModal } from '@/components/ShareModal';
-import { currentUser, useOrganization, useUser } from '@clerk/nextjs';
+import { OrganizationList, OrganizationProfile, currentUser, useOrganization, useUser } from '@clerk/nextjs';
 import InvitationList from '@/components/InvitationList';
 import MemberList from '@/components/MemberList';
 import axios from 'axios';
