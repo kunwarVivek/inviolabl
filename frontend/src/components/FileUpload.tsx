@@ -42,6 +42,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
   const { userId, sessionId, getToken } = useAuth();
   const [alProvider, setAlProvider] = useState(null);
   const [signer, setSigner] = useState(null);
+  const [uploadFailed, setUploadFailed] = useState(false);
 
   const dispatch = useDispatch()
 
@@ -162,6 +163,8 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
   const uploadEncryptedFile = async (file) => {
     setFileName(file[0].name)
     setLoading(true);
+    setFiles(file)
+    setUploadFailed(false)
     const chainId = await embeddedWallet?.switchChain(11155111);
     const eip1193provider = await embeddedWallet?.getEthereumProvider();
     const organizationPolicy = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/organizations/name/${currentOrganization.id}`)
@@ -233,7 +236,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       });
 
       console.log(tx);
-    
+
       const output = await lighthouse.uploadEncrypted(
         file,
         lightapi,
@@ -260,14 +263,16 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
         position: toast.POSITION.BOTTOM_RIGHT,
       });
       dispatch(setFileUploadComplete(true))
+      setIsModalOpen(false);
     } catch (error) {
       console.error("Error uploading encrypted file:", error)
-      dispatch(setFileUploadComplete(false))
       toast.error("Error due to increase network activity at that time. Please try again.")
+      dispatch(setFileUploadComplete(false))
+      setUploadFailed(true)
       throw new Error('File upload Error');
     } finally {
       setLoading(false);
-      setIsModalOpen(false);
+      // setIsModalOpen(false);
       setFileName("No File selected")
       setFileSize(null)
 
@@ -387,8 +392,8 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
   };
 
   const closeModal = () => {
-    if(loading){
-    setIsModalOpen(true);
+    if (loading) {
+      setIsModalOpen(true);
     } else {
       setIsModalOpen(false)
     }
@@ -453,6 +458,17 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
                       <span className="flex justify-center items-center font-semibold text-black">
                         File: {fileName}
                       </span>
+                      {uploadFailed && (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            uploadEncryptedFile(files);
+                          }}
+                          className="mt-5 w-full py-2 flex justify-center text-white items-center bg-red-500 hover:shadow-xl hover:bg-red-600 rounded-md px-4 text-sm font-semibold"
+                        >
+                          Retry Upload
+                        </button>
+                      )}
 
                       {/* <button
           type="submit"
