@@ -24,6 +24,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { usePrivyWagmi } from "@privy-io/wagmi-connector";
 import MagicBellClient, { Notification } from '@magicbell/core';
 import { setFileUploadComplete } from "@/features/FileUploadCompleteSlice";
+import { useRouter } from "next/navigation";
 
 
 const page = ({ params }) => {
@@ -43,8 +44,18 @@ const page = ({ params }) => {
   const { signMessage } = usePrivy();
   const { userId, sessionId, getToken } = useAuth();
 
+  const {
+    organization: currentOrganization,
+  } = useOrganization();
 
+  const router = useRouter();
 
+  useEffect(() => {
+    const handleScroll = () => {
+      router.replace(`https://alpha.inviolabl.io/organization/${currentOrganization?.name}/dashboard`)
+    };
+    handleScroll()
+  }, [currentOrganization]);
 
   const PrivyAccount = useSelector(
     (state: RootState) => state.privy.account
@@ -358,9 +369,6 @@ const page = ({ params }) => {
     setFileURL(url)
   }
 
-  const {
-    organization: currentOrganization,
-  } = useOrganization();
 
   const downloadFile = async (cid, path, type) => {
     const eip1193provider = await embeddedWallet?.getEthereumProvider();

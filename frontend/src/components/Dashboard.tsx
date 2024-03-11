@@ -14,7 +14,7 @@ import {
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useSession } from "next-auth/react";
-import { useOrganization } from "@clerk/nextjs";
+import { useOrganization, useOrganizationList } from "@clerk/nextjs";
 
 const Dashboard = ({ children }) => {
   const pathname = usePathname();
@@ -28,13 +28,12 @@ const Dashboard = ({ children }) => {
 
   const router = useRouter();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      router.replace(`https://alpha.inviolabl.io/organization/${currentOrganization?.name}/dashboard`)
-    };
-    handleScroll()
-  }, [currentOrganization?.name]);
-
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     router.replace(`http://localhost:3000/organization/${currentOrganization?.name}/dashboard`)
+  //   };
+  //   handleScroll()
+  // }, [currentOrganization]);
 
   const isAdmin = membership?.role === "admin";
 
@@ -57,7 +56,7 @@ const Dashboard = ({ children }) => {
   // Function to toggle sidebar
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
-    setTransitionComplete(false); // Reset transition state when toggling
+    setTransitionComplete(false); 
   };
 
   // Handle the end of the sidebar transition
@@ -152,7 +151,7 @@ const Dashboard = ({ children }) => {
             )}
             {isSidebarOpen && transitionComplete && isAdmin && (
               <Link
-                href={organization ? `/organization/${organization?.name}/sharepage` : "/admin/sharepage"}
+                href={organization ? `/organization/${currentOrganization?.name}/sharepage` : "/admin/sharepage"}
                 className={`block p-2 px-4 text-sm rounded-[100px] transition duration-200 font-semibold  ${isActive(`/organization/${organization?.name}/sharepage`)
                   ? "bg-[#c1acff] text-black"
                   : "hover:bg-gray-300"
@@ -166,7 +165,7 @@ const Dashboard = ({ children }) => {
               </Link>
             )}  {!isSidebarOpen && isAdmin && (
               <Link
-                href={organization ? `/organization/${organization?.name}/sharepage` : "/admin/sharepage"}>
+                href={organization ? `/organization/${currentOrganization?.name}/sharepage` : "/admin/sharepage"}>
                 <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 512 512"><path d="M215.4 96H144 107.8 96v8.8V144v40.4 89L.2 202.5c1.6-18.1 10.9-34.9 25.7-45.8L48 140.3V96c0-26.5 21.5-48 48-48h76.6l49.9-36.9C232.2 3.9 243.9 0 256 0s23.8 3.9 33.5 11L339.4 48H416c26.5 0 48 21.5 48 48v44.3l22.1 16.4c14.8 10.9 24.1 27.7 25.7 45.8L416 273.4v-89V144 104.8 96H404.2 368 296.6 215.4zM0 448V242.1L217.6 403.3c11.1 8.2 24.6 12.7 38.4 12.7s27.3-4.4 38.4-12.7L512 242.1V448v0c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64v0zM176 160H336c8.8 0 16 7.2 16 16s-7.2 16-16 16H176c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H336c8.8 0 16 7.2 16 16s-7.2 16-16 16H176c-8.8 0-16-7.2-16-16s7.2-16 16-16z" /></svg>
               </Link>
             )}
