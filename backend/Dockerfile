@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package.json yarn.lock ./
 
 # Install dependencies
-RUN yarn install --flat --frozen-lockfile
+RUN yarn install 
 
 # Copy the rest of your app's source code
 COPY . ./
@@ -21,7 +21,7 @@ WORKDIR /app
 COPY package.json yarn.lock ./
 
 # Install only production dependencies
-RUN yarn install --prod --flat --frozen-lockfile
+RUN yarn install 
 
 # Stage 3: Run the application
 FROM node:lts-alpine
