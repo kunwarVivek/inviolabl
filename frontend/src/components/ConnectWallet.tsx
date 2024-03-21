@@ -28,7 +28,7 @@ const ConnectWallet = () => {
       router.push("/wallet");
     }
   };
-  const isWalletConnected = typeof window !== "undefined" && window.ethereum && window.ethereum.selectedAddress;
+  // const isWalletConnected = typeof window !== "undefined" && window.ethereum && window.ethereum.selectedAddress;
 
   
 

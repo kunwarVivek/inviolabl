@@ -21,9 +21,9 @@ import { WalletClientSigner, type SmartAccountSigner } from "@alchemy/aa-core";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { createWalletClient, custom } from "viem";
 import { baseGoerli, baseSepolia, sepolia } from "viem/chains";
-import { useWalletClient } from "wagmi";
-import NftHome from "./Minting";
-import { WalletContextProvider, useWalletContext } from "@/context/wallet";
+// import { useWalletClient } from "wagmi";
+// import NftHome from "./Minting";
+// import { WalletContextProvider, useWalletContext } from "@/context/wallet";
 import Provider from "@/app/context/client-provider";
 import { setFileUploadComplete } from "@/features/FileUploadCompleteSlice";
 

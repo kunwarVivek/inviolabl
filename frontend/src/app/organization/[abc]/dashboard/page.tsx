@@ -21,7 +21,7 @@ import { createWalletClient, custom, encodeFunctionData } from "viem";
 import { baseSepolia, hardhat, sepolia } from "viem/chains";
 import Link from "next/link";
 import { Dialog, Transition } from "@headlessui/react";
-import { usePrivyWagmi } from "@privy-io/wagmi-connector";
+// import { usePrivyWagmi } from "@privy-io/wagmi-connector";
 import MagicBellClient, { Notification } from '@magicbell/core';
 import { setFileUploadComplete } from "@/features/FileUploadCompleteSlice";
 import { useRouter } from "next/navigation";
