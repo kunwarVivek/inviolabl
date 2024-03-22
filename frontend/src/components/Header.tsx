@@ -19,7 +19,7 @@ import { useWallets } from "@privy-io/react-auth";
 
 
 const Header = ({ className }: any) => {
-
+  
   const [userEmail, setUserEmail] = useState('')
   const { data: session, status } = useSession();
   const { isLoaded, userId, sessionId, getToken } = useAuth();
@@ -322,6 +322,7 @@ const Header = ({ className }: any) => {
                 {...props}
               />
             )}
+            
           </MagicBell>}
 
 
