@@ -3,19 +3,18 @@ import { NextResponse } from "next/server";
 export function middleware(request) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const cspHeader = `
-    default-src *;
-    script-src 'self' https://clerk.inviolabl.io https://explorer-api.walletconnect.com https://challenges.cloudflare.com 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval' https: http: 'unsafe-inline' ${
-    process.env.NODE_ENV === "production" ? "" : `'unsafe-eval'`
-  };
-    style-src 'self' 'unsafe-inline' 'unsafe-eval';
-    font-src 'self';
-    object-src 'none';
-    base-uri 'self';
-    img-src * blob: data:;
-    form-action 'self';
-    frame-ancestors 'none';
-    connect-src * https://auth.privy.io wss://relay.walletconnect.com wss://relay.walletconnect.org wss://www.walletlink.org https://*.infura.io https://*.blastapi.io;
-    frame-src https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org https://challenges.cloudflare.com https://clerk.inviolabl.io;
+    default-src * data: blob: 'unsafe-inline' 'unsafe-eval';
+    script-src * data: blob: 'unsafe-inline' 'unsafe-eval';
+    connect-src * data: blob: 'unsafe-inline' 'unsafe-eval' ipc://*;
+    img-src * data: blob: 'unsafe-inline' 'unsafe-eval';
+    frame-src * data: blob: 'unsafe-inline' 'unsafe-eval';
+    style-src * data: blob: 'unsafe-inline' 'unsafe-eval';
+    font-src * data: blob: 'unsafe-inline' 'unsafe-eval';
+    object-src * data: blob: 'unsafe-inline' 'unsafe-eval';
+    media-src * data: blob: 'unsafe-inline' 'unsafe-eval';
+    child-src * data: blob: 'unsafe-inline' 'unsafe-eval';
+    form-action * data: blob: 'unsafe-inline' 'unsafe-eval';
+    worker-src * data: blob: 'unsafe-inline' 'unsafe-eval';
 `;
   // Replace newline characters and spaces
   const contentSecurityPolicyHeaderValue = cspHeader
