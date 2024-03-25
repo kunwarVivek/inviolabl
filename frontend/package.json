@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "@alch/alchemy-web3": "^1.4.7",
-    "@alchemy/aa-accounts": "^3.6.1",
-    "@alchemy/aa-alchemy": "^3.6.1",
-    "@alchemy/aa-core": "^3.6.1",
+    "@alchemy/aa-accounts": "^1.2.4",
+    "@alchemy/aa-alchemy": "^1.2.4",
+    "@alchemy/aa-core": "^1.2.4",
     "@auth0/auth0-react": "^2.2.4",
     "@clerk/nextjs": "^4.29.9",
     "@headlessui/react": "^1.7.18",
