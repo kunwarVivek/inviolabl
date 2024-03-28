@@ -19,9 +19,6 @@ RUN npm run build
 # Stage 2: Run the application
 FROM node:lts-alpine
 
-# Set working directory
-WORKDIR /app
-
 # Copy built assets from the builder stage
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
