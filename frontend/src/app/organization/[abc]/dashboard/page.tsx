@@ -52,7 +52,7 @@ const page = ({ params }) => {
 
   useEffect(() => {
     const handleScroll = () => {
-      router.replace(`https://alpha.inviolabl.io/organization/${currentOrganization?.name}/dashboard`)
+      router.replace(`http://localhost:3000/organization/${currentOrganization?.name}/dashboard`)
     };
     handleScroll()
   }, [currentOrganization]);
@@ -529,6 +529,13 @@ const page = ({ params }) => {
 
   console.log(fileUploadComplete)
 
+  const [validUser, setValidUser] = useState(true);
+
+  const validateSelectedEmail = () => {
+    const isValidUser = privyUsers.some(user => user?.email?.address === selectedEmail);
+    setValidUser(isValidUser);
+  };
+
 
   return (
 
@@ -669,7 +676,8 @@ const page = ({ params }) => {
                             type="text"
                             className="appearance-none bg-transparent p-2 border-none w-full text-gray-700 mr-3 leading-tight focus:outline-none"
                             value={selectedEmail}
-                            onChange={(e) => setSelectedEmail(e.target.value)}
+                            onChange={(e) => {setSelectedEmail(e.target.value); setValidUser(true);}}
+                            onBlur={validateSelectedEmail}
                             list="emailList"
                             placeholder="Enter email address"
                             onClick={(e) => e.stopPropagation()}
@@ -682,8 +690,9 @@ const page = ({ params }) => {
                             </datalist>
                           )}
                         </div>
+                        {!validUser && <span className="text-red-500 text-sm font-semibold">Please choose an email address from the list.</span>}
                         <button
-                          disabled={!selectedEmail}
+                          disabled={!selectedEmail || !validUser}
                           onClick={() => shareFile(cidHash)}
                           className="py-2 mt-5 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold">
                           <span>Share</span>
