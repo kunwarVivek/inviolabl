@@ -52,7 +52,7 @@ const page = ({ params }) => {
 
   useEffect(() => {
     const handleScroll = () => {
-      router.replace(`https://alpha.inviolabl.io/organization/${currentOrganization?.name}/dashboard`)
+      router.replace(`http://localhost:3000/organization/${currentOrganization?.name}/dashboard`)
     };
     handleScroll()
   }, [currentOrganization]);
@@ -467,7 +467,7 @@ const page = ({ params }) => {
   };
 
 
-
+console.log(privyUsers)
 
   console.log(selectedEmail)
 
@@ -478,7 +478,7 @@ const page = ({ params }) => {
       const publicKey = embeddedWallet.address
       const messageRequested = (await lighthouse.getAuthMessage(embeddedWallet.address)).data.message
       const signedMessage = await signMessage(messageRequested, uiConfig);
-      const user = privyUsers.find(user => user.email.address == selectedEmail);
+      const user = privyUsers.find(user => user?.custom?.customUserId == selectedEmail);
       console.log(user)
 
       const publicKeyUserB = [user.wallet.address]
@@ -532,11 +532,11 @@ const page = ({ params }) => {
   const [validUser, setValidUser] = useState(true);
 
   const validateSelectedEmail = () => {
-    const isValidUser = privyUsers.some(user => user?.email?.address === selectedEmail);
+    const isValidUser = privyUsers.some(user => user?.custom?.customUserId === selectedEmail);
     setValidUser(isValidUser);
   };
 
-
+  
   return (
 
     <div className="bg-white min-h-screen">
@@ -685,7 +685,7 @@ const page = ({ params }) => {
                           {selectedEmail?.length > 0 && (
                             <datalist id="emailList">
                               {privyUsers.map(user => (
-                                <option key={user?.id} value={user?.email?.address} />
+                                <option key={user?.id} value={user?.custom?.customUserId} />
                               ))}
                             </datalist>
                           )}
