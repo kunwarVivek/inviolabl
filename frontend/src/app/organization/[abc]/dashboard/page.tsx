@@ -52,7 +52,7 @@ const page = ({ params }) => {
 
   useEffect(() => {
     const handleScroll = () => {
-      router.replace(`http://localhost:3000/organization/${currentOrganization?.name}/dashboard`)
+      router.replace(`https://alpha.inviolabl.io/organization/${currentOrganization?.name}/dashboard`)
     };
     handleScroll()
   }, [currentOrganization]);
@@ -467,7 +467,7 @@ const page = ({ params }) => {
   };
 
 
-console.log(privyUsers)
+
 
   console.log(selectedEmail)
 
