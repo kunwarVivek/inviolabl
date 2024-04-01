@@ -536,7 +536,7 @@ const page = ({ params }) => {
     setValidUser(isValidUser);
   };
 
-  
+
   return (
 
     <div className="bg-white min-h-screen">
@@ -545,7 +545,7 @@ const page = ({ params }) => {
           <table className="min-w-full bg-white ">
             <thead className="bg-white text-black ">
               <tr>
-                <th colSpan={5} className="py-2">
+                <th colSpan={6} className="py-2">
                   <div className="pl-10 py-5 bg-slate-100 text-start space-x-4 mt-14 mb-2">
                     <span className="font-semibold text-xl">File History</span>
                   </div>
@@ -604,6 +604,11 @@ const page = ({ params }) => {
                 >
                   UPLOADED BY
                 </th> */}
+                <th
+                  className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                >
+                  ACTION
+                </th>
 
               </tr>
             </thead>
@@ -626,10 +631,7 @@ const page = ({ params }) => {
                         <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z" />
                       </svg>
                     </button>
-                    <button onClick={() => { openModal(); setCidHash(file.cid) }} className="ml-2 hover:text-blue-500">
-                      <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 448 512">
-                        <path d="M352 224c53 0 96-43 96-96s-43-96-96-96s-96 43-96 96c0 4 .2 8 .7 11.9l-94.1 47C145.4 170.2 121.9 160 96 160c-53 0-96 43-96 96s43 96 96 96c25.9 0 49.4-10.2 66.6-26.9l94.1 47c-.5 3.9-.7 7.8-.7 11.9c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-25.9 0-49.4 10.2-66.6 26.9l-94.1-47c.5-3.9 .7-7.8 .7-11.9s-.2-8-.7-11.9l94.1-47C302.6 213.8 326.1 224 352 224z" /></svg>
-                    </button>
+
 
 
                   </td>
@@ -637,6 +639,9 @@ const page = ({ params }) => {
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{userDetails?.primaryEmailAddress?.emailAddress}</td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getViewCount(file.cid)}</td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getDownloadCount(file.cid)}</td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"> <button onClick={() => { openModal(); setCidHash(file.cid) }} className="ml-2 hover:text-blue-500 hover:underline">
+                    Share
+                  </button></td>
 
                 </tr>
               ))}
@@ -676,7 +681,7 @@ const page = ({ params }) => {
                             type="text"
                             className="appearance-none bg-transparent p-2 border-none w-full text-gray-700 mr-3 leading-tight focus:outline-none"
                             value={selectedEmail}
-                            onChange={(e) => {setSelectedEmail(e.target.value); setValidUser(true);}}
+                            onChange={(e) => { setSelectedEmail(e.target.value); setValidUser(true); }}
                             onBlur={validateSelectedEmail}
                             list="emailList"
                             placeholder="Enter email address"

@@ -469,6 +469,16 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
                           Retry Upload
                         </button>
                       )}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setFiles([]);
+                          setIsModalOpen(false);
+                        }}
+                        className="mt-5 w-full py-2 flex justify-center text-white items-center bg-gray-500 hover:shadow-xl hover:bg-gray-600 rounded-md px-4 text-sm font-semibold"
+                      >
+                        Cancel
+                      </button>
 
                       {/* <button
           type="submit"
