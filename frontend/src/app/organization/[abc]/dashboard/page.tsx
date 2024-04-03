@@ -509,6 +509,8 @@ const page = ({ params }) => {
 
   const closeModal = () => {
     setIsModalOpen(false);
+    setSelectedEmail("")
+    setValidUser(false)
   };
 
   const openModal = () => {
