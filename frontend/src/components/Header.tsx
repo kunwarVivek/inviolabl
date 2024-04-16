@@ -117,13 +117,13 @@ const Header = ({ className }: any) => {
             </Link>
           )}
           <ConnectWallet />
-          {sessionId && (
+          {/* {sessionId && (
             <Link href={"/organization"}>
               <span className="py-[5.5px] px-4 mb-4 text-white text-sm bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 font-semibold rounded-md">
                 Organization
               </span>
             </Link>
-          )}
+          )} */}
           <OrganizationSwitcher hidePersonal={true} />
           {/* {!sessionId && (
             <Link href={"/organization"}>
