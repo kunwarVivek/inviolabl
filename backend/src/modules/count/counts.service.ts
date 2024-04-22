@@ -33,11 +33,12 @@ export class CountsService {
     }
   }
 
-  async createCountWithInitialCounts(cid: string): Promise<void> {
+  async createCountWithInitialCounts(cid: string, email:string): Promise<void> {
     const count = new Count();
     count.cid = cid;
     count.views = 0;
     count.downloads = 0;
+    count.email = email;
     await this.countsRepository.save(count);
   }
 

@@ -22,7 +22,7 @@ const Header = ({ className }: any) => {
   
   const [userEmail, setUserEmail] = useState('')
   const { data: session, status } = useSession();
-  const { isLoaded, userId, sessionId, getToken } = useAuth();
+  const { isLoaded, userId, sessionId, getToken, orgId } = useAuth();
   const pathname = usePathname();
   const { signOut } = useClerk();
   const dispatch = useDispatch();
@@ -32,6 +32,9 @@ const Header = ({ className }: any) => {
   } = useOrganization();
 
   const { organization } = useOrganization();
+
+  console.log(currentOrganization)
+  console.log(orgId)
 
   const isAdmin = membership?.role === "admin";
 
@@ -114,7 +117,6 @@ const Header = ({ className }: any) => {
           {sessionId && <Link href={"/organization"}>
             <span className="py-[5.5px] px-4 mb-4 text-white text-sm bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 font-semibold rounded-md">Organization</span>
           </Link>}
-          <OrganizationSwitcher hidePersonal={true} />
           {!sessionId && <Link href={"/organization"}>
             <span className="py-[5.5px] px-4 mb-4 text-white text-sm bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 font-semibold rounded-md">Try it free</span>
           </Link>}

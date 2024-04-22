@@ -27,7 +27,7 @@ import { setFileUploadComplete } from "@/features/FileUploadCompleteSlice";
 import { useRouter } from "next/navigation";
 
 
-const page = ({ params }) => {
+const page = () => {
   MagicBellClient.configure({ apiKey: '644b158683d2a357dc593625a99be3edc344a6fe', apiSecret: '8zQx0ykxUj89n9A7G6CmY5U+lcsjqNsqe7e/3VE0' });
   const [fileDetails, setFileDetails] = useState(null);
   const [account, setAccount] = useState("");
@@ -107,7 +107,7 @@ const page = ({ params }) => {
       try {
         const token = await getToken()
         setToken(token)
-        const response = await lighthouse.getUploads("87ea616b.7316eb2b3fad435f9e5618aca682acb8")
+        const response = await lighthouse.getUploads('87ea616b.7316eb2b3fad435f9e5618aca682acb8')
         console.log(response)
         setFileDetails(response.data.fileList)
 
@@ -519,6 +519,11 @@ const page = ({ params }) => {
 
   const [cidHash, setCidHash] = useState("")
 
+  const getUploadedBy = (cid) => {
+    const detail = countDetails.find(detail=>detail.cid === cid);
+    return detail ? detail.email : userDetails?.primaryEmailAddress?.emailAddress;
+  }
+
   const getDownloadCount = (cid) => {
     const detail = countDetails.find(detail => detail.cid === cid);
     return detail ? detail.downloads : 0;
@@ -620,7 +625,7 @@ const page = ({ params }) => {
 
 
                 <tr key={index}>
-                  <td className="px-5 py-5 pl-10 border-b flex border-gray-200 bg-white text-sm">
+                  <td className="px-5 py-5 pl-10 border-b border-gray-200 bg-white text-sm">
                     <button
 
                       onClick={() => handleFileClick(file.cid, file.mimeType)}
@@ -638,10 +643,10 @@ const page = ({ params }) => {
 
                   </td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.fileSizeInBytes}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{userDetails?.primaryEmailAddress?.emailAddress}</td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getUploadedBy(file.cid)}</td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getViewCount(file.cid)}</td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getDownloadCount(file.cid)}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"> <button onClick={() => { openModal(); setCidHash(file.cid) }} className="ml-2 hover:text-blue-500 hover:underline">
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"> <button onClick={() => { openModal(); setCidHash(file.cid) }} className="py-2 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold">
                     Share
                   </button></td>
 

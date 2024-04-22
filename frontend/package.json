@@ -17,7 +17,7 @@
     "@clerk/nextjs": "^4.29.9",
     "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",
-    "@lighthouse-web3/sdk": "^0.3.0",
+    "@lighthouse-web3/sdk": "^0.3.2",
     "@magicbell/core": "^5.0.12",
     "@magicbell/magicbell-react": "^10.9.10",
     "@prisma/client": "^5.11.0",

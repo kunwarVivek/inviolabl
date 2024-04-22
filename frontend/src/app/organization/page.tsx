@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useAuth, useSessionList, useUser } from "@clerk/nextjs";
+import { useAuth, useOrganization, useOrganizationList, useSessionList, useUser } from "@clerk/nextjs";
 import { useDispatch } from "react-redux";
 import { updateUserFromResponse } from "@/features/LoginSlice";
 import OrganizationList from "@/components/OrganizationList";
@@ -17,11 +17,26 @@ import { useSession } from "next-auth/react";
 
 export default function Home() {
 
-   const dispatch = useDispatch();
+    const dispatch = useDispatch();
 
-    const {  userId, sessionId, getToken } = useAuth();
+    const { userId, sessionId, getToken, orgId } = useAuth();
     console.log(sessionId, userId, getToken)
-    
+
+    const {
+        organization: currentOrganization,
+        membership
+    } = useOrganization();
+
+    const organization = useOrganization()
+
+    const usermemberships = useOrganizationList()
+
+    console.log(currentOrganization)
+    console.log(orgId)
+    console.log(organization.organization)
+
+    const isAdmin = membership?.role === "admin";
+
 
     // const registerUser = async () => {
     //     try {
@@ -97,7 +112,7 @@ export default function Home() {
             });
     }
 
-    
+
 
 
     return (
@@ -123,7 +138,7 @@ export default function Home() {
                 </div>
                 <div className="">
                     {/* <CreateOrganization routing="path" path="/organization" afterCreateOrganizationUrl=":slug" /> */}
-                    <CreateOrganization />
+                    {organization.organization == null && <CreateOrganization />}
                     <div className="mt-10">
                         <OrganizationList />
                     </div>

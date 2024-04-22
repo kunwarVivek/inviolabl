@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseInterceptors } from '@nestjs/common';
 import { CountsService } from './counts.service';
 import { Count } from './count.entity';
 import { SentryInterceptor } from '../../interceptors/sentry-interceptor.service';
@@ -34,10 +34,10 @@ export class CountsController {
   }
 
   @Post(':cid')
-  async createCount(@Param('cid') cid: string): Promise<void> {
+  async createCount(@Param('cid') cid: string, @Body('email') email:string): Promise<void> {
     const existingCount = await this.countsService.getByCID(cid);
     if (!existingCount) {
-      await this.countsService.createCountWithInitialCounts(cid);
+      await this.countsService.createCountWithInitialCounts(cid, email);
     }
   }
 }

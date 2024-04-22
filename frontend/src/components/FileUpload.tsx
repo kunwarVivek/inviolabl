@@ -160,6 +160,10 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
   //   }
   // };
 
+  const { isLoaded, isSignedIn, user } = useUser();
+  console.log(user?.primaryEmailAddress.emailAddress)
+
+
   const uploadEncryptedFile = async (file) => {
     setFileName(file[0].name)
     setLoading(true);
@@ -258,7 +262,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       console.log(
         `Decrypt at https://decrypt.mesh3.network/evm/${output.data[0].Hash}`
       )
-      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/counts/${output.data[0].Hash}`)
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/counts/${output.data[0].Hash}`, { email: user?.primaryEmailAddress.emailAddress })
       toast.info('File uploaded successfully', {
         position: toast.POSITION.BOTTOM_RIGHT,
       });
@@ -278,10 +282,6 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
 
     }
   }
-
-
-  const { isLoaded, isSignedIn, user } = useUser();
-  console.log(user?.primaryEmailAddress.emailAddress)
 
   const {
     organization: currentOrganization,

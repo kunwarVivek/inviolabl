@@ -13,4 +13,8 @@ export class Count {
 
   @Column({ default: 0 })
   downloads!: number;
+
+  @Column()
+  email!: string;
+
 }
