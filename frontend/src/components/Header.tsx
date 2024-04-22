@@ -1,35 +1,38 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import ConnectWallet from "./ConnectWallet";
-import { signOut, useSession } from "next-auth/react";
-import Image from "next/image";
-import Link from "next/link";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-import { Menu, Transition } from "@headlessui/react"; // If using Headless UI
-import { TruncatedWalletAddress } from "./TruncateFunction";
-import { cn } from "@/lib/utils";
-import { usePathname, useSearchParams } from "next/navigation";
-import { clearUser, setUser } from "@/features/LoginSlice";
-import { OrganizationProfile, OrganizationSwitcher, SignInButton, SignedIn, SignedOut, UserButton, useAuth, useClerk, useOrganization, useUser } from "@clerk/nextjs";
-import MagicBell, { FloatingNotificationInbox } from '@magicbell/magicbell-react';
-import { ethers } from "ethers";
+import { setUser } from "@/features/LoginSlice";
 import { setAccount } from "@/features/PrivySlice";
+import { cn } from "@/lib/utils";
+import { RootState } from "@/store/store";
+import {
+  OrganizationSwitcher,
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+  useAuth,
+  useClerk,
+  useOrganization,
+  useUser,
+} from "@clerk/nextjs";
+import MagicBell, {
+  FloatingNotificationInbox,
+} from "@magicbell/magicbell-react";
 import { useWallets } from "@privy-io/react-auth";
-
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import ConnectWallet from "./ConnectWallet";
 
 const Header = ({ className }: any) => {
-  
-  const [userEmail, setUserEmail] = useState('')
+  const [userEmail, setUserEmail] = useState("");
   const { data: session, status } = useSession();
   const { isLoaded, userId, sessionId, getToken, orgId } = useAuth();
   const pathname = usePathname();
   const { signOut } = useClerk();
   const dispatch = useDispatch();
-  const {
-    organization: currentOrganization,
-    membership
-  } = useOrganization();
+  const { organization: currentOrganization, membership } = useOrganization();
 
   const { organization } = useOrganization();
 
@@ -38,15 +41,17 @@ const Header = ({ className }: any) => {
 
   const isAdmin = membership?.role === "admin";
 
-  console.log(signOut)
+  console.log(signOut);
 
   const { user } = useUser();
-  
-  console.log(user)
-  console.log(user?.primaryEmailAddress.emailAddress)
+
+  console.log(user);
+  console.log(user?.primaryEmailAddress.emailAddress);
 
   const { wallets } = useWallets();
-  const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
+  const embeddedWallet = wallets.find(
+    (wallet) => wallet.walletClientType === "privy"
+  );
 
   useEffect(() => {
     // Check if user exists before dispatching
@@ -54,10 +59,9 @@ const Header = ({ className }: any) => {
       dispatch(setUser(user));
     }
     if (embeddedWallet) {
-      dispatch(setAccount(embeddedWallet.address))
+      dispatch(setAccount(embeddedWallet.address));
     }
   }, [dispatch, user, embeddedWallet]);
-
 
   const MetaMaskAccount = useSelector(
     (state: RootState) => state.metaMask.account
@@ -65,21 +69,16 @@ const Header = ({ className }: any) => {
   const Logo = useSelector(
     (state: RootState) => state.organisationSettings.logo
   );
-  const tenantDetails = useSelector(
-    (state: RootState) => state.tenant.details
-  );
-  const userDetails = useSelector(
-    (state: RootState) => state.user.details
-  );
+  const tenantDetails = useSelector((state: RootState) => state.tenant.details);
+  const userDetails = useSelector((state: RootState) => state.user.details);
 
-  console.log(userDetails)
+  console.log(userDetails);
 
-  console.log(userDetails?.primaryEmailAddress.emailAddress)
+  console.log(userDetails?.primaryEmailAddress.emailAddress);
 
-
-
-  const isTenantIncluded = tenantDetails && pathname.includes(tenantDetails?.name);
-  console.log(isTenantIncluded)
+  const isTenantIncluded =
+    tenantDetails && pathname.includes(tenantDetails?.name);
+  console.log(isTenantIncluded);
 
   const [showCopied, setShowCopied] = useState(false);
   console.log(status, session);
@@ -109,10 +108,17 @@ const Header = ({ className }: any) => {
         </div>
 
         <div className="flex items-center space-x-4">
-          {status === "authenticated" && <Link href={isTenantIncluded ? `/${tenantDetails.name}/dashboard` : "/dashboard"}>
-
-            <span className="text-sm font-semibold">Dashboard</span>
-          </Link>}
+          {status === "authenticated" && (
+            <Link
+              href={
+                isTenantIncluded
+                  ? `/${tenantDetails.name}/dashboard`
+                  : "/dashboard"
+              }
+            >
+              <span className="text-sm font-semibold">Dashboard</span>
+            </Link>
+          )}
           <ConnectWallet />
           {sessionId && <Link href={"/organization"}>
             <span className="py-[5.5px] px-4 mb-4 text-white text-sm bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 font-semibold rounded-md">Organization</span>
@@ -308,25 +314,24 @@ const Header = ({ className }: any) => {
             </Menu>
           ) : <Link href={isTenantIncluded ? `/${tenantDetails.name}/signin` : "/signin"}><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 cursor-pointer fill-[#5f03de] hover:shadow-2xl hover:fill-[#8364e2]" viewBox="0 0 448 512"><path d="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z" /></svg></Link>} */}
 
-
-          {sessionId && <MagicBell
-            apiKey={'644b158683d2a357dc593625a99be3edc344a6fe'}
-            userEmail={userDetails?.primaryEmailAddress.emailAddress}
-            theme={{
-              icon: { borderColor: '#8B5CF6', },
-            }}
-          >
-            {(props) => (
-              <FloatingNotificationInbox
-                height={350}
-                placement="bottom-start"
-                closeOnClickOutside={true}
-                {...props}
-              />
-            )}
-            
-          </MagicBell>}
-
+          {sessionId && (
+            <MagicBell
+              apiKey={"644b158683d2a357dc593625a99be3edc344a6fe"}
+              userEmail={userDetails?.primaryEmailAddress.emailAddress}
+              theme={{
+                icon: { borderColor: "#8B5CF6" },
+              }}
+            >
+              {(props) => (
+                <FloatingNotificationInbox
+                  height={350}
+                  placement="bottom-start"
+                  closeOnClickOutside={true}
+                  {...props}
+                />
+              )}
+            </MagicBell>
+          )}
 
           <SignedIn>
             {/* Mount the UserButton component */}
