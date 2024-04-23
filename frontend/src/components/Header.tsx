@@ -24,8 +24,11 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ConnectWallet from "./ConnectWallet";
+import MagicBellClient, { Notification } from "@magicbell/core";
+
 
 const Header = ({ className }: any) => {
+  MagicBellClient.configure({ apiKey: '644b158683d2a357dc593625a99be3edc344a6fe', apiSecret: '8zQx0ykxUj89n9A7G6CmY5U+lcsjqNsqe7e/3VE0' });
   const [userEmail, setUserEmail] = useState("");
   const { data: session, status } = useSession();
   const { isLoaded, userId, sessionId, getToken, orgId } = useAuth();
@@ -119,7 +122,7 @@ const Header = ({ className }: any) => {
               <span className="text-sm font-semibold">Dashboard</span>
             </Link>
           )}
-          <ConnectWallet />
+          {/* <ConnectWallet /> */}
           {sessionId && <Link href={"/organization"}>
             <span className="py-[5.5px] px-4 mb-4 text-white text-sm bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 font-semibold rounded-md">Organization</span>
           </Link>}
