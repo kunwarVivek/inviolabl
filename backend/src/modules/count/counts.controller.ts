@@ -40,4 +40,10 @@ export class CountsController {
       await this.countsService.createCountWithInitialCounts(cid, email);
     }
   }
+
+  @Post(':cid/shared-emails')
+  async addSharedEmail(@Param('cid') cid: string, @Body('email') email: string): Promise<void> {
+    await this.countsService.addSharedEmail(cid, email);
+  }
+
 }

@@ -209,15 +209,26 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       return
     }
 
+    let preparing;
+    let uploading;  
     try {
       setIsModalOpen(true)
+      preparing = toast.info(
+        "Preparing to upload... Transaction is in process",
+        { autoClose: false }
+      );
       const encryptionAuth = await signAuthMessage()
       if (!encryptionAuth) {
         console.error("Failed to sign the message.")
         return
+
       }
 
+      toast.dismiss(preparing)
+
+
       const { signature, signerAddress } = encryptionAuth
+
 
       // const unsignedTx = {
       //   to: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
@@ -232,6 +243,10 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       // };
 
       // const txReceipt = await sendTransaction(unsignedTx, uiConfig);
+      uploading = toast.info(
+        "Uploading is in process...",
+        { autoClose: false }
+      );
 
 
       const tx = await provider.sendTransaction({
@@ -240,6 +255,8 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       });
 
       console.log(tx);
+
+
 
       const output = await lighthouse.uploadEncrypted(
         file,
@@ -259,6 +276,8 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
         }
       */
       // If successful, log the URL for accessing the file
+      toast.dismiss(uploading)
+
       console.log(
         `Decrypt at https://decrypt.mesh3.network/evm/${output.data[0].Hash}`
       )
@@ -270,6 +289,8 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error uploading encrypted file:", error)
+      toast.dismiss(preparing);
+      toast.dismiss(uploading);
       toast.error("Error due to increase network activity at that time. Please try again.")
       dispatch(setFileUploadComplete(false))
       setUploadFailed(true)
@@ -442,7 +463,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
                         htmlFor="file-upload"
                         className="mb-5 cursor-pointer py-2 flex justify-center text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold"
                       >
-                        {loading ? "Uploading..." : "Choose File"}
+                        {loading ? "It will be a long running process, please have patience.." : "Choose File"}
                       </label>
                       <input
                         // disabled={!account}

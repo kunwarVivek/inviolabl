@@ -43,14 +43,14 @@ const page = () => {
 
   const router = useRouter();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      router.replace(
-        `https://alpha.inviolabl.io/organization/${currentOrganization?.name}/dashboard`
-      );
-    };
-    handleScroll();
-  }, [currentOrganization]);
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     router.replace(
+  //       `http://localhost:3000/organization/${currentOrganization?.name}/dashboard`
+  //     );
+  //   };
+  //   handleScroll();
+  // }, [currentOrganization]);
 
   const PrivyAccount = useSelector((state: RootState) => state.privy.account);
 
@@ -240,11 +240,11 @@ const page = () => {
     filter === "all"
       ? fileHistory
       : fileHistory.filter(
-          (file) =>
-            file &&
-            file.filename &&
-            file.filename.endsWith(`.${filter.toLowerCase()}`)
-        );
+        (file) =>
+          file &&
+          file.filename &&
+          file.filename.endsWith(`.${filter.toLowerCase()}`)
+      );
 
   const handleFilterChange = (selectedFilter) => {
     setFilter(selectedFilter.toLowerCase());
@@ -313,6 +313,7 @@ const page = () => {
   };
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSharedWithOpen, setIsSharedWithOpen] = useState(false);
   const [fileUrl, setFileURL] = useState("");
 
   const addresses = embeddedWallet?.address;
@@ -504,6 +505,9 @@ const page = () => {
 
       console.log(shareResponse);
       setIsModalOpen(false);
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/counts/${cid}/shared-emails`, { email: selectedEmail }
+      );
       toast.info(`FIle access shared to ${selectedEmail}`, {
         position: toast.POSITION.BOTTOM_RIGHT,
       });
@@ -528,12 +532,36 @@ const page = () => {
     setIsModalOpen(true);
   };
 
+  const closeSharedWithModal = () => {
+    setIsSharedWithOpen(false);
+  };
+
+  const openSharedWithModal = () => {
+    setIsSharedWithOpen(true);
+  };
+
   const [cidHash, setCidHash] = useState("");
 
   const getUploadedBy = (cid) => {
-    const detail = countDetails.find(detail=>detail.cid === cid);
+    const detail = countDetails.find(detail => detail.cid === cid);
     return detail ? detail.email : userDetails?.primaryEmailAddress?.emailAddress;
   }
+
+  const getSharedWith = (cid) => {
+    const detail = countDetails.find((detail) => detail.cid === cid);
+    if (detail && detail.sharedEmails && detail.sharedEmails.length > 0) {
+        return (
+            <ul>
+                {detail.sharedEmails.map((email) => (
+                    <li key={email}>{email}</li>
+                ))}
+            </ul>
+        );
+    } else {
+        return userDetails?.primaryEmailAddress?.emailAddress;
+    }
+};
+
 
   const getDownloadCount = (cid) => {
     const detail = countDetails.find((detail) => detail.cid === cid);
@@ -550,7 +578,7 @@ const page = () => {
   const [validUser, setValidUser] = useState(true);
 
   const validateSelectedEmail = () => {
-    const isValidUser = privyUsers.some(
+    const isValidUser = privyUsers?.some(
       (user) => user?.custom?.customUserId === selectedEmail
     );
     setValidUser(isValidUser);
@@ -563,7 +591,7 @@ const page = () => {
           <table className="min-w-full bg-white ">
             <thead className="bg-white text-black ">
               <tr>
-                <th colSpan={6} className="py-2">
+                <th colSpan={8} className="py-2">
                   <div className="pl-10 py-5 bg-slate-100 text-start space-x-4 mt-14 mb-2">
                     <span className="font-semibold text-xl">File History</span>
                   </div>
@@ -600,6 +628,12 @@ const page = () => {
                   UPLOADED BY
                 </th>
                 <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  SHARED WITH
+                </th>
+                <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  DOWNLOAD
+                </th>
+                <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   NO OF VIEWS
                 </th>
                 <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
@@ -626,31 +660,30 @@ const page = () => {
               {fileInfo?.map((file, index) => (
                 <tr key={index}>
                   <td className="px-5 py-5 pl-10 border-b border-gray-200 bg-white text-sm">
-                    <button
+                    <span className="cursor-pointer"
                       onClick={() => handleFileClick(file.cid, file.mimeType)}
                     >
                       <span>{file.fileName}</span>
-                    </button>
-
-                    <button
-                      onClick={() => downloadFile(file.cid, "/", file.mimeType)}
-                      className="ml-2 hover:text-blue-500"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        height="16"
-                        width="16"
-                        viewBox="0 0 512 512"
-                      >
-                        <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z" />
-                      </svg>
-                    </button>
-
-
-
+                    </span>
                   </td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.fileSizeInBytes}</td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                    {`${(file.fileSizeInBytes / 1024).toFixed(2)} KB`}
+                  </td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getUploadedBy(file.cid)}</td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"><button className="py-2 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold" onClick={() => { openSharedWithModal(); setCidHash(file.cid) }}>Access</button></td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"><button
+                    onClick={() => downloadFile(file.cid, "/", file.mimeType)}
+                    className="ml-2 hover:text-blue-500"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      height="16"
+                      width="16"
+                      viewBox="0 0 512 512"
+                    >
+                      <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z" />
+                    </svg>
+                  </button></td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getViewCount(file.cid)}</td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getDownloadCount(file.cid)}</td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"> <button onClick={() => { openModal(); setCidHash(file.cid) }} className="py-2 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold">
@@ -662,6 +695,44 @@ const page = () => {
             </tbody>
           </table>
         </div>
+        <Transition appear show={isSharedWithOpen} as={Fragment}>
+          <Dialog as="div" className="relative z-10" onClose={closeSharedWithModal}>
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <div className="fixed inset-0 bg-black bg-opacity-25" />
+            </Transition.Child>
+
+            <div className="fixed inset-0 overflow-y-auto">
+              <div className="flex min-h-full items-center justify-center p-4 text-center">
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0 scale-95"
+                  enterTo="opacity-100 scale-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100 scale-100"
+                  leaveTo="opacity-0 scale-95"
+                >
+                  <Dialog.Panel className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all">
+                    <div className="bg-transparent w-full">
+                      <div className="container mx-auto max-w-screen-sm p-6">
+                        <h4 className="underline font-semibold text-base">People With Access</h4>
+                        {getSharedWith(cidHash)}
+                      </div>
+                    </div>
+                  </Dialog.Panel>
+                </Transition.Child>
+              </div>
+            </div>
+          </Dialog>
+        </Transition>
         <Transition appear show={isModalOpen} as={Fragment}>
           <Dialog as="div" className="relative z-10" onClose={closeModal}>
             <Transition.Child

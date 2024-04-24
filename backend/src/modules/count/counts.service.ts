@@ -81,4 +81,21 @@ export class CountsService {
       throw new Error('Failed to increment downloads.');
     }
   }
+
+  async addSharedEmail(cid: string, email: string): Promise<void> {
+    try {
+      const count = await this.getCountByCID(cid);
+      if (count) {
+        count.sharedEmails.push(email);
+        await this.countsRepository.save(count);
+      } else {
+        console.error(`Count with CID ${cid} not found.`);
+        throw new Error(`Count with CID ${cid} not found.`);
+      }
+    } catch (error:any) {
+      console.error('Error adding shared email:', error.message);
+      throw new Error('Failed to add shared email.');
+    }
+  }
+
 }

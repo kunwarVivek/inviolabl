@@ -17,4 +17,11 @@ export class Count {
   @Column()
   email!: string;
 
+  @Column("simple-array")
+    sharedEmails: string[];
+
+    constructor() {
+        this.sharedEmails = []; 
+    }
+
 }

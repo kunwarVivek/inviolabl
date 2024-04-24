@@ -40,12 +40,12 @@ export default function Page() {
     isLoaded,
   } = useOrganization();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      router.replace(`https://alpha.inviolabl.io/organization/${currentOrganization?.name}/sharepage`)
-    };
-    handleScroll()
-  }, [currentOrganization]);
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     router.replace(`http://localhost:3000/organization/${currentOrganization?.name}/sharepage`)
+  //   };
+  //   handleScroll()
+  // }, [currentOrganization]);
 
   const sendInvite = (email) => {
     const newShare = { id: shares.length + 1, email, status: "Invite Sent" };
