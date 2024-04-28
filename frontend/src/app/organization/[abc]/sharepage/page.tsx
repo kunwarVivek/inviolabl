@@ -40,12 +40,12 @@ export default function Page() {
     isLoaded,
   } = useOrganization();
 
-  // useEffect(() => {
-  //   const handleScroll = () => {
-  //     router.replace(`http://localhost:3000/organization/${currentOrganization?.name}/sharepage`)
-  //   };
-  //   handleScroll()
-  // }, [currentOrganization]);
+  useEffect(() => {
+    const handleScroll = () => {
+      router.replace(`https://alpha.inviolabl.io/organization/${currentOrganization?.name}/sharepage`)
+    };
+    handleScroll()
+  }, [currentOrganization]);
 
   const sendInvite = (email) => {
     const newShare = { id: shares.length + 1, email, status: "Invite Sent" };
@@ -128,26 +128,6 @@ export default function Page() {
                 onChange={e => setEmailAddress(e.target.value)}
               />
             </div>
-            {isAdmin && <label className='px-2 cursor-pointer'>
-              <input
-                type="radio"
-                checked={role === 'admin'}
-                onChange={() => {
-                  setRole('admin');
-                }}
-              />{' '}
-              Admin
-            </label>}
-            <label className='px-2 cursor-pointer'>
-              <input
-                type="radio"
-                checked={role === 'basic_member'}
-                onChange={() => {
-                  setRole('basic_member');
-                }}
-              />{' '}
-              Member
-            </label>{' '}
             <button
               type="submit"
               disabled={!emailAddress || disabled}

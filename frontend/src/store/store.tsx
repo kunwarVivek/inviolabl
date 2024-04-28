@@ -8,6 +8,10 @@ import TenantReducer from "@/features/TenantSlice";
 import UserReducer from '../features/LoginSlice';
 import PrivyReducer from '../features/PrivySlice';
 import FileUploadCompleteReducer from '../features/FileUploadCompleteSlice';
+import CountsReducer from '../features/CountsSlice';
+import FileInfoReducer from '../features/FileInfoSlice';
+import SessionReducer from '../features/SessionSlice';
+
 
 
 const reducers = combineReducers({
@@ -16,7 +20,10 @@ const reducers = combineReducers({
   tenant: TenantReducer,
   user: UserReducer,
   privy: PrivyReducer,
-  FileUploadComplete: FileUploadCompleteReducer
+  FileUploadComplete: FileUploadCompleteReducer,
+  counts: CountsReducer,
+  fileInfo: FileInfoReducer,
+  session: SessionReducer,
   
 })
 const persistReducers = persistReducer(

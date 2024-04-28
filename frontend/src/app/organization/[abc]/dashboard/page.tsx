@@ -21,6 +21,9 @@ import { sepolia } from "viem/chains";
 import { setFileUploadComplete } from "@/features/FileUploadCompleteSlice";
 import MagicBellClient, { Notification } from "@magicbell/core";
 import { useRouter } from "next/navigation";
+import { setCounts } from "@/features/CountsSlice";
+import { setFileInfoList } from "@/features/FileInfoSlice";
+import { setSession } from "@/features/SessionSlice";
 
 
 const page = () => {
@@ -43,20 +46,22 @@ const page = () => {
 
   const router = useRouter();
 
-  // useEffect(() => {
-  //   const handleScroll = () => {
-  //     router.replace(
-  //       `http://localhost:3000/organization/${currentOrganization?.name}/dashboard`
-  //     );
-  //   };
-  //   handleScroll();
-  // }, [currentOrganization]);
+  useEffect(() => {
+    const handleScroll = () => {
+      router.replace(
+        `https://alpha.inviolabl.io/organization/${currentOrganization?.name}/dashboard`
+      );
+    };
+    handleScroll();
+  }, [currentOrganization]);
 
   const PrivyAccount = useSelector((state: RootState) => state.privy.account);
 
   console.log(PrivyAccount);
 
   const userDetails = useSelector((state: RootState) => state.user.details);
+  const sessionCheck = useSelector((state: RootState) => state.session);
+
 
   const fileUploadComplete = useSelector(
     (state: RootState) => state.FileUploadComplete.account
@@ -102,6 +107,7 @@ const page = () => {
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/counts`
         );
         setCountDetails(countDet.data);
+        dispatch(setCounts(countDet.data))
 
         const cids = response.data.fileList.map((file) => file.cid);
         const accessPromises = cids.map((cid) =>
@@ -126,6 +132,9 @@ const page = () => {
         const fileInfoList = fileInfos.map((response) => response.data);
         console.log("File Info:", fileInfoList);
         setFileInfo(fileInfoList);
+        dispatch(setFileInfoList(fileInfoList));
+        dispatch(setSession(sessionId))
+
 
         const privyUsersList = await axios.get(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/privy/users`
@@ -138,6 +147,14 @@ const page = () => {
 
     fetchFileDetails();
   }, [downloading, viewing, fileUploadComplete]);
+
+  const fileInfoList = useSelector(
+    (state: RootState) => state.fileInfo);
+
+  const countss = useSelector(
+    (state: RootState) => state.counts);
+
+  console.log(fileInfoList)
 
   console.log(token);
   console.log(email);
@@ -550,17 +567,17 @@ const page = () => {
   const getSharedWith = (cid) => {
     const detail = countDetails.find((detail) => detail.cid === cid);
     if (detail && detail.sharedEmails && detail.sharedEmails.length > 0) {
-        return (
-            <ul>
-                {detail.sharedEmails.map((email) => (
-                    <li key={email}>{email}</li>
-                ))}
-            </ul>
-        );
+      return (
+        <ul>
+          {detail.sharedEmails.map((email) => (
+            <li key={email}>{email}</li>
+          ))}
+        </ul>
+      );
     } else {
-        return userDetails?.primaryEmailAddress?.emailAddress;
+      return userDetails?.primaryEmailAddress?.emailAddress;
     }
-};
+  };
 
 
   const getDownloadCount = (cid) => {
@@ -583,6 +600,11 @@ const page = () => {
     );
     setValidUser(isValidUser);
   };
+
+  const checkSession = sessionCheck === sessionId;
+  console.log(checkSession);
+
+  console.log(sessionId)
 
   return (
     <div className="bg-white min-h-screen">
@@ -657,41 +679,78 @@ const page = () => {
             </thead>
 
             <tbody className="text-gray-700">
-              {fileInfo?.map((file, index) => (
-                <tr key={index}>
-                  <td className="px-5 py-5 pl-10 border-b border-gray-200 bg-white text-sm">
-                    <span className="cursor-pointer"
-                      onClick={() => handleFileClick(file.cid, file.mimeType)}
+              {checkSession ?
+                (fileInfoList?.map((file, index) => (
+                  <tr key={index}>
+                    <td className="px-5 py-5 pl-10 border-b border-gray-200 bg-white text-sm">
+                      <span className="cursor-pointer"
+                        onClick={() => handleFileClick(file.cid, file.mimeType)}
+                      >
+                        <span>{file.fileName}</span>
+                      </span>
+                    </td>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      {`${(file.fileSizeInBytes / 1024).toFixed(2)} KB`}
+                    </td>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getUploadedBy(file.cid)}</td>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"><button className="py-2 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold" onClick={() => { openSharedWithModal(); setCidHash(file.cid) }}>Access</button></td>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"><button
+                      onClick={() => downloadFile(file.cid, "/", file.mimeType)}
+                      className="ml-2 hover:text-blue-500"
                     >
-                      <span>{file.fileName}</span>
-                    </span>
-                  </td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                    {`${(file.fileSizeInBytes / 1024).toFixed(2)} KB`}
-                  </td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getUploadedBy(file.cid)}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"><button className="py-2 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold" onClick={() => { openSharedWithModal(); setCidHash(file.cid) }}>Access</button></td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"><button
-                    onClick={() => downloadFile(file.cid, "/", file.mimeType)}
-                    className="ml-2 hover:text-blue-500"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      height="16"
-                      width="16"
-                      viewBox="0 0 512 512"
-                    >
-                      <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z" />
-                    </svg>
-                  </button></td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getViewCount(file.cid)}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getDownloadCount(file.cid)}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"> <button onClick={() => { openModal(); setCidHash(file.cid) }} className="py-2 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold">
-                    Share
-                  </button></td>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        height="16"
+                        width="16"
+                        viewBox="0 0 512 512"
+                      >
+                        <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z" />
+                      </svg>
+                    </button></td>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getViewCount(file.cid)}</td>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getDownloadCount(file.cid)}</td>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"> <button onClick={() => { openModal(); setCidHash(file.cid) }} className="py-2 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold">
+                      Share
+                    </button></td>
 
-                </tr>
-              ))}
+                  </tr>
+                ))) : (
+                  fileInfo?.map((file, index) => (
+                    <tr key={index}>
+                      <td className="px-5 py-5 pl-10 border-b border-gray-200 bg-white text-sm">
+                        <span className="cursor-pointer"
+                          onClick={() => handleFileClick(file.cid, file.mimeType)}
+                        >
+                          <span>{file.fileName}</span>
+                        </span>
+                      </td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        {`${(file.fileSizeInBytes / 1024).toFixed(2)} KB`}
+                      </td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getUploadedBy(file.cid)}</td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"><button className="py-2 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold" onClick={() => { openSharedWithModal(); setCidHash(file.cid) }}>Access</button></td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"><button
+                        onClick={() => downloadFile(file.cid, "/", file.mimeType)}
+                        className="ml-2 hover:text-blue-500"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          height="16"
+                          width="16"
+                          viewBox="0 0 512 512"
+                        >
+                          <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z" />
+                        </svg>
+                      </button></td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getViewCount(file.cid)}</td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getDownloadCount(file.cid)}</td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"> <button onClick={() => { openModal(); setCidHash(file.cid) }} className="py-2 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold">
+                        Share
+                      </button></td>
+
+                    </tr>
+                  ))
+                )}
             </tbody>
           </table>
         </div>
