@@ -24,6 +24,8 @@ import { useRouter } from "next/navigation";
 import { setCounts } from "@/features/CountsSlice";
 import { setFileInfoList } from "@/features/FileInfoSlice";
 import { setSession } from "@/features/SessionSlice";
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css'
 
 
 const page = () => {
@@ -227,10 +229,10 @@ const page = () => {
 
     fetch(file.fileName).then((response) => {
       response.blob().then((blob) => {
-        // Creating new object of PDF file
+
         const fileURL = window.URL.createObjectURL(blob);
 
-        // Setting various property values
+
         let alink = document.createElement("a");
         alink.href = fileURL;
         alink.download = file.fileName;
@@ -284,45 +286,6 @@ const page = () => {
     );
   }
 
-  // function downloadFile(file) {
-  //   // Replace 'file.cid' with the actual file name or identifier
-  //   const fileName = file.fileName
-  //   const downloadUrl = `https://gateway.lighthouse.storage/ipfs/${file.cid}`;
-
-  //   // Create a temporary link element
-  //   const link = document.createElement('a');
-  //   link.href = downloadUrl;
-  //   link.download = fileName;
-
-  //   // Append the link to the document
-  //   document.body.appendChild(link);
-
-  //   // Trigger the click event to start the download
-  //   link.click();
-
-  //   // Remove the link from the document
-  //   document.body.removeChild(link);
-  // }
-
-  // const downloadFile = async (lighthouse_cid) => {
-  //   const axios = require('axios');
-  //   const lighthouseDealDownloadEndpoint = 'https://gateway.lighthouse.storage/ipfs/';
-
-  //   try {
-  //     let downloadResponse = await axios({
-  //       method: 'GET',
-  //       url: `${lighthouseDealDownloadEndpoint}${lighthouse_cid}`,
-  //       responseType: 'stream',
-  //     });
-
-  //     // Handle the download response as needed
-  //     console.log('Download successful!', downloadResponse);
-  //   } catch (error) {
-  //     // Handle errors
-  //     console.error('Download failed:', error);
-  //   }
-  // };
-
   const uiConfig = {
     title: "Sign",
     description: "Signature",
@@ -346,47 +309,6 @@ const page = () => {
     };
   };
 
-  const decrypt = async () => {
-    // Fetch file encryption key
-    const cid = "QmRJS5VC6qTvuvu47VNuQjKuEZnnPyT3NFRpj9NU6GR7Wf"; //replace with your IPFS CID
-    const { publicKey, signedMessage } = await encryptionSignature();
-    /*
-      fetchEncryptionKey(cid, publicKey, signedMessage)
-        Parameters:
-          CID: CID of the file to decrypt
-          publicKey: public key of the user who has access to file or owner
-          signedMessage: message signed by the owner of publicKey
-    */
-    const keyObject = await lighthouse.fetchEncryptionKey(
-      cid,
-      publicKey,
-      signedMessage
-    );
-
-    // Decrypt file
-    /*
-      decryptFile(cid, key, mimeType)
-        Parameters:
-          CID: CID of the file to decrypt
-          key: the key to decrypt the file
-          mimeType: default null, mime type of file
-    */
-    const fileType = "application/pdf";
-    const decrypted = await lighthouse.decryptFile(
-      cid,
-      keyObject.data.key,
-      fileType
-    );
-    console.log(decrypted);
-    /*
-      Response: blob
-    */
-
-    // View File
-    const url = URL.createObjectURL(decrypted);
-    console.log(url);
-    setFileURL(url);
-  };
 
   const downloadFile = async (cid, path, type) => {
     const eip1193provider = await embeddedWallet?.getEthereumProvider();
@@ -613,7 +535,7 @@ const page = () => {
           <table className="min-w-full bg-white ">
             <thead className="bg-white text-black ">
               <tr>
-                <th colSpan={8} className="py-2">
+                <th colSpan={9} className="py-2">
                   <div className="pl-10 py-5 bg-slate-100 text-start space-x-4 mt-14 mb-2">
                     <span className="font-semibold text-xl">File History</span>
                   </div>
@@ -645,6 +567,9 @@ const page = () => {
                 </th>
                 <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   SIZE
+                </th>
+                <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  TYPE
                 </th>
                 <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   UPLOADED BY
@@ -692,6 +617,10 @@ const page = () => {
                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                       {`${(file.fileSizeInBytes / 1024).toFixed(2)} KB`}
                     </td>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      {file.mimeType === "application/pdf" ? "PDF" :
+                        (file.mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ? "DOCX" : file.mimeType)}
+                    </td>
                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getUploadedBy(file.cid)}</td>
                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"><button className="py-2 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold" onClick={() => { openSharedWithModal(); setCidHash(file.cid) }}>Access</button></td>
                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"><button
@@ -715,41 +644,17 @@ const page = () => {
 
                   </tr>
                 ))) : (
-                  fileInfo?.map((file, index) => (
-                    <tr key={index}>
-                      <td className="px-5 py-5 pl-10 border-b border-gray-200 bg-white text-sm">
-                        <span className="cursor-pointer"
-                          onClick={() => handleFileClick(file.cid, file.mimeType)}
-                        >
-                          <span>{file.fileName}</span>
-                        </span>
-                      </td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                        {`${(file.fileSizeInBytes / 1024).toFixed(2)} KB`}
-                      </td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getUploadedBy(file.cid)}</td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"><button className="py-2 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold" onClick={() => { openSharedWithModal(); setCidHash(file.cid) }}>Access</button></td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"><button
-                        onClick={() => downloadFile(file.cid, "/", file.mimeType)}
-                        className="ml-2 hover:text-blue-500"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          height="16"
-                          width="16"
-                          viewBox="0 0 512 512"
-                        >
-                          <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z" />
-                        </svg>
-                      </button></td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getViewCount(file.cid)}</td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getDownloadCount(file.cid)}</td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"> <button onClick={() => { openModal(); setCidHash(file.cid) }} className="py-2 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold">
-                        Share
-                      </button></td>
-
+                    <tr>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white"><Skeleton /></td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white"><Skeleton /></td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white"><Skeleton /></td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white"><Skeleton /></td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white"><Skeleton /></td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white"><Skeleton /></td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white"><Skeleton /></td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white"><Skeleton /></td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white"><Skeleton /></td>
                     </tr>
-                  ))
                 )}
             </tbody>
           </table>

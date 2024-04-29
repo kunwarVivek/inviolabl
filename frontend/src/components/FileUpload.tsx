@@ -210,11 +210,13 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
     }
 
     let preparing;
-    let uploading;  
+    let uploading;
+    let signingMessage;
+    let transactionMessage;
     try {
       setIsModalOpen(true)
-      preparing = toast.info(
-        "Preparing to upload... Transaction is in process",
+      signingMessage = toast.info(
+        "Signing authentication message...",
         { autoClose: false }
       );
       const encryptionAuth = await signAuthMessage()
@@ -223,10 +225,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
         return
 
       }
-
-      toast.dismiss(preparing)
-
-
+      
       const { signature, signerAddress } = encryptionAuth
 
 
@@ -243,11 +242,13 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       // };
 
       // const txReceipt = await sendTransaction(unsignedTx, uiConfig);
-      uploading = toast.info(
-        "Uploading is in process...",
+
+      toast.dismiss(signingMessage)
+
+      transactionMessage = toast.info(
+        "Transaction initiated",
         { autoClose: false }
       );
-
 
       const tx = await provider.sendTransaction({
         from: embeddedWallet.address as `0x${string}`,
@@ -256,7 +257,12 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
 
       console.log(tx);
 
+      toast.dismiss(transactionMessage)
 
+      uploading = toast.info(
+        "Transaction completed. File uploading is in process.",
+        { autoClose: false }
+      );
 
       const output = await lighthouse.uploadEncrypted(
         file,
@@ -282,15 +288,14 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
         `Decrypt at https://decrypt.mesh3.network/evm/${output.data[0].Hash}`
       )
       await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/counts/${output.data[0].Hash}`, { email: user?.primaryEmailAddress.emailAddress })
-      toast.info('File uploaded successfully', {
-        position: toast.POSITION.BOTTOM_RIGHT,
-      });
       dispatch(setFileUploadComplete(true))
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error uploading encrypted file:", error)
       toast.dismiss(preparing);
       toast.dismiss(uploading);
+      toast.dismiss(signingMessage);
+      toast.dismiss(transactionMessage);
       toast.error("Error due to increase network activity at that time. Please try again.")
       dispatch(setFileUploadComplete(false))
       setUploadFailed(true)
@@ -490,7 +495,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
                           Retry Upload
                         </button>
                       )}
-                      <button
+                      {!loading && <button
                         onClick={(e) => {
                           e.preventDefault();
                           setFiles([]);
@@ -499,7 +504,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
                         className="mt-5 w-full py-2 flex justify-center text-white items-center bg-gray-500 hover:shadow-xl hover:bg-gray-600 rounded-md px-4 text-sm font-semibold"
                       >
                         Cancel
-                      </button>
+                      </button>}
 
                       {/* <button
           type="submit"
