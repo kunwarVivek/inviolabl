@@ -35,35 +35,37 @@ export default function CreateOrganization() {
                 }
             };
 
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/proxy`, {
-                url: "https://manage.g.alchemy.com/api/gasManager/policy",
-                data: gasPolicy,
-                config: {
+            const gasPolicyResponse = await axios.post(
+                "https://manage.g.alchemy.com/api/gasManager/policy",
+                gasPolicy,
+                {
                     headers: {
                         Authorization: `Bearer ${accessKey}`,
                         'Content-Type': 'application/json',
                     },
                     withCredentials: true,
                 }
-            });
-            console.log('Data posted successfully:', response.data.data);
+            );
 
-            const status = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/proxy`, {
-                url: `https://manage.g.alchemy.com/api/gasManager/policy/${response.data.data.policy.policyId}/status`,
-                data: {status: "active"},
-                config: {
+            console.log('Data posted successfully:', gasPolicyResponse.data);
+
+            const statusResponse = await axios.put(
+                `https://manage.g.alchemy.com/api/gasManager/policy/${gasPolicyResponse.data.policy.policyId}/status`,
+                { status: "active" },
+                {
                     headers: {
                         Authorization: `Bearer ${accessKey}`,
                         'Content-Type': 'application/json',
                     },
                     withCredentials: true,
                 }
-            });
-            console.log(status)
+            );
+
+            console.log(statusResponse);
 
             const PolicyData = {
                 "name": organization.id,
-                "gasPolicy": response.data.data.policy.policyId
+                "gasPolicy": gasPolicyResponse.data.data.policy.policyId
             };
 
 
