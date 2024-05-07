@@ -98,7 +98,8 @@ export default function CreateOrganization() {
             {/* <button type="submit">Create organization</button> */}
             <button
                 type="submit"
-                className="py-2 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold">
+                disabled={!organizationName}
+                className={`py-2 flex justify-between text-white items-center bg-[#8364E2] ${organizationName && "hover:shadow-xl hover:bg-purple-700"} rounded-md px-4 text-sm font-semibold`}>
                 <span>Create organization</span>
                 <svg xmlns="http://www.w3.org/2000/svg" className="ms-2 fill-white" height="1em" viewBox="0 0 320 512"><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z" /></svg>
             </button>
