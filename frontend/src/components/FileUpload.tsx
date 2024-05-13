@@ -290,6 +290,8 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/counts/${output.data[0].Hash}`, { email: user?.primaryEmailAddress.emailAddress })
       dispatch(setFileUploadComplete(true))
       setIsModalOpen(false);
+      setFileName("No File selected")
+      setFileSize(null)
     } catch (error) {
       console.error("Error uploading encrypted file:", error)
       toast.dismiss(preparing);
@@ -303,8 +305,8 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
     } finally {
       setLoading(false);
       // setIsModalOpen(false);
-      setFileName("No File selected")
-      setFileSize(null)
+      // setFileName("No File selected")
+      // setFileSize(null)
 
     }
   }
@@ -471,7 +473,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
                         {loading ? "It will be a long running process, please have patience.." : "Choose File"}
                       </label>
                       <input
-                        // disabled={!account}
+                        disabled={loading}
                         type="file"
                         className="hidden"
                         id="file-upload"
