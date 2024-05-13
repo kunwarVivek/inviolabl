@@ -292,6 +292,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       setIsModalOpen(false);
       setFileName("No File selected")
       setFileSize(null)
+      setLoading(false);
     } catch (error) {
       console.error("Error uploading encrypted file:", error)
       toast.dismiss(preparing);
@@ -303,7 +304,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       setUploadFailed(true)
       throw new Error('File upload Error');
     } finally {
-      setLoading(false);
+      // setLoading(false);
       // setIsModalOpen(false);
       // setFileName("No File selected")
       // setFileSize(null)
