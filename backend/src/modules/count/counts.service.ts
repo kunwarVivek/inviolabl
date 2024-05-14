@@ -8,10 +8,14 @@ export class CountsService {
   constructor(
     @InjectRepository(Count)
     private countsRepository: Repository<Count>,
-  ) {}
+  ) { }
 
   async getAllCounts(): Promise<Count[]> {
-    return this.countsRepository.find();
+    return this.countsRepository.find({
+      order: {
+        id: 'DESC'
+      }
+    });
   }
 
   async getCountByCID(cid: string): Promise<Count> {
@@ -22,7 +26,7 @@ export class CountsService {
       console.error(`Count with CID ${cid} not found.`);
       throw new Error(`Count with CID ${cid} not found.`);
     }
-  }  
+  }
 
   async getByCID(cid: string): Promise<Count | false> {
     try {
@@ -33,12 +37,15 @@ export class CountsService {
     }
   }
 
-  async createCountWithInitialCounts(cid: string, email:string): Promise<void> {
+  async createCountWithInitialCounts(cid: string, email: string, filename: string, filesize: number, filetype: string): Promise<void> {
     const count = new Count();
     count.cid = cid;
     count.views = 0;
     count.downloads = 0;
     count.email = email;
+    count.filename = filename;
+    count.filesize = filesize;
+    count.filetype = filetype;
     await this.countsRepository.save(count);
   }
 
@@ -61,7 +68,7 @@ export class CountsService {
       }
       count.views++;
       await this.countsRepository.save(count);
-    } catch (error:any) {
+    } catch (error: any) {
       console.error('Error incrementing views:', error.message);
       throw new Error('Failed to increment views.');
     }
@@ -76,7 +83,7 @@ export class CountsService {
       }
       count.downloads++;
       await this.countsRepository.save(count);
-    } catch (error:any) {
+    } catch (error: any) {
       console.error('Error incrementing downloads:', error.message);
       throw new Error('Failed to increment downloads.');
     }
@@ -92,10 +99,21 @@ export class CountsService {
         console.error(`Count with CID ${cid} not found.`);
         throw new Error(`Count with CID ${cid} not found.`);
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.error('Error adding shared email:', error.message);
       throw new Error('Failed to add shared email.');
     }
   }
+
+  async getCountsByEmail(email: string): Promise<Count[] | undefined> {
+    try {
+      const counts = await this.countsRepository.find({ where: { email }, order: {id: "DESC"} });
+      return counts;
+    } catch (error: any) {
+      console.error(`Error finding counts by email ${email}:`, error.message);
+      throw new Error(`Failed to find counts by email ${email}.`);
+    }
+  }
+
 
 }

@@ -92,49 +92,56 @@ const page = () => {
   const [downloading, setDownloading] = useState(false);
   const [viewing, setViewing] = useState(false);
   const [token, setToken] = useState("");
+  const [fileShared, setFileShared] = useState(false)
 
   useEffect(() => {
     const fetchFileDetails = async () => {
       dispatch(setFileUploadComplete(false));
       setDownloading(false);
+      setFileShared(false)
       setViewing(false);
       try {
-        const token = await getToken()
-        setToken(token)
-        const response = await lighthouse.getUploads('87ea616b.7316eb2b3fad435f9e5618aca682acb8')
-        console.log(response)
-        setFileDetails(response.data.fileList)
+        // const token = await getToken()
+        // setToken(token)
+        // const response = await lighthouse.getUploads('87ea616b.7316eb2b3fad435f9e5618aca682acb8')
+        // console.log(response)
+        // setFileDetails(response.data.fileList)
+
+        const filedetails = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/counts/emails/${userDetails?.primaryEmailAddress?.emailAddress}`
+        );
 
         const countDet = await axios.get(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/counts`
         );
+
         setCountDetails(countDet.data);
         dispatch(setCounts(countDet.data))
 
-        const cids = response.data.fileList.map((file) => file.cid);
-        const accessPromises = cids.map((cid) =>
-          lighthouse.getAccessConditions(cid)
-        );
-        const accessResponses = await Promise.all(accessPromises);
-        const accessData = accessResponses.map((response) => response.data);
-        setAccessData(accessData);
+        // const cids = countDet.data.map((file) => file.cid);
+        // const accessPromises = cids.map((cid) =>
+        //   lighthouse.getAccessConditions(cid)
+        // );
+        // const accessResponses = await Promise.all(accessPromises);
+        // const accessData = accessResponses.map((response) => response.data);
+        // setAccessData(accessData);
 
-        const matchedAccess = accessData.filter((access) => {
-          return (
-            access.owner == Number(PrivyAccount) ||
-            access.sharedTo.some((account) => account == Number(PrivyAccount))
-          );
-        });
-        console.log("Matched Access Data:", matchedAccess);
-        setMatchedAccessData(matchedAccess);
+        // const matchedAccess = accessData.filter((access) => {
+        //   return (
+        //     access.owner == Number(PrivyAccount) ||
+        //     access.sharedTo.some((account) => account == Number(PrivyAccount))
+        //   );
+        // });
+        // console.log("Matched Access Data:", matchedAccess);
+        // setMatchedAccessData(matchedAccess);
 
-        const fileInfos = await Promise.all(
-          matchedAccess.map((access) => lighthouse.getFileInfo(access.cid))
-        );
-        const fileInfoList = fileInfos.map((response) => response.data);
-        console.log("File Info:", fileInfoList);
-        setFileInfo(fileInfoList);
-        dispatch(setFileInfoList(fileInfoList));
+        // const fileInfos = await Promise.all(
+        //   matchedAccess.map((access) => lighthouse.getFileInfo(access.cid))
+        // );
+        // const fileInfoList = fileInfos.map((response) => response.data);
+        // console.log("File Info:", fileInfoList);
+        setFileInfo(filedetails.data);
+        dispatch(setFileInfoList(filedetails.data));
         dispatch(setSession(sessionId))
 
 
@@ -148,7 +155,7 @@ const page = () => {
     };
 
     fetchFileDetails();
-  }, [downloading, viewing, fileUploadComplete]);
+  }, [downloading, viewing, fileUploadComplete, fileShared]);
 
   const fileInfoList = useSelector(
     (state: RootState) => state.fileInfo);
@@ -447,6 +454,7 @@ const page = () => {
       await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/counts/${cid}/shared-emails`, { email: selectedEmail }
       );
+      setFileShared(true)
       toast.info(`FIle access shared to ${selectedEmail}`, {
         position: toast.POSITION.BOTTOM_RIGHT,
       });
@@ -604,27 +612,27 @@ const page = () => {
             </thead>
 
             <tbody className="text-gray-700">
-              {checkSession ?
+              {checkSession && fileInfoList.length != 0 ?
                 (fileInfoList?.map((file, index) => (
                   <tr key={index}>
                     <td className="px-5 py-5 pl-10 border-b border-gray-200 bg-white text-sm">
                       <span className="cursor-pointer"
-                        onClick={() => handleFileClick(file.cid, file.mimeType)}
+                        onClick={() => handleFileClick(file.cid, file.filetype)}
                       >
-                        <span>{file.fileName}</span>
+                        <span>{file.filename}</span>
                       </span>
                     </td>
                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                      {`${(file.fileSizeInBytes / 1024).toFixed(2)} KB`}
+                      {`${(file.filesize / 1024).toFixed(2)} KB`}
                     </td>
                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                      {file.mimeType === "application/pdf" ? "PDF" :
-                        (file.mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ? "DOCX" : file.mimeType)}
+                      {file.filetype === "application/pdf" ? "PDF" :
+                        (file.filetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ? "DOCX" : file.filetype)}
                     </td>
                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getUploadedBy(file.cid)}</td>
                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"><button className="py-2 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold" onClick={() => { openSharedWithModal(); setCidHash(file.cid) }}>Access</button></td>
                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"><button
-                      onClick={() => downloadFile(file.cid, "/", file.mimeType)}
+                      onClick={() => downloadFile(file.cid, "/", file.filetype)}
                       className="ml-2 hover:text-blue-500"
                     >
                       <svg
@@ -644,17 +652,11 @@ const page = () => {
 
                   </tr>
                 ))) : (
-                    <tr>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white"><Skeleton /></td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white"><Skeleton /></td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white"><Skeleton /></td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white"><Skeleton /></td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white"><Skeleton /></td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white"><Skeleton /></td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white"><Skeleton /></td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white"><Skeleton /></td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white"><Skeleton /></td>
-                    </tr>
+                  <tr>
+                    <td colSpan={9} className="text-center py-5">
+                      No files to display
+                    </td>
+                  </tr>
                 )}
             </tbody>
           </table>
@@ -757,7 +759,7 @@ const page = () => {
                         )}
                         <button
                           disabled={!selectedEmail || !validUser}
-                          onClick={() => shareFile(cidHash)}
+                          onClick={() => { shareFile(cidHash) }}
                           className="py-2 mt-5 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold"
                         >
                           <span>Share</span>

@@ -287,7 +287,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
       console.log(
         `Decrypt at https://decrypt.mesh3.network/evm/${output.data[0].Hash}`
       )
-      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/counts/${output.data[0].Hash}`, { email: user?.primaryEmailAddress.emailAddress })
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/counts/${output.data[0].Hash}`, { email: user?.primaryEmailAddress.emailAddress, filename: file[0].name, filesize: file[0].size, filetype: file[0].type })
       dispatch(setFileUploadComplete(true))
       setIsModalOpen(false);
       setFileName("No File selected")
@@ -347,7 +347,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
     setTotalSize((prevTotalSize) => prevTotalSize + sizeOfNewFiles);
   };
 
-  console.log(fileSize)
+  console.log(files)
 
   const removeFile = (fileName: string) => {
     setFiles(files.filter((file) => file.name !== fileName));

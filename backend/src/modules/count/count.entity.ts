@@ -20,8 +20,20 @@ export class Count {
   @Column("simple-array")
     sharedEmails: string[];
 
+  @Column()
+  filename!: string;
+
+  @Column()
+  filesize!: number;
+
+  @Column()
+  filetype!: string;
+  
     constructor() {
-        this.sharedEmails = []; 
-    }
+      this.sharedEmails = [];
+      this.filename = ""; 
+      this.filesize = 0; 
+      this.filetype = ""; 
+    }  
 
 }

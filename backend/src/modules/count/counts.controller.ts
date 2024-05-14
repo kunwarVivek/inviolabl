@@ -6,7 +6,7 @@ import { SentryInterceptor } from '../../interceptors/sentry-interceptor.service
 @UseInterceptors(SentryInterceptor)
 @Controller('counts')
 export class CountsController {
-  constructor(private readonly countsService: CountsService) {}
+  constructor(private readonly countsService: CountsService) { }
 
   @Get()
   async getAllCounts(): Promise<Count[]> {
@@ -34,16 +34,25 @@ export class CountsController {
   }
 
   @Post(':cid')
-  async createCount(@Param('cid') cid: string, @Body('email') email:string): Promise<void> {
+  async createCount(
+    @Param('cid') cid: string,
+    @Body() body: { email: string, filename: string, filesize: number, filetype: string }
+  ): Promise<void> {
+    const { email, filename, filesize, filetype } = body;
     const existingCount = await this.countsService.getByCID(cid);
     if (!existingCount) {
-      await this.countsService.createCountWithInitialCounts(cid, email);
+      await this.countsService.createCountWithInitialCounts(cid, email, filename, filesize, filetype);
     }
   }
 
   @Post(':cid/shared-emails')
   async addSharedEmail(@Param('cid') cid: string, @Body('email') email: string): Promise<void> {
     await this.countsService.addSharedEmail(cid, email);
+  }
+
+  @Get('emails/:email')
+  async getCountsByEmail(@Param('email') email: string): Promise<Count[] | undefined> {
+    return this.countsService.getCountsByEmail(email);
   }
 
 }
