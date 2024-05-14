@@ -46,6 +46,19 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
 
   const dispatch = useDispatch()
 
+  const { signMessage } = usePrivy();
+
+  const { membershipList, membership } = useOrganization({
+    membershipList: {},
+  });
+
+  const isAdmin = (m) => m.role === "admin";
+
+  const adminMember = membershipList ? membershipList.find(isAdmin) : null;
+
+  const adminIdentifier = adminMember ? adminMember.publicUserData.identifier : null;
+
+  console.log(adminIdentifier)
 
   const MetaMaskAccount = useSelector(
     (state: RootState) => state.metaMask.account
@@ -86,6 +99,11 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
   }
 
 
+  const uiConfig = {
+    title: "Sign",
+    description: "Signature",
+    buttonText: "Confirm",
+  };
 
   // const uploadFile = async (file) => {
   //   setFileName(file[0].name)
@@ -225,7 +243,7 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
         return
 
       }
-      
+
       const { signature, signerAddress } = encryptionAuth
 
 
@@ -282,12 +300,43 @@ const FileUpload = ({ isModalOpen, setIsModalOpen }) => {
         }
       */
       // If successful, log the URL for accessing the file
-      toast.dismiss(uploading)
 
       console.log(
         `Decrypt at https://decrypt.mesh3.network/evm/${output.data[0].Hash}`
       )
+
+      const privyUsersList = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/privy/users`
+      );
+
+      const adminuser = privyUsersList.data.privyUsers.find(
+        (user) => user?.custom?.customUserId == adminIdentifier
+      );
+
+      console.log(adminuser);
+
+
+      const messageRequested = (
+        await lighthouse.getAuthMessage(embeddedWallet.address)
+      ).data.message;
+
+      const signedMessage = await signMessage(messageRequested, uiConfig);
+      const publicKeyUserB = [adminuser.wallet.address];
+      const addresses = embeddedWallet?.address
+      const cid = output.data[0].Hash
+      const shareResponse = await lighthouse.shareFile(
+        addresses,
+        publicKeyUserB,
+        cid,
+        signedMessage
+      )
+      console.log(shareResponse)
       await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/counts/${output.data[0].Hash}`, { email: user?.primaryEmailAddress.emailAddress, filename: file[0].name, filesize: file[0].size, filetype: file[0].type })
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/counts/${output.data[0].Hash}/shared-emails`, { email: adminIdentifier }
+      );
+      toast.dismiss(uploading)
+
       dispatch(setFileUploadComplete(true))
       setIsModalOpen(false);
       setFileName("No File selected")

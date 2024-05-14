@@ -82,7 +82,7 @@ export default function Page() {
         organizationId: organization.id,
         inviterUserId: user.id,
         role: role,
-        redirectUrl: `http://localhost:3000/organization/${organization.name}/dashboard`
+        redirectUrl: `https://alpha.inviolabl.io/organization/${organization.name}/dashboard`
       };
       const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/clerk/invite-user`, inviteData);
       console.log(response.data.message);
