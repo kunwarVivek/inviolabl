@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { Count } from './count.entity';
 
 @Injectable()
@@ -107,7 +107,13 @@ export class CountsService {
 
   async getCountsByEmail(email: string): Promise<Count[] | undefined> {
     try {
-      const counts = await this.countsRepository.find({ where: { email }, order: {id: "DESC"} });
+      const counts = await this.countsRepository.find({
+        where: [
+          { email: Like(`%${email}%`) },
+          { sharedEmails: Like(`%${email}%`) }
+        ],
+        order: { id: "DESC" }
+      });
       return counts;
     } catch (error: any) {
       console.error(`Error finding counts by email ${email}:`, error.message);
