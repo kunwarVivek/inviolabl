@@ -24,8 +24,9 @@ import { useRouter } from "next/navigation";
 import { setCounts } from "@/features/CountsSlice";
 import { setFileInfoList } from "@/features/FileInfoSlice";
 import { setSession } from "@/features/SessionSlice";
-import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css'
+// import Skeleton from 'react-loading-skeleton';
+// import 'react-loading-skeleton/dist/skeleton.css'
+import { Span } from "@sentry/nextjs";
 
 
 const page = () => {
@@ -37,6 +38,8 @@ const page = () => {
   const [loading, setLoading] = useState(false);
   const [triggerEffect, setTriggerEffect] = useState(false);
   const [triggerDownload, setTriggerDownload] = useState(false);
+  const [fileOwner, setFileOwner] = useState("")
+  const [shareFileName, setShareFileName] = useState("")
   const dispatch = useDispatch();
 
   console.log(data);
@@ -140,15 +143,16 @@ const page = () => {
         // );
         // const fileInfoList = fileInfos.map((response) => response.data);
         // console.log("File Info:", fileInfoList);
+        const privyUsersList = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/privy/users`
+        );
+        setPrivyUsers(privyUsersList.data.privyUsers);
         setFileInfo(filedetails.data);
         dispatch(setFileInfoList(filedetails.data));
         dispatch(setSession(sessionId))
 
 
-        const privyUsersList = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/privy/users`
-        );
-        setPrivyUsers(privyUsersList.data.privyUsers);
+
       } catch (error) {
         console.error(`Error retrieving file details: ${error.message}`);
       }
@@ -426,7 +430,7 @@ const page = () => {
 
   console.log(selectedEmail);
 
-  const shareFile = async (cidHash: any) => {
+  const shareFile = async (cidHash: any, filename:any, fileowner:any) => {
     try {
       const cid = cidHash;
       const publicKey = embeddedWallet.address;
@@ -460,7 +464,7 @@ const page = () => {
       });
       const not = Notification.create({
         title: "File Access Granted.",
-        content: `You can now view shared files under dashboard `,
+        content: `You can now view ${filename} file shared by ${fileowner} under dashboard `,
         recipients: [{ email: selectedEmail }],
       });
     } catch (error) {
@@ -629,7 +633,7 @@ const page = () => {
                       {file.filetype === "application/pdf" ? "PDF" :
                         (file.filetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ? "DOCX" : file.filetype)}
                     </td>
-                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getUploadedBy(file.cid)}</td>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.email}</td>
                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"><button className="py-2 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold" onClick={() => { openSharedWithModal(); setCidHash(file.cid) }}>Access</button></td>
                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"><button
                       onClick={() => downloadFile(file.cid, "/", file.filetype)}
@@ -644,11 +648,11 @@ const page = () => {
                         <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z" />
                       </svg>
                     </button></td>
-                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getViewCount(file.cid)}</td>
-                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{getDownloadCount(file.cid)}</td>
-                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm"> <button onClick={() => { openModal(); setCidHash(file.cid) }} className="py-2 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold">
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.views}</td>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.downloads}</td>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{file.email != userDetails?.primaryEmailAddress?.emailAddress ? (<span className="flex justify-center">-</span>) : (<button onClick={() => { openModal(); setCidHash(file.cid); setFileOwner(file.email); setShareFileName(file.filename) }} className="py-2 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold">
                       Share
-                    </button></td>
+                    </button>)} </td>
 
                   </tr>
                 ))) : (
@@ -743,7 +747,7 @@ const page = () => {
                           />
                           {selectedEmail?.length > 0 && (
                             <datalist id="emailList">
-                              {privyUsers.map((user) => (
+                              {privyUsers?.map((user) => (
                                 <option
                                   key={user?.id}
                                   value={user?.custom?.customUserId}
@@ -759,7 +763,7 @@ const page = () => {
                         )}
                         <button
                           disabled={!selectedEmail || !validUser}
-                          onClick={() => { shareFile(cidHash) }}
+                          onClick={() => { shareFile(cidHash,shareFileName,fileOwner) }}
                           className="py-2 mt-5 flex justify-between text-white items-center bg-[#8364E2] hover:shadow-xl hover:bg-purple-700 rounded-md px-4 text-sm font-semibold"
                         >
                           <span>Share</span>
